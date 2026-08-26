@@ -108,5 +108,55 @@ namespace GreenCityReporter.Controllers
                 new { id = reportId }
             );
         }
+        // POST: /Admin/AddComment
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddComment(int reportId, string message)
+        {
+            var admin = await _userManager.GetUserAsync(User);
+
+            if (admin == null)
+            {
+                return Challenge();
+            }
+
+            var report = await _context.Reports
+                .FirstOrDefaultAsync(r => r.Id == reportId);
+
+            if (report == null)
+            {
+                return NotFound();
+            }
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                TempData["CommentError"] = "Comment cannot be empty.";
+
+                return RedirectToAction(nameof(Report), new { id = reportId });
+            }
+
+            if (message.Length > 1000)
+            {
+                TempData["CommentError"] = "Comment cannot exceed 1000 characters.";
+
+                return RedirectToAction(nameof(Report), new { id = reportId });
+            }
+
+            var comment = new Comment
+            {
+                ReportId = reportId,
+                UserId = admin.Id,
+                Message = message.Trim(),
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Comments.Add(comment);
+
+            await _context.SaveChangesAsync();
+
+            TempData["CommentSuccess"] = "Comment added successfully.";
+
+            return RedirectToAction(nameof(Report), new { id = reportId });
+        }
     }
 }

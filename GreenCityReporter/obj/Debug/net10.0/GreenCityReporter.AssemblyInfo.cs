@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GreenCityReporter")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+be7ffde5abe08ad4ee4b7930b8f784d92b804731")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f7cda270f449d0a736e2989fe18a4e60d7fef905")]
 [assembly: System.Reflection.AssemblyProductAttribute("GreenCityReporter")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GreenCityReporter")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
