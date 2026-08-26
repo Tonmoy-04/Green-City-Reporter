@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using GreenCityReporter.Models.Enums;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace GreenCityReporter.Models
 {
@@ -42,9 +43,11 @@ namespace GreenCityReporter.Models
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation Properties
+        [ValidateNever]
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; } = null!;
 
+        [ValidateNever]
         [ForeignKey("CategoryId")]
         public Category Category { get; set; } = null!;
 

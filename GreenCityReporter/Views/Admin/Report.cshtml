@@ -1,0 +1,449 @@
+﻿@model GreenCityReporter.Models.Report
+
+@{
+    ViewData["Title"] = "Manage Report";
+}
+
+<div class="container py-5">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success rounded-3 mb-4">
+            <i class="fa-solid fa-check-circle me-2"></i>
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1 class="fw-bold mb-1">
+                Manage Report
+            </h1>
+
+            <p class="text-muted mb-0">
+                @Model.TrackingNumber
+            </p>
+        </div>
+
+        <a asp-controller="Admin"
+           asp-action="Index"
+           class="btn btn-outline-secondary rounded-pill px-4">
+
+            <i class="fa-solid fa-arrow-left me-2"></i>
+            All Reports
+
+        </a>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- Report Information -->
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+
+                        <div>
+
+                            <small class="text-muted">
+                                Tracking Number
+                            </small>
+
+                            <h5 class="fw-bold text-success">
+                                @Model.TrackingNumber
+                            </h5>
+
+                        </div>
+
+                        <span class="badge bg-secondary px-3 py-2">
+                            @Model.CurrentStatus
+                        </span>
+
+                    </div>
+
+                    <h2 class="fw-bold mb-4">
+                        @Model.Title
+                    </h2>
+
+                    @if (!string.IsNullOrEmpty(Model.ImagePath))
+                    {
+                        <div class="mb-4">
+
+                            <img src="@Model.ImagePath"
+                                 alt="Report image"
+                                 class="img-fluid rounded-4 shadow-sm"
+                                 style="max-height:450px;width:100%;object-fit:cover;" />
+
+                        </div>
+                    }
+
+                    <div class="mb-4">
+
+                        <h6 class="fw-bold">
+                            Description
+                        </h6>
+
+                        <p class="text-muted">
+                            @Model.Description
+                        </p>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <h6 class="fw-bold">
+                            <i class="fa-solid fa-location-dot me-2 text-danger"></i>
+                            Address
+                        </h6>
+
+                        <p class="text-muted mb-0">
+                            @Model.Address
+                        </p>
+
+                    </div>
+
+                    <hr />
+
+                    <div class="row mt-3">
+
+                        <div class="col-md-4">
+
+                            <small class="text-muted d-block">
+                                Category
+                            </small>
+
+                            <strong>
+                                @Model.Category?.Name
+                            </strong>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <small class="text-muted d-block">
+                                Citizen
+                            </small>
+
+                            <strong>
+                                @Model.User?.FullName
+                            </strong>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <small class="text-muted d-block">
+                                Submitted
+                            </small>
+
+                            <strong>
+                                @Model.CreatedAt
+                                .ToLocalTime()
+                                .ToString("dd MMM yyyy, hh:mm tt")
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Status History -->
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-header bg-white border-0 p-4">
+
+                    <h5 class="fw-bold mb-0">
+                        <i class="fa-solid fa-clock-rotate-left me-2 text-success"></i>
+                        Status History
+                    </h5>
+
+                </div>
+
+                <div class="card-body p-4">
+
+                    @if (Model.StatusHistories.Any())
+                    {
+                        @foreach (var history in Model.StatusHistories
+                            .OrderByDescending(h => h.UpdatedAt))
+                        {
+                            <div class="border-bottom pb-3 mb-3">
+
+                                <div class="d-flex justify-content-between">
+
+                                    <strong>
+                                        @history.PreviousStatus
+                                        →
+                                        @history.NewStatus
+                                    </strong>
+
+                                    <small class="text-muted">
+                                        @history.UpdatedAt
+                                        .ToLocalTime()
+                                        .ToString("dd MMM yyyy, hh:mm tt")
+                                    </small>
+
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(history.Remarks))
+                                {
+                                    <p class="text-muted small mt-2 mb-0">
+                                        @history.Remarks
+                                    </p>
+                                }
+
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">
+                            No status changes have been made yet.
+                        </p>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+        <!-- Comments -->
+
+        <div class="card border-0 shadow-sm rounded-4 mt-4">
+
+            <div class="card-header bg-white border-0 p-4">
+
+                <h5 class="fw-bold mb-0">
+                    <i class="fa-solid fa-comments me-2 text-success"></i>
+                    Comments
+                </h5>
+
+            </div>
+
+            <div class="card-body p-4">
+
+                @if (TempData["CommentSuccess"] != null)
+                {
+                    <div class="alert alert-success rounded-3">
+                        <i class="fa-solid fa-check-circle me-2"></i>
+                        @TempData["CommentSuccess"]
+                    </div>
+                }
+
+                @if (TempData["CommentError"] != null)
+                {
+                    <div class="alert alert-danger rounded-3">
+                        <i class="fa-solid fa-circle-exclamation me-2"></i>
+                        @TempData["CommentError"]
+                    </div>
+                }
+
+
+                <!-- Existing Comments -->
+                @if (Model.Comments != null && Model.Comments.Any())
+                {
+                    @foreach (var comment in Model.Comments
+                        .OrderByDescending(c => c.CreatedAt))
+                    {
+                        <div class="border-bottom pb-3 mb-3">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <div>
+                                    <strong>
+                                        @comment.User?.FullName
+                                    </strong>
+                                </div>
+
+                                <small class="text-muted">
+                                    @comment.CreatedAt
+                                    .ToLocalTime()
+                                    .ToString("dd MMM yyyy, hh:mm tt")
+                                </small>
+
+                            </div>
+
+                            <p class="text-muted mt-2 mb-0">
+                                @comment.Message
+                            </p>
+
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center py-4">
+
+                        <i class="fa-regular fa-comment-dots fa-2x text-muted mb-3"></i>
+
+                        <p class="text-muted mb-0">
+                            No comments yet.
+                        </p>
+
+                    </div>
+                }
+
+
+                <!-- Admin Add Comment Form -->
+
+                <div class="border-top pt-4 mt-4">
+
+                    <h6 class="fw-bold mb-3">
+                        Add Admin Comment
+                    </h6>
+
+                    <form asp-controller="Admin"
+                          asp-action="AddComment"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="reportId"
+                               value="@Model.Id" />
+
+                        <div class="mb-3">
+
+                            <textarea name="message"
+                                      class="form-control"
+                                      rows="4"
+                                      maxlength="1000"
+                                      placeholder="Write an update or message to the citizen..."
+                                      required></textarea>
+
+                            <div class="form-text">
+                                Maximum 1000 characters.
+                            </div>
+
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-success rounded-pill px-4">
+
+                            <i class="fa-solid fa-paper-plane me-2"></i>
+                            Add Comment
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Admin Controls -->
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-header bg-white border-0 p-4">
+
+                    <h5 class="fw-bold mb-0">
+                        <i class="fa-solid fa-sliders me-2 text-success"></i>
+                        Update Report
+                    </h5>
+
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form asp-controller="Admin"
+                          asp-action="UpdateStatus"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="reportId"
+                               value="@Model.Id" />
+
+                        <!-- Status -->
+                        <div class="mb-4">
+
+                            <label class="form-label fw-medium">
+                                Status
+                            </label>
+
+                            <select name="newStatus"
+                                    class="form-select">
+
+                                @foreach (var status in Enum.GetValues<GreenCityReporter.Models.Enums.ReportStatus>())
+                                {
+                                    <option value="@status"
+                                            selected="@(status == Model.CurrentStatus)">
+                                        @status
+                                    </option>
+                                }
+
+                            </select>
+
+                        </div>
+
+                        <!-- Priority -->
+                        <div class="mb-4">
+
+                            <label class="form-label fw-medium">
+                                Priority
+                            </label>
+
+                            <select name="priority"
+                                    class="form-select">
+
+                                @foreach (var priority in Enum.GetValues<GreenCityReporter.Models.Enums.Priority>())
+                                {
+                                    <option value="@priority"
+                                            selected="@(priority == Model.Priority)">
+                                        @priority
+                                    </option>
+                                }
+
+                            </select>
+
+                        </div>
+
+                        <!-- Remarks -->
+                        <div class="mb-4">
+
+                            <label class="form-label fw-medium">
+                                Remarks
+                            </label>
+
+                            <textarea name="remarks"
+                                      class="form-control"
+                                      rows="4"
+                                      maxlength="500"
+                                      placeholder="Add remarks about this update..."></textarea>
+
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-success w-100 rounded-pill py-2">
+
+                            <i class="fa-solid fa-save me-2"></i>
+                            Update Report
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

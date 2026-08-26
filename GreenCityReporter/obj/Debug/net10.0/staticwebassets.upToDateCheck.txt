@@ -61,6 +61,7 @@ wwwroot\lib\jquery\dist\jquery.slim.js
 wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
+wwwroot\uploads\reports\c6d16129-a3e7-43f9-a8b0-e44d2321fd2d.png
 D:\Green City Reporter\GreenCityReporter\wwwroot\lib\jquery\LICENSE.txt
 D:\Green City Reporter\GreenCityReporter\wwwroot\lib\jquery\dist\jquery.slim.min.map
 D:\Green City Reporter\GreenCityReporter\wwwroot\lib\jquery\dist\jquery.slim.min.js

@@ -3,44 +3,36 @@
   "WorkspaceRootPath": "D:\\Green City Reporter\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Green City Reporter\\GreenCityReporter\\Migrations\\20260826175323_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:GreenCityReporter\\Migrations\\20260826175323_InitialCreate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\views\\admin\\report.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\views\\admin\\report.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Green City Reporter\\GreenCityReporter\\Migrations\\20260826115645_UpdateApplicationModel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:GreenCityReporter\\Migrations\\20260826115645_UpdateApplicationModel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\controllers\\admincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\data\\databaseseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\data\\databaseseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\views\\admin\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\views\\admin\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\views\\report\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\views\\report\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\controllers\\reportcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\controllers\\reportcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\views\\report\\myreports.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\views\\report\\myreports.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\models\\category.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\models\\category.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\models\\statushistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\models\\statushistory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\wwwroot\\css\\site.css||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\wwwroot\\css\\site.css||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\views\\shared\\_layout.cshtml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\views\\shared\\_layout.cshtml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\views\\home\\index.cshtml||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\views\\home\\index.cshtml||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
   "DocumentGroupContainers": [
@@ -50,68 +42,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "20260826175323_InitialCreate.cs",
-              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Migrations\\20260826175323_InitialCreate.cs",
-              "RelativeDocumentMoniker": "GreenCityReporter\\Migrations\\20260826175323_InitialCreate.cs",
-              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Migrations\\20260826175323_InitialCreate.cs",
-              "RelativeToolTip": "GreenCityReporter\\Migrations\\20260826175323_InitialCreate.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAB4AAAARAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-26T17:53:24.029Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "20260826115645_UpdateApplicationModel.cs",
-              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Migrations\\20260826115645_UpdateApplicationModel.cs",
-              "RelativeDocumentMoniker": "GreenCityReporter\\Migrations\\20260826115645_UpdateApplicationModel.cs",
-              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Migrations\\20260826115645_UpdateApplicationModel.cs",
-              "RelativeToolTip": "GreenCityReporter\\Migrations\\20260826115645_UpdateApplicationModel.cs",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-26T11:56:45.839Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "DatabaseSeeder.cs",
-              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Data\\DatabaseSeeder.cs",
-              "RelativeDocumentMoniker": "GreenCityReporter\\Data\\DatabaseSeeder.cs",
-              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Data\\DatabaseSeeder.cs",
-              "RelativeToolTip": "GreenCityReporter\\Data\\DatabaseSeeder.cs",
-              "ViewState": "AgIAAGUAAAAAAAAAAAAAAIsAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-26T11:00:28.453Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Category.cs",
-              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Models\\Category.cs",
-              "RelativeDocumentMoniker": "GreenCityReporter\\Models\\Category.cs",
-              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Models\\Category.cs",
-              "RelativeToolTip": "GreenCityReporter\\Models\\Category.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-26T10:49:52.662Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "StatusHistory.cs",
-              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Models\\StatusHistory.cs",
-              "RelativeDocumentMoniker": "GreenCityReporter\\Models\\StatusHistory.cs",
-              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Models\\StatusHistory.cs",
-              "RelativeToolTip": "GreenCityReporter\\Models\\StatusHistory.cs",
-              "ViewState": "AgIAAAIAAAAAAAAAAAAmwCEAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-26T06:12:40.585Z"
-            },
             {
               "$type": "Document",
               "DocumentIndex": 2,
@@ -120,57 +52,97 @@
               "RelativeDocumentMoniker": "GreenCityReporter\\Program.cs",
               "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Program.cs",
               "RelativeToolTip": "GreenCityReporter\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAA6AAAAAAAAAA==",
+              "ViewState": "AgIAACMAAAAAAAAAAAAAAD0AAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-26T05:32:57.267Z"
+              "WhenOpened": "2026-08-26T05:32:57.267Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Report.cshtml",
+              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Admin\\Report.cshtml",
+              "RelativeDocumentMoniker": "GreenCityReporter\\Views\\Admin\\Report.cshtml",
+              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Admin\\Report.cshtml",
+              "RelativeToolTip": "GreenCityReporter\\Views\\Admin\\Report.cshtml",
+              "ViewState": "AgIAAPMAAAAAAAAAAAAAABQBAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-08-26T20:32:03.507Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Admin\\Index.cshtml",
+              "RelativeDocumentMoniker": "GreenCityReporter\\Views\\Admin\\Index.cshtml",
+              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Admin\\Index.cshtml",
+              "RelativeToolTip": "GreenCityReporter\\Views\\Admin\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAMgAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-08-26T20:20:01.053Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AdminController.cs",
+              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Controllers\\AdminController.cs",
+              "RelativeDocumentMoniker": "GreenCityReporter\\Controllers\\AdminController.cs",
+              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Controllers\\AdminController.cs",
+              "RelativeToolTip": "GreenCityReporter\\Controllers\\AdminController.cs",
+              "ViewState": "AgIAAIUAAAAAAAAAAAAAAJoAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-26T20:09:39.395Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Details.cshtml",
+              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Report\\Details.cshtml",
+              "RelativeDocumentMoniker": "GreenCityReporter\\Views\\Report\\Details.cshtml",
+              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Report\\Details.cshtml",
+              "RelativeToolTip": "GreenCityReporter\\Views\\Report\\Details.cshtml",
+              "ViewState": "AgIAAMQAAAAAAAAAAAAkwEYBAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-08-26T19:55:46.187Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "MyReports.cshtml",
+              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Report\\MyReports.cshtml",
+              "RelativeDocumentMoniker": "GreenCityReporter\\Views\\Report\\MyReports.cshtml",
+              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Report\\MyReports.cshtml",
+              "RelativeToolTip": "GreenCityReporter\\Views\\Report\\MyReports.cshtml",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAALEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-08-26T18:44:17.346Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "ApplicationDbContext.cs",
-              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Data\\ApplicationDbContext.cs",
-              "RelativeDocumentMoniker": "GreenCityReporter\\Data\\ApplicationDbContext.cs",
-              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Data\\ApplicationDbContext.cs",
-              "RelativeToolTip": "GreenCityReporter\\Data\\ApplicationDbContext.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACIAAAAtAAAAAAAAAA==",
+              "Title": "ReportController.cs",
+              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Controllers\\ReportController.cs",
+              "RelativeDocumentMoniker": "GreenCityReporter\\Controllers\\ReportController.cs",
+              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Controllers\\ReportController.cs",
+              "RelativeToolTip": "GreenCityReporter\\Controllers\\ReportController.cs",
+              "ViewState": "AgIAAB8BAAAAAAAAAAAAAP0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-26T05:32:49.865Z"
+              "WhenOpened": "2026-08-26T18:32:13.333Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 7,
-              "Title": "site.css",
-              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\wwwroot\\css\\site.css",
-              "RelativeDocumentMoniker": "GreenCityReporter\\wwwroot\\css\\site.css",
-              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\wwwroot\\css\\site.css",
-              "RelativeToolTip": "GreenCityReporter\\wwwroot\\css\\site.css",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-08-26T06:18:51.712Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "_Layout.cshtml",
-              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Shared\\_Layout.cshtml",
-              "RelativeDocumentMoniker": "GreenCityReporter\\Views\\Shared\\_Layout.cshtml",
-              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Shared\\_Layout.cshtml",
-              "RelativeToolTip": "GreenCityReporter\\Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAAA8AAAAAAAAAAAArwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-08-26T05:33:04.497Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Home\\Index.cshtml",
-              "RelativeDocumentMoniker": "GreenCityReporter\\Views\\Home\\Index.cshtml",
-              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Home\\Index.cshtml",
-              "RelativeToolTip": "GreenCityReporter\\Views\\Home\\Index.cshtml",
-              "ViewState": "AgIAACkAAAAAAAAAAAAkwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-08-26T05:33:21.013Z"
+              "Title": "Category.cs",
+              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Models\\Category.cs",
+              "RelativeDocumentMoniker": "GreenCityReporter\\Models\\Category.cs",
+              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Models\\Category.cs",
+              "RelativeToolTip": "GreenCityReporter\\Models\\Category.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-26T10:49:52.662Z"
             }
           ]
         }
