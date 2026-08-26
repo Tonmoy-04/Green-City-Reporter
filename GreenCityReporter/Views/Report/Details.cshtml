@@ -1,0 +1,345 @@
+﻿@model GreenCityReporter.Models.Report
+
+@{
+    ViewData["Title"] = "Report Details";
+}
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">Report Details</h1>
+            <p class="text-muted mb-0">
+                View the complete information about your report.
+            </p>
+        </div>
+
+        <a asp-controller="Report"
+           asp-action="MyReports"
+           class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fa-solid fa-arrow-left me-2"></i>
+            My Reports
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Main Report Information -->
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+
+                        <div>
+                            <span class="text-muted small">
+                                Tracking Number
+                            </span>
+
+                            <h5 class="fw-bold text-success mb-0">
+                                @Model.TrackingNumber
+                            </h5>
+                        </div>
+
+                        <div>
+                            @switch (Model.CurrentStatus.ToString())
+                            {
+                                case "Pending":
+                                    <span class="badge bg-warning text-dark px-3 py-2">
+                                        Pending
+                                    </span>
+                                    break;
+
+                                case "InProgress":
+                                    <span class="badge bg-primary px-3 py-2">
+                                        In Progress
+                                    </span>
+                                    break;
+
+                                case "Resolved":
+                                    <span class="badge bg-success px-3 py-2">
+                                        Resolved
+                                    </span>
+                                    break;
+
+                                case "Rejected":
+                                    <span class="badge bg-danger px-3 py-2">
+                                        Rejected
+                                    </span>
+                                    break;
+
+                                default:
+                                    <span class="badge bg-secondary px-3 py-2">
+                                        @Model.CurrentStatus
+                                    </span>
+                                    break;
+                            }
+                        </div>
+
+                    </div>
+
+                    <h2 class="fw-bold mb-3">
+                        @Model.Title
+                    </h2>
+                    
+                    @if (!string.IsNullOrEmpty(Model.ImagePath))
+                    {
+                        <div class="mb-4">
+                            <img src="@Model.ImagePath"
+                                 alt="Report image"
+                                 class="img-fluid rounded-4 shadow-sm"
+                                 style="max-height: 450px; width: 100%; object-fit: cover;" />
+                        </div>
+                    }
+                   
+
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold">
+                            <i class="fa-solid fa-align-left me-2 text-success"></i>
+                            Description
+                        </h6>
+
+                        <p class="text-muted mb-0">
+                            @Model.Description
+                        </p>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold">
+                            <i class="fa-solid fa-location-dot me-2 text-danger"></i>
+                            Address
+                        </h6>
+
+                        <p class="text-muted mb-0">
+                            @Model.Address
+                        </p>
+                    </div>
+
+                    <!-- Coordinates -->
+                    @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                    {
+                        <div class="mb-4">
+
+                            <h6 class="fw-bold">
+                                <i class="fa-solid fa-map-location-dot me-2 text-primary"></i>
+                                Coordinates
+                            </h6>
+
+                            <p class="text-muted mb-0">
+                                Latitude: @Model.Latitude.Value
+                                <br />
+                                Longitude: @Model.Longitude.Value
+                            </p>
+
+                        </div>
+                    }
+
+                    <hr />
+
+                    <!-- Report Metadata -->
+                    <div class="row mt-3">
+
+                        <div class="col-md-4 mb-3">
+
+                            <small class="text-muted d-block">
+                                Category
+                            </small>
+
+                            <span class="fw-medium">
+                                @Model.Category?.Name
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <small class="text-muted d-block">
+                                Priority
+                            </small>
+
+                            @switch (Model.Priority.ToString())
+                            {
+                                case "High":
+                                    <span class="text-danger fw-medium">
+                                        High
+                                    </span>
+                                    break;
+
+                                case "Medium":
+                                    <span class="text-warning fw-medium">
+                                        Medium
+                                    </span>
+                                    break;
+
+                                default:
+                                    <span class="text-success fw-medium">
+                                        Low
+                                    </span>
+                                    break;
+                            }
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <small class="text-muted d-block">
+                                Submitted
+                            </small>
+
+                            <span class="fw-medium">
+                                @Model.CreatedAt
+                                .ToLocalTime()
+                                .ToString("dd MMM yyyy, hh:mm tt")
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- Comments -->
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-header bg-white border-0 p-4">
+
+                    <h5 class="fw-bold mb-0">
+                        <i class="fa-solid fa-comments me-2 text-success"></i>
+                        Comments
+                    </h5>
+
+                </div>
+
+                <div class="card-body p-4">
+
+                    @if (Model.Comments != null && Model.Comments.Any())
+                    {
+                        @foreach (var comment in Model.Comments
+                            .OrderByDescending(c => c.CreatedAt))
+                        {
+                            <div class="border-bottom pb-3 mb-3">
+
+                                <div class="d-flex justify-content-between">
+
+                                    <strong>
+                                        @comment.User?.FullName
+                                    </strong>
+
+                                    <small class="text-muted">
+                                        @comment.CreatedAt
+                                        .ToLocalTime()
+                                        .ToString("dd MMM yyyy, hh:mm tt")
+                                    </small>
+
+                                </div>
+
+                                <p class="text-muted mb-0 mt-2">
+                                    @comment.Message
+                                </p>
+
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+
+                            <i class="fa-regular fa-comment-dots fa-2x text-muted mb-3"></i>
+
+                            <p class="text-muted mb-0">
+                                No comments yet.
+                            </p>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Status History -->
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-header bg-white border-0 p-4">
+
+                    <h5 class="fw-bold mb-0">
+                        <i class="fa-solid fa-clock-rotate-left me-2 text-success"></i>
+                        Status History
+                    </h5>
+
+                </div>
+
+                <div class="card-body p-4">
+
+                    @if (Model.StatusHistories != null && Model.StatusHistories.Any())
+                    {
+                        @foreach (var history in Model.StatusHistories
+                            .OrderByDescending(h => h.UpdatedAt))
+                        {
+                            <div class="mb-4">
+
+                                <div class="d-flex align-items-start">
+
+                                    <div class="bg-success bg-opacity-10 text-success rounded-circle p-2 me-3">
+                                        <i class="fa-solid fa-check"></i>
+                                    </div>
+
+                                    <div>
+
+                                        <h6 class="fw-bold mb-1">
+                                            @history.NewStatus
+                                        </h6>
+
+                                        <small class="text-muted">
+                                            @history.UpdatedAt
+                                            .ToLocalTime()
+                                            .ToString("dd MMM yyyy, hh:mm tt")
+                                        </small>
+
+                                        @if (!string.IsNullOrWhiteSpace(history.Remarks))
+                                        {
+                                            <p class="text-muted small mt-2 mb-0">
+                                                @history.Remarks
+                                            </p>
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+
+                            <i class="fa-regular fa-clock fa-2x text-muted mb-3"></i>
+
+                            <p class="text-muted mb-0">
+                                No status history available yet.
+                            </p>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

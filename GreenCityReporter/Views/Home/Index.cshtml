@@ -14,12 +14,20 @@
                 Green City Reporter helps you quickly report civic issues like potholes, waste, and broken streetlights directly to local authorities. Track your reports and see the impact you make in your community.
             </p>
             <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3">
-                <a href="#" class="btn btn-success btn-lg px-5 py-3 rounded-pill shadow-sm fw-medium d-flex align-items-center justify-content-center">
-                    <i class="fa-solid fa-bullhorn me-2"></i> Report an Issue
-                </a>
-                <a href="#" class="btn btn-outline-dark btn-lg px-5 py-3 rounded-pill fw-medium d-flex align-items-center justify-content-center">
-                    <i class="fa-solid fa-magnifying-glass me-2"></i> Track Progress
-                </a>
+                <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3">
+                    <a asp-controller="Report"
+                       asp-action="Create"
+                       class="btn btn-success btn-lg px-5 py-3 rounded-pill shadow-sm fw-medium d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-bullhorn me-2"></i> Report an Issue
+                    </a>
+
+                    <a asp-controller="Report"
+                       asp-action="MyReports"
+                       class="btn btn-outline-dark btn-lg px-5 py-3 rounded-pill fw-medium d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-file-lines me-2"></i> My Reports
+                    </a>
+                </div>
+
             </div>
 
             <div class="row mt-5 pt-4 border-top text-center text-lg-start">
