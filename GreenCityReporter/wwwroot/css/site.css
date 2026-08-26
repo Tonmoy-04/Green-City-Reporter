@@ -8,8 +8,13 @@ html {
   }
 }
 
+body {
+  font-family: 'Inter', sans-serif;
+  color: #333;
+}
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #198754;
 }
 
 html {
@@ -19,6 +24,10 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+
+.min-vh-75 {
+    min-height: 75vh;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
