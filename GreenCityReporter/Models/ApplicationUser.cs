@@ -1,0 +1,18 @@
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
+
+namespace GreenCityReporter.Models
+{
+    public class ApplicationUser : IdentityUser
+    {
+        [Required]
+        [StringLength(100)]
+        public string FullName { get; set; } = string.Empty;
+
+        // Navigation Properties
+        public ICollection<Report> Reports { get; set; } = new List<Report>();
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        public ICollection<StatusHistory> StatusHistories { get; set; } = new List<StatusHistory>();
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    }
+}
