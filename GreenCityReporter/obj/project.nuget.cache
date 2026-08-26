@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "oxOkPOFsjqY=",
+  "dgSpecHash": "OU6UAhFfaNg=",
   "success": true,
-  "projectFilePath": "C:\\Users\\noman\\source\\repos\\Green City Reporter\\GreenCityReporter\\GreenCityReporter.csproj",
+  "projectFilePath": "D:\\Green City Reporter\\GreenCityReporter\\GreenCityReporter.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\noman\\.nuget\\packages\\azure.core\\1.50.0\\azure.core.1.50.0.nupkg.sha512",
     "C:\\Users\\noman\\.nuget\\packages\\azure.identity\\1.17.1\\azure.identity.1.17.1.nupkg.sha512",
