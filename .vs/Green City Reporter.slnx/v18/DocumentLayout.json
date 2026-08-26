@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\Green City Reporter\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\views\\report\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\views\\report\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|d:\\green city reporter\\greencityreporter\\controllers\\reportcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{756335E4-CEE7-8CC2-BE29-81C86AEEE7FD}|GreenCityReporter\\GreenCityReporter.csproj|solutionrelative:greencityreporter\\controllers\\reportcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -26,11 +30,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Program.cs",
               "RelativeDocumentMoniker": "GreenCityReporter\\Program.cs",
@@ -39,12 +43,24 @@
               "ViewState": "AgIAABsAAAAAAAAAAAAAADoAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-26T05:32:57.267Z",
-              "IsPinned": true,
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Details.cshtml",
+              "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Report\\Details.cshtml",
+              "RelativeDocumentMoniker": "GreenCityReporter\\Views\\Report\\Details.cshtml",
+              "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Report\\Details.cshtml",
+              "RelativeToolTip": "GreenCityReporter\\Views\\Report\\Details.cshtml",
+              "ViewState": "AgIAAMQAAAAAAAAAAAAkwEYBAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-08-26T19:55:46.187Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "MyReports.cshtml",
               "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Views\\Report\\MyReports.cshtml",
               "RelativeDocumentMoniker": "GreenCityReporter\\Views\\Report\\MyReports.cshtml",
@@ -52,25 +68,24 @@
               "RelativeToolTip": "GreenCityReporter\\Views\\Report\\MyReports.cshtml",
               "ViewState": "AgIAABgAAAAAAAAAAAAAALEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-08-26T18:44:17.346Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-08-26T18:44:17.346Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "ReportController.cs",
               "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Controllers\\ReportController.cs",
               "RelativeDocumentMoniker": "GreenCityReporter\\Controllers\\ReportController.cs",
               "ToolTip": "D:\\Green City Reporter\\GreenCityReporter\\Controllers\\ReportController.cs",
               "RelativeToolTip": "GreenCityReporter\\Controllers\\ReportController.cs",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAowBMAAAAKAAAAAAAAAA==",
+              "ViewState": "AgIAAB8BAAAAAAAAAAAAAP0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-08-26T18:32:13.333Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "Category.cs",
               "DocumentMoniker": "D:\\Green City Reporter\\GreenCityReporter\\Models\\Category.cs",
               "RelativeDocumentMoniker": "GreenCityReporter\\Models\\Category.cs",

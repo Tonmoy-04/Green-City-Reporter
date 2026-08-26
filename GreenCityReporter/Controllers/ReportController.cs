@@ -252,6 +252,64 @@ namespace GreenCityReporter.Controllers
             return View(report);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddComment(int reportId, string message)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return Challenge();
+            }
+
+            // Find the report
+            var report = await _context.Reports
+                .FirstOrDefaultAsync(r => r.Id == reportId);
+
+            if (report == null)
+            {
+                return NotFound();
+            }
+
+            // Citizens can only comment on their own reports.
+            // Admins can comment on any report.
+            if (report.UserId != user.Id && !User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
+
+            // Validate comment
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                TempData["CommentError"] = "Comment cannot be empty.";
+
+                return RedirectToAction(nameof(Details), new { id = reportId });
+            }
+
+            if (message.Length > 1000)
+            {
+                TempData["CommentError"] = "Comment cannot exceed 1000 characters.";
+
+                return RedirectToAction(nameof(Details), new { id = reportId });
+            }
+
+            var comment = new Comment
+            {
+                ReportId = reportId,
+                UserId = user.Id,
+                Message = message.Trim(),
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Comments.Add(comment);
+
+            await _context.SaveChangesAsync();
+
+            TempData["CommentSuccess"] = "Comment added successfully.";
+
+            return RedirectToAction(nameof(Details), new { id = reportId });
+        }
         private static string GenerateTrackingNumber()
         {
             return $"GCR-{DateTime.UtcNow:yyyyMMddHHmmss}-{Random.Shared.Next(1000, 9999)}";
