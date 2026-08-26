@@ -1,16 +1,17 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using GreenCityReporter.Models;
 
 namespace GreenCityReporter.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        public DbSet<ApplicationUser> Users { get; set; }
+        // Users DbSet is provided by IdentityDbContext
         public DbSet<Report> Reports { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<StatusHistory> StatusHistories { get; set; }

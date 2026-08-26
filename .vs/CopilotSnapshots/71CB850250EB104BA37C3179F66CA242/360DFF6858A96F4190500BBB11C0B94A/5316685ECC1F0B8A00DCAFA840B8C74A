@@ -1,0 +1,83 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container-fluid px-0">
+    <div class="row align-items-center min-vh-75 py-5">
+        <div class="col-lg-6 px-lg-5 text-center text-lg-start mb-5 mb-lg-0">
+            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 mb-3 fw-medium">Smart City Initiative</span>
+            <h1 class="display-3 fw-bold text-dark lh-sm mb-4">
+                Build a <span class="text-success">better city</span><br />
+                together with us.
+            </h1>
+            <p class="lead text-muted mb-5 pe-lg-5">
+                Green City Reporter helps you quickly report civic issues like potholes, waste, and broken streetlights directly to local authorities. Track your reports and see the impact you make in your community.
+            </p>
+            <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3">
+                <a href="#" class="btn btn-success btn-lg px-5 py-3 rounded-pill shadow-sm fw-medium d-flex align-items-center justify-content-center">
+                    <i class="fa-solid fa-bullhorn me-2"></i> Report an Issue
+                </a>
+                <a href="#" class="btn btn-outline-dark btn-lg px-5 py-3 rounded-pill fw-medium d-flex align-items-center justify-content-center">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i> Track Progress
+                </a>
+            </div>
+
+            <div class="row mt-5 pt-4 border-top text-center text-lg-start">
+                <div class="col-4">
+                    <h3 class="fw-bold text-dark mb-0">1.2K+</h3>
+                    <p class="text-muted small mb-0">Issues Resolved</p>
+                </div>
+                <div class="col-4 border-start border-end">
+                    <h3 class="fw-bold text-dark mb-0">24h</h3>
+                    <p class="text-muted small mb-0">Avg. Response</p>
+                </div>
+                <div class="col-4">
+                    <h3 class="fw-bold text-dark mb-0">8K+</h3>
+                    <p class="text-muted small mb-0">Active Citizens</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 text-center position-relative">
+            <!-- This acts as a placeholder for an illustration until you add real images -->
+            <div class="bg-success bg-opacity-10 rounded-circle position-absolute top-50 start-50 translate-middle" style="width: 500px; height: 500px; z-index: -1;"></div>
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden mx-auto" style="max-width: 480px;">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h5 class="fw-bold text-start mb-0"><i class="fa-solid fa-bolt text-warning me-2"></i> Recent Activity</h5>
+                </div>
+                <div class="card-body text-start">
+                    <div class="d-flex mb-4">
+                        <div class="bg-danger bg-opacity-10 text-danger rounded p-3 me-3">
+                            <i class="fa-solid fa-road fa-lg"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Large Pothole on Main St.</h6>
+                            <p class="text-muted small mb-0">Reported 2 hours ago &bull; <span class="text-warning fw-medium">In Review</span></p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-4">
+                        <div class="bg-success bg-opacity-10 text-success rounded p-3 me-3">
+                            <i class="fa-solid fa-trash fa-lg"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Missed Garbage Collection</h6>
+                            <p class="text-muted small mb-0">Reported yesterday &bull; <span class="text-success fw-medium">Resolved</span></p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded p-3 me-3">
+                            <i class="fa-solid fa-droplet fa-lg"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Burst Water Pipe</h6>
+                            <p class="text-muted small mb-0">Reported 3 days ago &bull; <span class="text-primary fw-medium">In Progress</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light border-0 py-3 text-center">
+                    <a href="#" class="text-decoration-none text-success fw-medium small">View all reports <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

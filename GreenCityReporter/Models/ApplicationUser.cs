@@ -1,19 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace GreenCityReporter.Models
 {
-    public class ApplicationUser
+    public class ApplicationUser : IdentityUser
     {
-        [Key]
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-
         [Required]
         [StringLength(100)]
         public string FullName { get; set; } = string.Empty;
-
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; } = string.Empty;
 
         // Navigation Properties
         public ICollection<Report> Reports { get; set; } = new List<Report>();
