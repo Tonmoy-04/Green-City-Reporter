@@ -1,0 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+
+namespace GreenCityReporter.Data
+{
+    public class ApplicationDbContext : DbContext
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
+        {
+        }
+
+        // DbSets will be added here in future steps
+    }
+}
