@@ -1,201 +1,524 @@
+
 @model IEnumerable<GreenCityReporter.Models.Report>
 
 @{
     ViewData["Title"] = "Admin Dashboard";
+
+    var reports = Model.ToList();
+
+    var totalReports = reports.Count;
+
+    var pendingReports = reports.Count(r =>
+        r.CurrentStatus.ToString() == "Pending");
+
+    var inProgressReports = reports.Count(r =>
+        r.CurrentStatus.ToString() == "InProgress");
+
+    var resolvedReports = reports.Count(r =>
+        r.CurrentStatus.ToString() == "Resolved");
+
+    var highPriorityReports = reports.Count(r =>
+        r.Priority.ToString() == "High");
 }
 
-<div class="container py-5">
+<div class="admin-dashboard">
 
-    <div class="mb-4">
-        <h1 class="fw-bold mb-1">
-            Admin Dashboard
-        </h1>
+    <!-- ================= HERO ================= -->
 
-        <p class="text-muted mb-0">
-            Manage and monitor citizen reports.
-        </p>
-    </div>
+    <section class="admin-hero mb-4">
 
-    <div class="card border-0 shadow-sm rounded-4">
+        <div class="admin-hero-content">
 
-        <div class="card-header bg-white border-0 p-4">
+            <span class="admin-eyebrow">
+                <i class="fa-solid fa-shield-halved me-2"></i>
+                Administration
+            </span>
 
-            <div class="d-flex justify-content-between align-items-center">
+            <h1 class="admin-title">
+                Good day, Admin.
+            </h1>
 
-                <h5 class="fw-bold mb-0">
-                    <i class="fa-solid fa-list-check me-2 text-success"></i>
-                    All Reports
-                </h5>
+            <p class="admin-subtitle">
+                Monitor citizen reports, prioritize urgent issues,
+                and keep Green City moving.
+            </p>
 
-                <span class="badge bg-success px-3 py-2">
-                    @Model.Count() Reports
+        </div>
+
+        <div class="admin-hero-icon">
+            <i class="fa-solid fa-leaf"></i>
+        </div>
+
+    </section>
+
+
+    <!-- ================= STAT CARDS ================= -->
+
+    <section class="admin-stat-grid mb-5">
+
+        <!-- Total -->
+
+        <div class="admin-stat-card stat-total">
+
+            <div class="stat-icon">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+
+            <div>
+
+                <span class="stat-label">
+                    Total Reports
+                </span>
+
+                <strong class="stat-value">
+                    @totalReports
+                </strong>
+
+                <span class="stat-note">
+                    All submitted reports
                 </span>
 
             </div>
 
         </div>
 
-        <div class="card-body p-0">
 
-            @if (Model.Any())
-            {
-                <div class="table-responsive">
+        <!-- Pending -->
 
-                    <table class="table table-hover align-middle mb-0">
+        <div class="admin-stat-card stat-pending">
 
-                        <thead class="table-light">
+            <div class="stat-icon">
+                <i class="fa-regular fa-clock"></i>
+            </div>
 
-                            <tr>
-                                <th class="px-4">Tracking Number</th>
-                                <th>Title</th>
-                                <th>Category</th>
-                                <th>Citizen</th>
-                                <th>Status</th>
-                                <th>Priority</th>
-                                <th>Date</th>
-                                <th class="text-end px-4">Action</th>
-                            </tr>
+            <div>
 
-                        </thead>
+                <span class="stat-label">
+                    Pending
+                </span>
 
-                        <tbody>
+                <strong class="stat-value">
+                    @pendingReports
+                </strong>
 
-                            @foreach (var report in Model)
-                            {
-                                <tr>
+                <span class="stat-note">
+                    Awaiting review
+                </span>
 
-                                    <td class="px-4">
-                                        <span class="fw-medium text-success">
-                                            @report.TrackingNumber
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="fw-medium">
-                                            @report.Title
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        @report.Category?.Name
-                                    </td>
-
-                                    <td>
-                                        @report.User?.FullName
-                                    </td>
-
-                                    <td>
-
-                                        @switch (report.CurrentStatus.ToString())
-                                        {
-                                            case "Pending":
-                                                <span class="badge bg-warning text-dark">
-                                                    Pending
-                                                </span>
-                                                break;
-
-                                            case "InProgress":
-                                                <span class="badge bg-primary">
-                                                    In Progress
-                                                </span>
-                                                break;
-
-                                            case "Resolved":
-                                                <span class="badge bg-success">
-                                                    Resolved
-                                                </span>
-                                                break;
-
-                                            case "Rejected":
-                                                <span class="badge bg-danger">
-                                                    Rejected
-                                                </span>
-                                                break;
-
-                                            default:
-                                                <span class="badge bg-secondary">
-                                                    @report.CurrentStatus
-                                                </span>
-                                                break;
-                                        }
-
-                                    </td>
-
-                                    <td>
-
-                                        @switch (report.Priority.ToString())
-                                        {
-                                            case "High":
-                                                <span class="text-danger fw-medium">
-                                                    High
-                                                </span>
-                                                break;
-
-                                            case "Medium":
-                                                <span class="text-warning fw-medium">
-                                                    Medium
-                                                </span>
-                                                break;
-
-                                            default:
-                                                <span class="text-success fw-medium">
-                                                    Low
-                                                </span>
-                                                break;
-                                        }
-
-                                    </td>
-
-                                    <td>
-                                        <small class="text-muted">
-                                            @report.CreatedAt
-                                            .ToLocalTime()
-                                            .ToString("dd MMM yyyy")
-                                        </small>
-                                    </td>
-
-                                    <td class="text-end px-4">
-
-                                        <a asp-controller="Admin"
-                                           asp-action="Report"
-                                           asp-route-id="@report.Id"
-                                           class="btn btn-sm btn-outline-success rounded-pill px-3">
-
-                                            <i class="fa-solid fa-eye me-1"></i>
-                                            View
-
-                                        </a>
-
-                                    </td>
-
-                                </tr>
-                            }
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-            }
-            else
-            {
-                <div class="text-center py-5">
-
-                    <i class="fa-solid fa-inbox fa-3x text-muted mb-3"></i>
-
-                    <h5 class="fw-bold">
-                        No reports yet
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Citizen reports will appear here.
-                    </p>
-
-                </div>
-            }
+            </div>
 
         </div>
 
-    </div>
+
+        <!-- In Progress -->
+
+        <div class="admin-stat-card stat-progress">
+
+            <div class="stat-icon">
+                <i class="fa-solid fa-spinner"></i>
+            </div>
+
+            <div>
+
+                <span class="stat-label">
+                    In Progress
+                </span>
+
+                <strong class="stat-value">
+                    @inProgressReports
+                </strong>
+
+                <span class="stat-note">
+                    Currently being handled
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- Resolved -->
+
+        <div class="admin-stat-card stat-resolved">
+
+            <div class="stat-icon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <div>
+
+                <span class="stat-label">
+                    Resolved
+                </span>
+
+                <strong class="stat-value">
+                    @resolvedReports
+                </strong>
+
+                <span class="stat-note">
+                    Successfully completed
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= SECTION HEADER ================= -->
+
+    <section class="admin-toolbar mb-4">
+
+        <div>
+
+            <h2 class="section-title mb-1">
+                Report Management
+            </h2>
+
+            <p class="section-subtitle mb-0">
+                Review the latest reports and take action quickly.
+            </p>
+
+        </div>
+
+        <div class="toolbar-summary">
+
+            <span class="summary-dot"></span>
+
+            @highPriorityReports
+            high-priority
+            @(highPriorityReports == 1 ? "report" : "reports")
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= REPORT TABLE ================= -->
+
+    <section class="admin-table-card">
+
+        <!-- Table Header -->
+
+        <div class="table-card-header">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="table-title-icon">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+
+                <div>
+
+                    <h3 class="table-title">
+                        All Reports
+                    </h3>
+
+                    <p class="table-subtitle mb-0">
+                        Newest submissions appear first
+                    </p>
+
+                </div>
+
+            </div>
+
+            <span class="report-count">
+                @totalReports
+                @(totalReports == 1 ? "Report" : "Reports")
+            </span>
+
+        </div>
+
+
+        @if (reports.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table admin-report-table align-middle mb-0">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Tracking</th>
+
+                            <th>Report</th>
+
+                            <th>Category</th>
+
+                            <th>Citizen</th>
+
+                            <th>Status</th>
+
+                            <th>Priority</th>
+
+                            <th>Submitted</th>
+
+                            <th class="text-end">
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var report in reports)
+                        {
+                            var status =
+                                report.CurrentStatus.ToString();
+
+                            var priority =
+                                report.Priority.ToString();
+
+
+                            <tr>
+
+                                <!-- Tracking -->
+
+                                <td>
+
+                                    <span class="tracking-chip">
+                                        @report.TrackingNumber
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Report -->
+
+                                <td>
+
+                                    <div class="report-name">
+                                        @report.Title
+                                    </div>
+
+                                    <div class="report-id">
+                                        Report #@report.Id
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Category -->
+
+                                <td>
+
+                                    <span class="category-text">
+                                        @(report.Category?.Name ?? "Uncategorized")
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Citizen -->
+
+                                <td>
+
+                                    <div class="citizen-cell">
+
+                                        <span class="citizen-avatar">
+
+                                            @(
+                                                (report.User?.FullName ?? "U")
+                                                .Substring(0, 1)
+                                                .ToUpper()
+                                            )
+
+                                        </span>
+
+                                        <span>
+                                            @(report.User?.FullName ?? "Unknown")
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Status -->
+
+                                <td>
+
+                                    @switch (status)
+                                    {
+                                        case "Pending":
+
+                                            <span class="status-pill status-pending">
+                                                <span></span>
+                                                Pending
+                                            </span>
+
+                                            break;
+
+
+                                        case "InProgress":
+
+                                            <span class="status-pill status-progress">
+                                                <span></span>
+                                                In Progress
+                                            </span>
+
+                                            break;
+
+
+                                        case "Resolved":
+
+                                            <span class="status-pill status-resolved">
+                                                <span></span>
+                                                Resolved
+                                            </span>
+
+                                            break;
+
+
+                                        case "Rejected":
+
+                                            <span class="status-pill status-rejected">
+                                                <span></span>
+                                                Rejected
+                                            </span>
+
+                                            break;
+
+
+                                        default:
+
+                                            <span class="status-pill status-neutral">
+                                                <span></span>
+                                                @status
+                                            </span>
+
+                                            break;
+                                    }
+
+                                </td>
+
+
+                                <!-- Priority -->
+
+                                <td>
+
+                                    @switch (priority)
+                                    {
+                                        case "High":
+
+                                            <span class="priority priority-high">
+
+                                                <i class="fa-solid fa-arrow-up"></i>
+
+                                                High
+
+                                            </span>
+
+                                            break;
+
+
+                                        case "Medium":
+
+                                            <span class="priority priority-medium">
+
+                                                <i class="fa-solid fa-minus"></i>
+
+                                                Medium
+
+                                            </span>
+
+                                            break;
+
+
+                                        default:
+
+                                            <span class="priority priority-low">
+
+                                                <i class="fa-solid fa-arrow-down"></i>
+
+                                                Low
+
+                                            </span>
+
+                                            break;
+                                    }
+
+                                </td>
+
+
+                                <!-- Date -->
+
+                                <td>
+
+                                    <div class="date-cell">
+
+                                        @report.CreatedAt
+                                            .ToLocalTime()
+                                            .ToString("dd MMM yyyy")
+
+                                    </div>
+
+                                    <div class="time-cell">
+
+                                        @report.CreatedAt
+                                            .ToLocalTime()
+                                            .ToString("hh:mm tt")
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- Action -->
+
+                                <td class="text-end">
+
+                                    <a asp-controller="Admin"
+                                       asp-action="Report"
+                                       asp-route-id="@report.Id"
+                                       class="btn admin-view-btn">
+
+                                        View
+
+                                        <i class="fa-solid fa-arrow-right ms-2"></i>
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <!-- Empty State -->
+
+            <div class="admin-empty-state">
+
+                <div class="empty-icon">
+
+                    <i class="fa-regular fa-folder-open"></i>
+
+                </div>
+
+                <h4>
+                    No reports yet
+                </h4>
+
+                <p>
+                    Citizen reports will appear here once they are submitted.
+                </p>
+
+            </div>
+        }
+
+    </section>
 
 </div>
+
