@@ -1,4 +1,4 @@
-﻿
+
 @model IEnumerable<GreenCityReporter.Models.Report>
 
 @{
@@ -93,25 +93,25 @@
                                     {
                                         case "Pending":
                                             <span class="badge bg-warning text-dark">
-                                                Pending
+                                                <i class="fa-regular fa-clock me-1"></i> Pending
                                             </span>
                                             break;
 
                                         case "InProgress":
                                             <span class="badge bg-primary">
-                                                In Progress
+                                                <i class="fa-solid fa-spinner me-1"></i> In Progress
                                             </span>
                                             break;
 
                                         case "Resolved":
                                             <span class="badge bg-success">
-                                                Resolved
+                                                <i class="fa-solid fa-check-circle me-1"></i> Resolved
                                             </span>
                                             break;
 
                                         case "Rejected":
                                             <span class="badge bg-danger">
-                                                Rejected
+                                                <i class="fa-solid fa-xmark-circle me-1"></i> Rejected
                                             </span>
                                             break;
 
