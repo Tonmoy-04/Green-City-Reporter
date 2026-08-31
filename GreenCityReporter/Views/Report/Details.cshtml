@@ -1,4 +1,4 @@
-﻿@model GreenCityReporter.Models.Report
+@model GreenCityReporter.Models.Report
 
 @{
     ViewData["Title"] = "Report Details";
@@ -143,7 +143,7 @@
                     <!-- Report Metadata -->
                     <div class="row mt-3">
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
 
                             <small class="text-muted d-block">
                                 Category
@@ -155,7 +155,7 @@
 
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
 
                             <small class="text-muted d-block">
                                 Priority
@@ -184,7 +184,7 @@
 
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
 
                             <small class="text-muted d-block">
                                 Submitted
@@ -194,6 +194,18 @@
                                 @Model.CreatedAt
                                 .ToLocalTime()
                                 .ToString("dd MMM yyyy, hh:mm tt")
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+
+                            <small class="text-muted d-block">
+                                Updated
+                            </small>
+
+                            <span class="fw-medium">
+                                @Model.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
                             </span>
 
                         </div>

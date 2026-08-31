@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -28,9 +28,18 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark fw-medium mx-2" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark fw-medium mx-2" href="#">Recent Reports</a>
-                        </li>
+                        @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark fw-medium mx-2" asp-area="" asp-controller="Report" asp-action="Create">Report an Issue</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark fw-medium mx-2" asp-area="" asp-controller="Report" asp-action="MyReports">My Reports</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark fw-medium mx-2" asp-area="" asp-controller="Report" asp-action="Track">Track Report</a>
+                            </li>
+                        }
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">

@@ -1,4 +1,4 @@
-﻿using GreenCityReporter.Data;
+using GreenCityReporter.Data;
 using GreenCityReporter.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -310,6 +310,50 @@ namespace GreenCityReporter.Controllers
 
             return RedirectToAction(nameof(Details), new { id = reportId });
         }
+        // GET: /Report/Track
+        [HttpGet]
+        public IActionResult Track()
+        {
+            return View();
+        }
+
+        // POST: /Report/Track
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Track(string trackingNumber)
+        {
+            if (string.IsNullOrWhiteSpace(trackingNumber))
+            {
+                TempData["TrackError"] = "Please enter a tracking number.";
+                return View("Track", trackingNumber);
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Challenge();
+            }
+
+            var report = await _context.Reports
+                .FirstOrDefaultAsync(r => r.TrackingNumber == trackingNumber.Trim());
+
+            if (report == null)
+            {
+                TempData["TrackError"] = "No report found with that tracking number.";
+                return View("Track", trackingNumber);
+            }
+
+            // A citizen can only track their own reports (per security requirements)
+            // Admins could track any report.
+            if (report.UserId != user.Id && !User.IsInRole("Admin"))
+            {
+                TempData["TrackError"] = "Access denied. You can only track your own reports.";
+                return View("Track", trackingNumber);
+            }
+
+            return RedirectToAction(nameof(Details), new { id = report.Id });
+        }
+
         private static string GenerateTrackingNumber()
         {
             return $"GCR-{DateTime.UtcNow:yyyyMMddHHmmss}-{Random.Shared.Next(1000, 9999)}";
