@@ -1,0 +1,327 @@
+@model GreenCityReporter.ViewModels.CitizenDashboardViewModel
+
+@{
+    ViewData["Title"] = "Citizen Dashboard";
+}
+
+<div class="container py-5">
+
+    <!-- Welcome Hero Banner -->
+    <div class="card border-0 shadow-sm rounded-4 text-white mb-4" style="background: linear-gradient(135deg, #10b981 0%, #059669 50%, #06b6d4 100%);">
+        <div class="card-body p-4 p-md-5">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <span class="badge bg-white bg-opacity-25 text-white px-3 py-2 rounded-pill mb-2 fw-semibold">
+                        <i class="fa-solid fa-leaf me-1"></i> Citizen Portal
+                    </span>
+                    <h1 class="fw-bold mb-2">Welcome Back!</h1>
+                    <p class="lead mb-0 text-white-50">
+                        Track your environmental contributions, monitor issue resolutions, and stay notified on progress.
+                    </p>
+                </div>
+                <div class="col-md-4 text-center text-md-end mt-4 mt-md-0">
+                    <a asp-controller="Report" asp-action="Create" class="btn btn-light text-success fw-bold rounded-pill px-4 py-3 shadow-sm">
+                        <i class="fa-solid fa-plus-circle me-2"></i> Report New Issue
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat KPI Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-3">
+                <div class="d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 text-success rounded-4 p-3 me-3">
+                        <i class="fa-solid fa-folder-open fa-2x"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted fw-semibold text-uppercase d-block" style="font-size: 0.75rem;">Total Reports</small>
+                        <h2 class="fw-bold mb-0 text-dark">@Model.TotalReports</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-3">
+                <div class="d-flex align-items-center">
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-4 p-3 me-3">
+                        <i class="fa-regular fa-clock fa-2x"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted fw-semibold text-uppercase d-block" style="font-size: 0.75rem;">Pending</small>
+                        <h2 class="fw-bold mb-0 text-dark">@Model.PendingCount</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-3">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-4 p-3 me-3">
+                        <i class="fa-solid fa-spinner fa-2x"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted fw-semibold text-uppercase d-block" style="font-size: 0.75rem;">In Progress</small>
+                        <h2 class="fw-bold mb-0 text-dark">@Model.InProgressCount</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-3">
+                <div class="d-flex align-items-center">
+                    <div class="bg-success text-white rounded-4 p-3 me-3">
+                        <i class="fa-solid fa-circle-check fa-2x"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted fw-semibold text-uppercase d-block" style="font-size: 0.75rem;">Resolved</small>
+                        <h2 class="fw-bold mb-0 text-dark">@Model.ResolvedCount</h2>
+                    </div>
+                </div>
+                <div class="progress mt-3" style="height: 6px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: @Model.ResolutionRate%" aria-valuenow="@Model.ResolutionRate" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <small class="text-muted text-end d-block mt-1" style="font-size: 0.7rem;">@Model.ResolutionRate.ToString("0.#")% Resolution Rate</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row g-4">
+        
+        <!-- Left Column: Recent Submissions & Notifications Feed -->
+        <div class="col-lg-8">
+            
+            <!-- Recent Notifications Widget Card -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 d-flex align-items-center">
+                        <i class="fa-solid fa-bell text-success me-2"></i> Recent Notifications
+                        @if (Model.UnreadNotificationCount > 0)
+                        {
+                            <span class="badge bg-danger rounded-pill ms-2" style="font-size: 0.7rem;">@Model.UnreadNotificationCount NEW</span>
+                        }
+                    </h5>
+                    <a asp-controller="Notification" asp-action="Index" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                        View All Center
+                    </a>
+                </div>
+                <div class="card-body p-4">
+                    @if (!Model.RecentNotifications.Any())
+                    {
+                        <div class="text-center py-3 text-muted">
+                            <i class="fa-regular fa-bell fa-2x mb-2 text-muted"></i>
+                            <p class="mb-0 small">No notifications yet. You will be alerted when admins update your reports.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var notif in Model.RecentNotifications)
+                            {
+                                string msg = notif.Message;
+                                string iconClass = "fa-bell text-primary";
+                                string bgBadge = "bg-primary bg-opacity-10";
+
+                                if (msg.Contains("Resolved", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    iconClass = "fa-circle-check text-success";
+                                    bgBadge = "bg-success bg-opacity-10";
+                                }
+                                else if (msg.Contains("In Progress", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    iconClass = "fa-bars-progress text-primary";
+                                    bgBadge = "bg-primary bg-opacity-10";
+                                }
+                                else if (msg.Contains("comment", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    iconClass = "fa-comments text-warning-emphasis";
+                                    bgBadge = "bg-warning bg-opacity-10";
+                                }
+
+                                <div class="list-group-item px-0 py-3 border-bottom d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center me-3">
+                                        <div class="rounded-circle p-2 me-3 d-flex align-items-center justify-content-center @bgBadge" style="width: 40px; height: 40px;">
+                                            <i class="fa-solid @iconClass"></i>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0 text-dark @(!notif.IsRead ? "fw-bold" : "fw-normal")" style="font-size: 0.9rem;">
+                                                @notif.Message
+                                            </p>
+                                            <small class="text-muted" style="font-size: 0.75rem;">
+                                                <i class="fa-regular fa-clock me-1"></i>@notif.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                            </small>
+                                        </div>
+                                    </div>
+                                    @if (notif.ReportId > 0)
+                                    {
+                                        <a asp-controller="Report" asp-action="Details" asp-route-id="@notif.ReportId" class="btn btn-sm btn-light border rounded-pill px-3 flex-shrink-0">
+                                            View
+                                        </a>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Recent Submissions Table Card -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fa-solid fa-clock-rotate-left text-success me-2"></i> Recent Submissions
+                    </h5>
+                    <a asp-controller="Report" asp-action="MyReports" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                        View All Reports
+                    </a>
+                </div>
+                <div class="card-body p-4">
+                    @if (!Model.RecentReports.Any())
+                    {
+                        <div class="text-center py-4">
+                            <i class="fa-regular fa-folder-open fa-3x text-muted mb-3"></i>
+                            <h5 class="fw-semibold">No Reports Submitted Yet</h5>
+                            <p class="text-muted small">Report environmental issues in your neighborhood to make a positive impact.</p>
+                            <a asp-controller="Report" asp-action="Create" class="btn btn-success rounded-pill px-4">
+                                <i class="fa-solid fa-plus me-1"></i> Submit Report
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Tracking #</th>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var report in Model.RecentReports)
+                                    {
+                                        string statusStr = report.CurrentStatus.ToString() == "InProgress" ? "In Progress" : report.CurrentStatus.ToString();
+                                        string badgeClass = report.CurrentStatus.ToString() switch
+                                        {
+                                            "Pending" => "bg-warning text-dark",
+                                            "InProgress" => "bg-primary text-white",
+                                            "Resolved" => "bg-success text-white",
+                                            "Rejected" => "bg-danger text-white",
+                                            _ => "bg-secondary text-white"
+                                        };
+
+                                        <tr>
+                                            <td>
+                                                <span class="fw-medium text-success">@report.TrackingNumber</span>
+                                            </td>
+                                            <td class="fw-medium">@report.Title</td>
+                                            <td><span class="badge bg-light text-secondary border">@(report.Category?.Name ?? "General")</span></td>
+                                            <td><span class="badge @badgeClass px-2 py-1">@statusStr</span></td>
+                                            <td class="text-end">
+                                                <a asp-controller="Report" asp-action="Details" asp-route-id="@report.Id" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                                    Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Quick Shortcuts & Category Breakdown -->
+        <div class="col-lg-4">
+            
+            <!-- Quick Actions Card -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-0 p-4 pb-0">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fa-solid fa-bolt text-success me-2"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Report" asp-action="Create" class="btn btn-success text-start py-3 px-3 rounded-3 shadow-sm d-flex align-items-center justify-content-between">
+                            <div>
+                                <i class="fa-solid fa-bullhorn fa-lg me-2"></i>
+                                <span class="fw-bold">Report an Issue</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right fa-sm"></i>
+                        </a>
+
+                        <a asp-controller="Report" asp-action="Track" class="btn btn-light border text-start py-3 px-3 rounded-3 d-flex align-items-center justify-content-between">
+                            <div>
+                                <i class="fa-solid fa-magnifying-glass fa-lg me-2 text-success"></i>
+                                <span class="fw-semibold text-dark">Track Report Status</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right fa-sm text-muted"></i>
+                        </a>
+
+                        <a asp-controller="Notification" asp-action="Index" class="btn btn-light border text-start py-3 px-3 rounded-3 d-flex align-items-center justify-content-between">
+                            <div>
+                                <i class="fa-solid fa-bell fa-lg me-2 text-success"></i>
+                                <span class="fw-semibold text-dark">Notification Center</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right fa-sm text-muted"></i>
+                        </a>
+
+                        <a asp-controller="Account" asp-action="Profile" class="btn btn-light border text-start py-3 px-3 rounded-3 d-flex align-items-center justify-content-between">
+                            <div>
+                                <i class="fa-solid fa-user-gear fa-lg me-2 text-success"></i>
+                                <span class="fw-semibold text-dark">My User Profile</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right fa-sm text-muted"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Distribution Widget Card -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-0 p-4 pb-0">
+                    <h5 class="fw-bold mb-0">
+                        <i class="fa-solid fa-chart-pie text-success me-2"></i> Reports by Category
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (!Model.CategoryCounts.Any())
+                    {
+                        <p class="text-muted small mb-0 text-center py-3">No category data available yet.</p>
+                    }
+                    else
+                    {
+                        foreach (var cat in Model.CategoryCounts)
+                        {
+                            double pct = Model.TotalReports > 0 ? (double)cat.Value / Model.TotalReports * 100 : 0;
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="small fw-semibold text-dark">@cat.Key</span>
+                                    <span class="small text-muted fw-bold">@cat.Value (@pct.ToString("0.#")%)</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-success bg-opacity-75" role="progressbar" style="width: @pct%" aria-valuenow="@pct" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

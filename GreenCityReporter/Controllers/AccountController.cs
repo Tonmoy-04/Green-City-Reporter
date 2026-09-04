@@ -9,11 +9,16 @@ namespace GreenCityReporter.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly GreenCityReporter.Data.ApplicationDbContext _context;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            GreenCityReporter.Data.ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
         }
 
         [HttpGet]
@@ -102,7 +107,93 @@ public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl =
     return View(model);
 }
 
+        // GET: /Account/Profile
+        [HttpGet]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Challenge();
+            }
 
+            var roles = await _userManager.GetRolesAsync(user);
+            string role = roles.FirstOrDefault() ?? "Citizen";
+
+            int totalReports = _context.Reports.Count(r => r.UserId == user.Id);
+            int resolvedReports = _context.Reports.Count(r => r.UserId == user.Id && r.CurrentStatus == Models.Enums.ReportStatus.Resolved);
+
+            var viewModel = new ViewModels.UserProfileViewModel
+            {
+                FullName = user.FullName,
+                Email = user.Email ?? string.Empty,
+                Role = role,
+                TotalReportsCount = totalReports,
+                ResolvedReportsCount = resolvedReports
+            };
+
+            return View(viewModel);
+        }
+
+        // POST: /Account/Profile
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        public async Task<IActionResult> Profile(ViewModels.UserProfileViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Challenge();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                int totalReports = _context.Reports.Count(r => r.UserId == user.Id);
+                int resolvedReports = _context.Reports.Count(r => r.UserId == user.Id && r.CurrentStatus == Models.Enums.ReportStatus.Resolved);
+
+                model.Email = user.Email ?? string.Empty;
+                model.TotalReportsCount = totalReports;
+                model.ResolvedReportsCount = resolvedReports;
+                return View(model);
+            }
+
+            // Update Full Name
+            if (user.FullName != model.FullName.Trim())
+            {
+                user.FullName = model.FullName.Trim();
+                await _userManager.UpdateAsync(user);
+                TempData["ProfileSuccess"] = "Profile name updated successfully.";
+            }
+
+            // Handle Password Change if requested
+            if (!string.IsNullOrWhiteSpace(model.CurrentPassword) && !string.IsNullOrWhiteSpace(model.NewPassword))
+            {
+                if (model.NewPassword != model.ConfirmNewPassword)
+                {
+                    ModelState.AddModelError("ConfirmNewPassword", "New password and confirmation password do not match.");
+                    return View(model);
+                }
+
+                var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+                if (changePasswordResult.Succeeded)
+                {
+                    await _signInManager.RefreshSignInAsync(user);
+                    TempData["PasswordSuccess"] = "Password changed successfully.";
+                }
+                else
+                {
+                    foreach (var error in changePasswordResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return View(model);
+                }
+            }
+
+            return RedirectToAction(nameof(Profile));
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

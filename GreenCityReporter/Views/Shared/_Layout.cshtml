@@ -65,8 +65,17 @@
                                 <a class="nav-link text-dark fw-medium mx-2"
                                    asp-area=""
                                    asp-controller="Report"
+                                   asp-action="Dashboard">
+                                    <i class="fa-solid fa-chart-pie me-1 text-success"></i> Dashboard
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark fw-medium mx-2"
+                                   asp-area=""
+                                   asp-controller="Report"
                                    asp-action="Create">
-                                    <i class="fa-solid fa-plus-circle me-1 text-success"></i> Report an Issue
+                                    <i class="fa-solid fa-plus-circle me-1 text-success"></i> Report Issue
                                 </a>
                             </li>
 
@@ -116,15 +125,17 @@
                             }
 
                             <li class="nav-item me-2">
-                                <a class="nav-link text-dark fw-medium position-relative"
+                                <a class="nav-link text-dark fw-medium position-relative p-1"
                                    asp-area=""
                                    asp-controller="Notification"
                                    asp-action="Index"
                                    title="Notifications">
-                                    <i class="fa-solid fa-bell fa-lg text-secondary"></i>
+                                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle @(unreadCount > 0 ? "bg-warning bg-opacity-20 text-warning-emphasis" : "bg-success bg-opacity-10 text-success") shadow-sm" style="width: 38px; height: 38px;">
+                                        <i class="fa-solid fa-bell @(unreadCount > 0 ? "text-warning" : "text-success") fa-lg"></i>
+                                    </span>
                                     @if (unreadCount > 0)
                                     {
-                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light shadow-sm" style="font-size: 0.65rem;">
                                             @unreadCount
                                             <span class="visually-hidden">unread notifications</span>
                                         </span>
@@ -150,6 +161,17 @@
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0"
                                     aria-labelledby="navbarDropdown">
 
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Report" asp-action="Dashboard">
+                                            <i class="fa-solid fa-chart-line me-2 text-success"></i> Citizen Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                            <i class="fa-solid fa-user-gear me-2 text-success"></i> My Profile
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <a class="dropdown-item" asp-controller="Report" asp-action="MyReports">
                                             <i class="fa-solid fa-folder-open me-2 text-muted"></i> My Reports

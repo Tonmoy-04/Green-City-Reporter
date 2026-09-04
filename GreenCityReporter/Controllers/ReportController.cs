@@ -198,6 +198,45 @@ namespace GreenCityReporter.Controllers
 
 
 
+        // GET: /Report/Dashboard
+        [HttpGet]
+        public async Task<IActionResult> Dashboard()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Challenge();
+            }
+
+            var userReports = await _context.Reports
+                .Include(r => r.Category)
+                .Where(r => r.UserId == user.Id)
+                .ToListAsync();
+
+            var userNotifications = await _context.Notifications
+                .Include(n => n.Report)
+                .Where(n => n.UserId == user.Id)
+                .OrderByDescending(n => n.CreatedAt)
+                .ToListAsync();
+
+            var viewModel = new ViewModels.CitizenDashboardViewModel
+            {
+                TotalReports = userReports.Count,
+                PendingCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.Pending),
+                InProgressCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.InProgress),
+                ResolvedCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.Resolved),
+                RejectedCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.Rejected),
+                RecentReports = userReports.OrderByDescending(r => r.CreatedAt).Take(5).ToList(),
+                RecentNotifications = userNotifications.Take(5).ToList(),
+                UnreadNotificationCount = userNotifications.Count(n => !n.IsRead),
+                CategoryCounts = userReports
+                    .GroupBy(r => r.Category?.Name ?? "Uncategorized")
+                    .ToDictionary(g => g.Key, g => g.Count())
+            };
+
+            return View(viewModel);
+        }
+
         // GET: /Report/MyReports
         [HttpGet]
         public async Task<IActionResult> MyReports()
