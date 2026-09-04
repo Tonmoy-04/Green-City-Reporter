@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Green City Reporter\\GreenCityReporter\\GreenCityReporter.csproj": {}
+    "E:\\Project\\Green City\\Green-City-Reporter\\GreenCityReporter\\GreenCityReporter.csproj": {}
   },
   "projects": {
-    "D:\\Green City Reporter\\GreenCityReporter\\GreenCityReporter.csproj": {
+    "E:\\Project\\Green City\\Green-City-Reporter\\GreenCityReporter\\GreenCityReporter.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Green City Reporter\\GreenCityReporter\\GreenCityReporter.csproj",
+        "projectUniqueName": "E:\\Project\\Green City\\Green-City-Reporter\\GreenCityReporter\\GreenCityReporter.csproj",
         "projectName": "GreenCityReporter",
-        "projectPath": "D:\\Green City Reporter\\GreenCityReporter\\GreenCityReporter.csproj",
-        "packagesPath": "C:\\Users\\noman\\.nuget\\packages\\",
-        "outputPath": "D:\\Green City Reporter\\GreenCityReporter\\obj\\",
+        "projectPath": "E:\\Project\\Green City\\Green-City-Reporter\\GreenCityReporter\\GreenCityReporter.csproj",
+        "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
+        "outputPath": "E:\\Project\\Green City\\Green-City-Reporter\\GreenCityReporter\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\noman\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\USER\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {

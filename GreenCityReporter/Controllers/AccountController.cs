@@ -61,29 +61,48 @@ namespace GreenCityReporter.Controllers
             return View();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
+        
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
+{
+    ViewData["ReturnUrl"] = returnUrl;
+
+    if (ModelState.IsValid)
+    {
+        var result = await _signInManager.PasswordSignInAsync(
+            model.Email,
+            model.Password,
+            model.RememberMe,
+            lockoutOnFailure: false
+        );
+
+        if (result.Succeeded)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
+            // Find the logged-in user
+            var loggedInUser = await _userManager.FindByEmailAsync(model.Email);
+
+            // Admin -> Admin Dashboard
+            if (loggedInUser != null &&
+                await _userManager.IsInRoleAsync(loggedInUser, "Admin"))
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-
-                if (result.Succeeded)
-                {
-                    return RedirectToLocal(returnUrl);
-                }
-
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                return View(model);
+                return RedirectToAction("Index", "Admin");
             }
 
-            // If we got this far, something failed, redisplay form
-            return View(model);
+            // Citizen -> requested page / Home
+            return RedirectToLocal(returnUrl);
         }
+
+        ModelState.AddModelError(
+            string.Empty,
+            "Invalid login attempt."
+        );
+    }
+
+    return View(model);
+}
+
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

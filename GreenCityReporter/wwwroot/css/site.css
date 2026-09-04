@@ -38,3 +38,972 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* =========================================================
+   GREEN CITY - PROFESSIONAL ADMIN DASHBOARD
+   ========================================================= */
+
+.admin-dashboard {
+    --admin-green: #16794a;
+    --admin-green-dark: #0f5f39;
+    --admin-ink: #17221d;
+    --admin-muted: #748078;
+    --admin-border: #e6ece8;
+    --admin-surface: #ffffff;
+
+    padding: 28px 0 60px;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.admin-hero {
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 190px;
+
+    padding: 38px 42px;
+
+    border-radius: 24px;
+
+    color: #fff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #123f2b 0%,
+            #176f47 55%,
+            #24915c 100%
+        );
+
+    box-shadow:
+        0 18px 45px rgba(18, 63, 43, .16);
+}
+
+
+/* Decorative circles */
+
+.admin-hero::before,
+.admin-hero::after {
+    content: "";
+
+    position: absolute;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(255,255,255,.12);
+}
+
+.admin-hero::before {
+    width: 300px;
+    height: 300px;
+
+    right: 90px;
+    top: -185px;
+}
+
+.admin-hero::after {
+    width: 220px;
+    height: 220px;
+
+    right: -80px;
+    bottom: -140px;
+}
+
+
+.admin-hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+
+.admin-eyebrow {
+    display: inline-flex;
+
+    align-items: center;
+
+    margin-bottom: 10px;
+
+    font-size: .76rem;
+
+    font-weight: 700;
+
+    letter-spacing: .13em;
+
+    text-transform: uppercase;
+
+    opacity: .78;
+}
+
+
+.admin-title {
+    margin: 0;
+
+    font-size: clamp(2rem, 4vw, 2.85rem);
+
+    font-weight: 750;
+
+    letter-spacing: -.045em;
+}
+
+
+.admin-subtitle {
+    max-width: 640px;
+
+    margin: 10px 0 0;
+
+    color: rgba(255,255,255,.76);
+
+    font-size: .98rem;
+}
+
+
+.admin-hero-icon {
+    position: relative;
+
+    z-index: 2;
+
+    display: grid;
+
+    width: 104px;
+    height: 104px;
+
+    place-items: center;
+
+    border:
+        1px solid rgba(255,255,255,.22);
+
+    border-radius: 28px;
+
+    background:
+        rgba(255,255,255,.10);
+
+    backdrop-filter: blur(12px);
+
+    font-size: 3rem;
+
+    transform: rotate(-7deg);
+
+    transition: .3s ease;
+}
+
+
+.admin-hero:hover .admin-hero-icon {
+    transform:
+        rotate(0deg)
+        scale(1.05);
+}
+
+
+/* =========================================================
+   STAT CARDS
+   ========================================================= */
+
+.admin-stat-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+
+.admin-stat-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    min-height: 132px;
+
+    padding: 22px;
+
+    border:
+        1px solid var(--admin-border);
+
+    border-radius: 20px;
+
+    background:
+        var(--admin-surface);
+
+    box-shadow:
+        0 8px 28px
+        rgba(24, 45, 35, .055);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+
+.admin-stat-card:hover {
+
+    transform:
+        translateY(-4px);
+
+    box-shadow:
+        0 15px 35px
+        rgba(24, 45, 35, .10);
+}
+
+
+/* Stat icons */
+
+.stat-icon {
+
+    display: grid;
+
+    flex: 0 0 50px;
+
+    width: 50px;
+    height: 50px;
+
+    place-items: center;
+
+    border-radius: 15px;
+
+    font-size: 1.1rem;
+}
+
+
+.stat-total .stat-icon {
+    color: #276b50;
+    background: #e9f6ef;
+}
+
+
+.stat-pending .stat-icon {
+    color: #a56c00;
+    background: #fff5dc;
+}
+
+
+.stat-progress .stat-icon {
+    color: #3367a6;
+    background: #eaf2fb;
+}
+
+
+.stat-resolved .stat-icon {
+    color: #16794a;
+    background: #e5f6ed;
+}
+
+
+.stat-label {
+
+    display: block;
+
+    color:
+        var(--admin-muted);
+
+    font-size: .76rem;
+
+    font-weight: 650;
+
+    text-transform: uppercase;
+
+    letter-spacing: .07em;
+}
+
+
+.stat-value {
+
+    display: block;
+
+    margin:
+        2px 0 1px;
+
+    color:
+        var(--admin-ink);
+
+    font-size: 1.75rem;
+
+    line-height: 1.1;
+
+    letter-spacing: -.04em;
+}
+
+
+.stat-note {
+
+    display: block;
+
+    color: #9aa39e;
+
+    font-size: .74rem;
+}
+
+
+/* =========================================================
+   REPORT MANAGEMENT HEADER
+   ========================================================= */
+
+.admin-toolbar {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+.section-title {
+
+    color:
+        var(--admin-ink);
+
+    font-size: 1.3rem;
+
+    font-weight: 750;
+
+    letter-spacing: -.025em;
+}
+
+
+.section-subtitle {
+
+    color:
+        var(--admin-muted);
+
+    font-size: .88rem;
+}
+
+
+.toolbar-summary {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding:
+        9px 13px;
+
+    border:
+        1px solid #f0e1bc;
+
+    border-radius: 999px;
+
+    background: #fffaf0;
+
+    color: #85631d;
+
+    font-size: .78rem;
+
+    font-weight: 650;
+}
+
+
+.summary-dot {
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #e0a11c;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.admin-table-card {
+
+    overflow: hidden;
+
+    border:
+        1px solid var(--admin-border);
+
+    border-radius: 22px;
+
+    background: #fff;
+
+    box-shadow:
+        0 12px 35px
+        rgba(24, 45, 35, .065);
+}
+
+
+.table-card-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 21px 24px;
+
+    border-bottom:
+        1px solid var(--admin-border);
+}
+
+
+.table-title-icon {
+
+    display: grid;
+
+    width: 43px;
+    height: 43px;
+
+    place-items: center;
+
+    border-radius: 13px;
+
+    color:
+        var(--admin-green);
+
+    background: #e9f6ef;
+}
+
+
+.table-title {
+
+    margin: 0;
+
+    color:
+        var(--admin-ink);
+
+    font-size: 1rem;
+
+    font-weight: 750;
+}
+
+
+.table-subtitle {
+
+    color: #98a19c;
+
+    font-size: .76rem;
+}
+
+
+.report-count {
+
+    padding:
+        7px 11px;
+
+    border-radius: 9px;
+
+    color:
+        var(--admin-green);
+
+    background: #eef8f2;
+
+    font-size: .75rem;
+
+    font-weight: 700;
+}
+
+
+.admin-report-table {
+
+    min-width: 1080px;
+}
+
+
+.admin-report-table thead th {
+
+    padding:
+        14px 16px;
+
+    border-bottom:
+        1px solid var(--admin-border);
+
+    color: #8b9690;
+
+    background: #fafcfb;
+
+    font-size: .68rem;
+
+    font-weight: 750;
+
+    letter-spacing: .08em;
+
+    text-transform: uppercase;
+
+    white-space: nowrap;
+}
+
+
+.admin-report-table tbody td {
+
+    padding:
+        17px 16px;
+
+    border-color: #eef2ef;
+
+    color: #48534d;
+
+    font-size: .82rem;
+}
+
+
+.admin-report-table tbody tr {
+
+    transition:
+        background .18s ease;
+}
+
+
+.admin-report-table tbody tr:hover {
+
+    background:
+        #fbfefc;
+}
+
+
+/* =========================================================
+   TRACKING NUMBER
+   ========================================================= */
+
+.tracking-chip {
+
+    display: inline-block;
+
+    padding:
+        6px 9px;
+
+    border:
+        1px solid #dcece2;
+
+    border-radius: 8px;
+
+    color:
+        var(--admin-green);
+
+    background: #f3faf6;
+
+    font-size: .72rem;
+
+    font-weight: 750;
+}
+
+
+/* =========================================================
+   REPORT INFORMATION
+   ========================================================= */
+
+.report-name {
+
+    max-width: 190px;
+
+    overflow: hidden;
+
+    color: #202b25;
+
+    font-weight: 700;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+.report-id {
+
+    margin-top: 2px;
+
+    color: #a0aaa4;
+
+    font-size: .68rem;
+}
+
+
+.category-text {
+
+    color: #56615b;
+
+    font-weight: 550;
+}
+
+
+/* =========================================================
+   CITIZEN
+   ========================================================= */
+
+.citizen-cell {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    white-space: nowrap;
+}
+
+
+.citizen-avatar {
+
+    display: inline-grid;
+
+    width: 30px;
+    height: 30px;
+
+    place-items: center;
+
+    border-radius: 50%;
+
+    color: #28684d;
+
+    background: #e7f4ed;
+
+    font-size: .7rem;
+
+    font-weight: 750;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status-pill {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    padding:
+        6px 9px;
+
+    border-radius: 999px;
+
+    font-size: .7rem;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+.status-pill > span {
+
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+}
+
+
+.status-pending {
+
+    color: #936000;
+
+    background: #fff5dc;
+}
+
+.status-pending > span {
+    background: #e1a522;
+}
+
+
+.status-progress {
+
+    color: #315f99;
+
+    background: #edf4fc;
+}
+
+.status-progress > span {
+    background: #5b8bc3;
+}
+
+
+.status-resolved {
+
+    color: #187149;
+
+    background: #e8f7ef;
+}
+
+.status-resolved > span {
+    background: #2d9b68;
+}
+
+
+.status-rejected {
+
+    color: #a44040;
+
+    background: #fceded;
+}
+
+.status-rejected > span {
+    background: #d35d5d;
+}
+
+
+.status-neutral {
+
+    color: #67736d;
+
+    background: #f0f3f1;
+}
+
+.status-neutral > span {
+    background: #89938e;
+}
+
+
+/* =========================================================
+   PRIORITY
+   ========================================================= */
+
+.priority {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    font-size: .74rem;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+.priority-high {
+    color: #bf4848;
+}
+
+
+.priority-medium {
+    color: #b47b16;
+}
+
+
+.priority-low {
+    color: #2e8a60;
+}
+
+
+/* =========================================================
+   DATE
+   ========================================================= */
+
+.date-cell {
+
+    color: #4d5952;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+.time-cell {
+
+    margin-top: 2px;
+
+    color: #a0aaa4;
+
+    font-size: .68rem;
+}
+
+
+/* =========================================================
+   VIEW BUTTON
+   ========================================================= */
+
+.admin-view-btn {
+
+    padding:
+        7px 12px;
+
+    border:
+        1px solid #d8e9df;
+
+    border-radius: 9px;
+
+    color:
+        var(--admin-green);
+
+    background: #f7fbf8;
+
+    font-size: .73rem;
+
+    font-weight: 700;
+
+    transition: .2s ease;
+}
+
+
+.admin-view-btn:hover {
+
+    border-color:
+        var(--admin-green);
+
+    color: #fff;
+
+    background:
+        var(--admin-green);
+
+    transform:
+        translateX(2px);
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.admin-empty-state {
+
+    padding:
+        70px 24px;
+
+    text-align: center;
+}
+
+
+.empty-icon {
+
+    display: grid;
+
+    width: 64px;
+    height: 64px;
+
+    margin:
+        0 auto 15px;
+
+    place-items: center;
+
+    border-radius: 18px;
+
+    color: #7f8b84;
+
+    background: #f0f4f1;
+
+    font-size: 1.4rem;
+}
+
+
+.admin-empty-state h4 {
+
+    color:
+        var(--admin-ink);
+
+    font-weight: 750;
+}
+
+
+.admin-empty-state p {
+
+    margin: 0;
+
+    color:
+        var(--admin-muted);
+
+    font-size: .88rem;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1199.98px) {
+
+    .admin-stat-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 767.98px) {
+
+    .admin-dashboard {
+
+        padding-top: 12px;
+    }
+
+
+    .admin-hero {
+
+        min-height: 165px;
+
+        padding:
+            28px 24px;
+
+        border-radius: 20px;
+    }
+
+
+    .admin-hero-icon {
+
+        width: 70px;
+        height: 70px;
+
+        border-radius: 20px;
+
+        font-size: 2rem;
+    }
+
+
+    .admin-stat-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+
+    .admin-toolbar {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .table-card-header {
+
+        padding: 18px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .admin-hero-icon {
+
+        display: none;
+    }
+
+
+    .admin-title {
+
+        font-size: 1.8rem;
+    }
+
+
+    .admin-stat-card {
+
+        min-height: 112px;
+    }
+}

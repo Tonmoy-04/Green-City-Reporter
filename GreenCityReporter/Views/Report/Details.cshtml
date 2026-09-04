@@ -1,4 +1,4 @@
-﻿@model GreenCityReporter.Models.Report
+@model GreenCityReporter.Models.Report
 
 @{
     ViewData["Title"] = "Report Details";
@@ -47,25 +47,25 @@
                             {
                                 case "Pending":
                                     <span class="badge bg-warning text-dark px-3 py-2">
-                                        Pending
+                                        <i class="fa-regular fa-clock me-1"></i> Pending
                                     </span>
                                     break;
 
                                 case "InProgress":
                                     <span class="badge bg-primary px-3 py-2">
-                                        In Progress
+                                        <i class="fa-solid fa-spinner me-1"></i> In Progress
                                     </span>
                                     break;
 
                                 case "Resolved":
                                     <span class="badge bg-success px-3 py-2">
-                                        Resolved
+                                        <i class="fa-solid fa-check-circle me-1"></i> Resolved
                                     </span>
                                     break;
 
                                 case "Rejected":
                                     <span class="badge bg-danger px-3 py-2">
-                                        Rejected
+                                        <i class="fa-solid fa-xmark-circle me-1"></i> Rejected
                                     </span>
                                     break;
 
@@ -143,7 +143,7 @@
                     <!-- Report Metadata -->
                     <div class="row mt-3">
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
 
                             <small class="text-muted d-block">
                                 Category
@@ -155,7 +155,7 @@
 
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
 
                             <small class="text-muted d-block">
                                 Priority
@@ -165,26 +165,26 @@
                             {
                                 case "High":
                                     <span class="text-danger fw-medium">
-                                        High
+                                        <i class="fa-solid fa-arrow-up me-1"></i> High
                                     </span>
                                     break;
 
                                 case "Medium":
                                     <span class="text-warning fw-medium">
-                                        Medium
+                                        <i class="fa-solid fa-minus me-1"></i> Medium
                                     </span>
                                     break;
 
                                 default:
                                     <span class="text-success fw-medium">
-                                        Low
+                                        <i class="fa-solid fa-arrow-down me-1"></i> Low
                                     </span>
                                     break;
                             }
 
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
 
                             <small class="text-muted d-block">
                                 Submitted
@@ -194,6 +194,18 @@
                                 @Model.CreatedAt
                                 .ToLocalTime()
                                 .ToString("dd MMM yyyy, hh:mm tt")
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+
+                            <small class="text-muted d-block">
+                                Updated
+                            </small>
+
+                            <span class="fw-medium">
+                                @Model.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
                             </span>
 
                         </div>
