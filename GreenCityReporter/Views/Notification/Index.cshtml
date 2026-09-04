@@ -1,0 +1,99 @@
+@model IEnumerable<GreenCityReporter.Models.Notification>
+
+@{
+    ViewData["Title"] = "Notifications";
+    var hasUnread = Model.Any(n => !n.IsRead);
+}
+
+<div class="container py-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">
+                <i class="fa-solid fa-bell me-2 text-success"></i>Notifications
+            </h1>
+            <p class="text-muted mb-0">
+                Stay updated on your reported environmental issues.
+            </p>
+        </div>
+
+        @if (hasUnread)
+        {
+            <form asp-controller="Notification" asp-action="MarkAllAsRead" method="post" class="mt-3 mt-md-0">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-success rounded-pill px-4">
+                    <i class="fa-solid fa-check-double me-2"></i> Mark All as Read
+                </button>
+            </form>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 text-center py-5">
+            <div class="card-body py-5">
+                <div class="mb-3">
+                    <i class="fa-regular fa-bell-slash fa-3x text-muted"></i>
+                </div>
+                <h4 class="fw-bold">No Notifications</h4>
+                <p class="text-muted mb-0">
+                    You have no notifications at this time.
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="list-group list-group-flush">
+                @foreach (var notification in Model)
+                {
+                    <div class="list-group-item p-4 d-flex justify-content-between align-items-center @(!notification.IsRead ? "bg-light-subtle border-start border-success border-4" : "")">
+                        <div class="d-flex align-items-start me-3">
+                            <div class="me-3 mt-1">
+                                @if (!notification.IsRead)
+                                {
+                                    <span class="badge bg-success rounded-circle p-2">
+                                        <i class="fa-solid fa-circle fa-2xs"></i>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary bg-opacity-25 text-secondary rounded-circle p-2">
+                                        <i class="fa-solid fa-check"></i>
+                                    </span>
+                                }
+                            </div>
+                            <div>
+                                <p class="mb-1 @(!notification.IsRead ? "fw-bold text-dark" : "text-secondary")">
+                                    @notification.Message
+                                </p>
+                                <div class="d-flex align-items-center gap-3">
+                                    <small class="text-muted">
+                                        <i class="fa-regular fa-clock me-1"></i>
+                                        @notification.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                    </small>
+                                    @if (notification.ReportId > 0)
+                                    {
+                                        <a asp-controller="Report" asp-action="Details" asp-route-id="@notification.ReportId" class="small text-success fw-medium text-decoration-none">
+                                            <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> View Report
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (!notification.IsRead)
+                        {
+                            <form asp-controller="Notification" asp-action="MarkAsRead" asp-route-id="@notification.Id" method="post" class="ms-2">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-light border text-muted rounded-pill px-3" title="Mark as read">
+                                    <i class="fa-solid fa-check me-1"></i> Read
+                                </button>
+                            </form>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
