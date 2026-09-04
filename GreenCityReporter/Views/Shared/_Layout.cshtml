@@ -1,7 +1,8 @@
-﻿
+
 @using Microsoft.AspNetCore.Identity
 @using GreenCityReporter.Models
 @inject UserManager<ApplicationUser> UserManager
+@inject GreenCityReporter.Data.ApplicationDbContext DbContext
 
 <!DOCTYPE html>
 <html lang="en">
@@ -54,14 +55,46 @@
                                asp-area=""
                                asp-controller="Home"
                                asp-action="Index">
-                                Home
+                                <i class="fa-solid fa-house me-1 text-success"></i> Home
                             </a>
                         </li>
 
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark fw-medium mx-2"
+                                   asp-area=""
+                                   asp-controller="Report"
+                                   asp-action="Dashboard">
+                                    <i class="fa-solid fa-chart-pie me-1 text-success"></i> Dashboard
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark fw-medium mx-2"
+                                   asp-area=""
+                                   asp-controller="Report"
+                                   asp-action="Create">
+                                    <i class="fa-solid fa-plus-circle me-1 text-success"></i> Report Issue
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark fw-medium mx-2"
+                                   asp-area=""
+                                   asp-controller="Report"
+                                   asp-action="MyReports">
+                                    <i class="fa-solid fa-list-check me-1 text-success"></i> My Reports
+                                </a>
+                            </li>
+                        }
+
                         <li class="nav-item">
                             <a class="nav-link text-dark fw-medium mx-2"
-                               href="#">
-                                Recent Reports
+                               asp-area=""
+                               asp-controller="Report"
+                               asp-action="Track">
+                                <i class="fa-solid fa-magnifying-glass me-1 text-success"></i> Track Report
                             </a>
                         </li>
 
@@ -72,7 +105,7 @@
                                    asp-area=""
                                    asp-controller="Admin"
                                    asp-action="Index">
-                                    Dashboard
+                                    <i class="fa-solid fa-user-shield me-1 text-primary"></i> Dashboard
                                 </a>
                             </li>
                         }
@@ -80,11 +113,35 @@
                     </ul>
 
                     <!-- User Navigation -->
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav align-items-center">
 
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             var currentUser = await UserManager.GetUserAsync(User);
+                            int unreadCount = 0;
+                            if (currentUser != null)
+                            {
+                                unreadCount = DbContext.Notifications.Count(n => n.UserId == currentUser.Id && !n.IsRead);
+                            }
+
+                            <li class="nav-item me-2">
+                                <a class="nav-link text-dark fw-medium position-relative p-1"
+                                   asp-area=""
+                                   asp-controller="Notification"
+                                   asp-action="Index"
+                                   title="Notifications">
+                                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle @(unreadCount > 0 ? "bg-warning bg-opacity-20 text-warning-emphasis" : "bg-success bg-opacity-10 text-success") shadow-sm" style="width: 38px; height: 38px;">
+                                        <i class="fa-solid fa-bell @(unreadCount > 0 ? "text-warning" : "text-success") fa-lg"></i>
+                                    </span>
+                                    @if (unreadCount > 0)
+                                    {
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light shadow-sm" style="font-size: 0.65rem;">
+                                            @unreadCount
+                                            <span class="visually-hidden">unread notifications</span>
+                                        </span>
+                                    }
+                                </a>
+                            </li>
 
                             <li class="nav-item dropdown">
 
@@ -95,7 +152,7 @@
                                    data-bs-toggle="dropdown"
                                    aria-expanded="false">
 
-                                    <i class="fa-solid fa-user-circle me-1"></i>
+                                    <i class="fa-solid fa-user-circle me-1 text-success"></i>
 
                                     @(currentUser?.FullName ?? "User")
 
@@ -103,6 +160,33 @@
 
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0"
                                     aria-labelledby="navbarDropdown">
+
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Report" asp-action="Dashboard">
+                                            <i class="fa-solid fa-chart-line me-2 text-success"></i> Citizen Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                            <i class="fa-solid fa-user-gear me-2 text-success"></i> My Profile
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Report" asp-action="MyReports">
+                                            <i class="fa-solid fa-folder-open me-2 text-muted"></i> My Reports
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Notification" asp-action="Index">
+                                            <i class="fa-solid fa-bell me-2 text-muted"></i> Notifications
+                                            @if (unreadCount > 0)
+                                            {
+                                                <span class="badge bg-danger ms-1">@unreadCount</span>
+                                            }
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
 
                                     <li>
                                         <form class="form-inline"

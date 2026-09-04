@@ -250,42 +250,45 @@
                     <!-- Existing Comments -->
                     @if (Model.Comments != null && Model.Comments.Any())
                     {
-                        @foreach (var comment in Model.Comments
-                            .OrderByDescending(c => c.CreatedAt))
-                        {
-                            <div class="border-bottom pb-3 mb-3">
-
-                                <div class="d-flex justify-content-between">
-
-                                    <strong>
-                                        @comment.User?.FullName
-                                    </strong>
-
-                                    <small class="text-muted">
-                                        @comment.CreatedAt
-                                        .ToLocalTime()
-                                        .ToString("dd MMM yyyy, hh:mm tt")
-                                    </small>
-
+                        <div class="comments-list">
+                            @foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedAt))
+                            {
+                                bool isOwner = comment.UserId == Model.UserId;
+                                <div class="card border-0 bg-light rounded-3 mb-3 p-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-secondary bg-opacity-25 text-secondary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                                <i class="fa-solid fa-user fa-sm"></i>
+                                            </div>
+                                            <strong>@(comment.User?.FullName ?? "Anonymous")</strong>
+                                            @if (isOwner)
+                                            {
+                                                <span class="badge bg-success bg-opacity-10 text-success ms-2">Author</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-primary bg-opacity-10 text-primary ms-2">Official</span>
+                                            }
+                                        </div>
+                                        <small class="text-muted">
+                                            <i class="fa-regular fa-clock me-1"></i>
+                                            @comment.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                        </small>
+                                    </div>
+                                    <p class="text-dark mb-0 ms-4 ps-2">
+                                        @comment.Message
+                                    </p>
                                 </div>
-
-                                <p class="text-muted mb-0 mt-2">
-                                    @comment.Message
-                                </p>
-
-                            </div>
-                        }
+                            }
+                        </div>
                     }
                     else
                     {
                         <div class="text-center py-4">
-
                             <i class="fa-regular fa-comment-dots fa-2x text-muted mb-3"></i>
-
                             <p class="text-muted mb-0">
-                                No comments yet.
+                                No comments on this report yet.
                             </p>
-
                         </div>
                     }
 
@@ -357,42 +360,66 @@
 
                     @if (Model.StatusHistories != null && Model.StatusHistories.Any())
                     {
-                        @foreach (var history in Model.StatusHistories
-                            .OrderByDescending(h => h.UpdatedAt))
-                        {
-                            <div class="mb-4">
+                        <div class="timeline">
+                            @foreach (var history in Model.StatusHistories.OrderByDescending(h => h.UpdatedAt))
+                            {
+                                string newStatusStr = history.NewStatus.ToString() == "InProgress" ? "In Progress" : history.NewStatus.ToString();
+                                string badgeClass = history.NewStatus.ToString() switch
+                                {
+                                    "Pending" => "bg-warning text-dark",
+                                    "InProgress" => "bg-primary text-white",
+                                    "Resolved" => "bg-success text-white",
+                                    "Rejected" => "bg-danger text-white",
+                                    _ => "bg-secondary text-white"
+                                };
 
-                                <div class="d-flex align-items-start">
+                                <div class="mb-4 pb-2 border-bottom border-light">
 
-                                    <div class="bg-success bg-opacity-10 text-success rounded-circle p-2 me-3">
-                                        <i class="fa-solid fa-check"></i>
-                                    </div>
+                                    <div class="d-flex align-items-start">
 
-                                    <div>
+                                        <div class="me-3">
+                                            <span class="badge @badgeClass p-2 rounded-circle">
+                                                <i class="fa-solid fa-rotate"></i>
+                                            </span>
+                                        </div>
 
-                                        <h6 class="fw-bold mb-1">
-                                            @history.NewStatus
-                                        </h6>
+                                        <div class="flex-grow-1">
 
-                                        <small class="text-muted">
-                                            @history.UpdatedAt
-                                            .ToLocalTime()
-                                            .ToString("dd MMM yyyy, hh:mm tt")
-                                        </small>
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="badge @badgeClass px-2 py-1">
+                                                    @newStatusStr
+                                                </span>
+                                            </div>
 
-                                        @if (!string.IsNullOrWhiteSpace(history.Remarks))
-                                        {
-                                            <p class="text-muted small mt-2 mb-0">
-                                                @history.Remarks
-                                            </p>
-                                        }
+                                            <small class="text-muted d-block mt-1">
+                                                <i class="fa-regular fa-calendar me-1"></i>
+                                                @history.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                            </small>
+
+                                            @if (history.Updater != null)
+                                            {
+                                                <small class="text-muted d-block">
+                                                    <i class="fa-regular fa-user me-1"></i> By: @history.Updater.FullName
+                                                </small>
+                                            }
+
+                                            @if (!string.IsNullOrWhiteSpace(history.Remarks))
+                                            {
+                                                <div class="bg-light rounded p-2 mt-2">
+                                                    <p class="text-secondary small mb-0">
+                                                        <i class="fa-solid fa-comment-dots me-1 text-muted"></i>
+                                                        @history.Remarks
+                                                    </p>
+                                                </div>
+                                            }
+
+                                        </div>
 
                                     </div>
 
                                 </div>
-
-                            </div>
-                        }
+                            }
+                        </div>
                     }
                     else
                     {

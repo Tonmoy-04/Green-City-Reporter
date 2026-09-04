@@ -98,6 +98,18 @@ namespace GreenCityReporter.Controllers
 
             _context.StatusHistories.Add(history);
 
+            // Notify report owner
+            string readableStatus = newStatus == Models.Enums.ReportStatus.InProgress ? "In Progress" : newStatus.ToString();
+            var notification = new Notification
+            {
+                UserId = report.UserId,
+                ReportId = report.Id,
+                Message = $"Your report '{report.Title}' ({report.TrackingNumber}) status was updated to {readableStatus}.",
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.Notifications.Add(notification);
+
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] =
@@ -151,6 +163,17 @@ namespace GreenCityReporter.Controllers
             };
 
             _context.Comments.Add(comment);
+
+            // Notify report owner
+            var adminCommentNotification = new Notification
+            {
+                UserId = report.UserId,
+                ReportId = report.Id,
+                Message = $"An admin commented on your report '{report.Title}' ({report.TrackingNumber}).",
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.Notifications.Add(adminCommentNotification);
 
             await _context.SaveChangesAsync();
 
