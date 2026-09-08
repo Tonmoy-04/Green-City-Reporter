@@ -1,0 +1,52 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using GreenCityReporter.Models
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    var isLogin = ViewData["IsLogin"] as bool? == true;
+    var currentUser = isLogin ? null : await UserManager.GetUserAsync(User);
+    var name = string.IsNullOrWhiteSpace(currentUser?.FullName) ? "Administrator" : currentUser.FullName;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Green City</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+</head>
+<body class="@(isLogin ? "login-body" : "admin-body")">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    @if (isLogin)
+    {
+        <main id="main-content" class="login-layout">@RenderBody()</main>
+    }
+    else
+    {
+        <aside class="admin-sidebar">
+            <a asp-controller="Admin" asp-action="Index" class="brand"><span class="brand-icon"><i class="fa-solid fa-leaf" aria-hidden="true"></i></span><span>Green City<small>ADMINISTRATION</small></span></a>
+            <div class="sidebar-label">WORKSPACE</div>
+            <nav aria-label="Admin navigation">
+                <a asp-controller="Admin" asp-action="Index" class="sidebar-link @(controller == "Admin" ? "active" : "")" aria-current="@(controller == "Admin" && action == "Index" ? "page" : null)"><i class="fa-solid fa-grip" aria-hidden="true"></i> Report management</a>
+                <a asp-controller="Account" asp-action="Profile" class="sidebar-link @(controller == "Account" && action == "Profile" ? "active" : "")" aria-current="@(controller == "Account" && action == "Profile" ? "page" : null)"><i class="fa-regular fa-user" aria-hidden="true"></i> My profile</a>
+                <a asp-controller="Notification" asp-action="Index" class="sidebar-link @(controller == "Notification" ? "active" : "")" aria-current="@(controller == "Notification" ? "page" : null)"><i class="fa-regular fa-bell" aria-hidden="true"></i> Notifications</a>
+            </nav>
+            <div class="sidebar-bottom"><div class="sidebar-note"><i class="fa-solid fa-seedling" aria-hidden="true"></i><strong>A better city starts here.</strong><p>Turn citizen reports into meaningful progress.</p></div>
+                <form asp-controller="Account" asp-action="Logout" method="post"><button class="sidebar-link signout" type="submit"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Sign out</button></form>
+            </div>
+        </aside>
+        <div class="admin-workspace">
+            <header class="admin-topbar"><span>Workspace <span class="breadcrumb-divider">/</span> <strong>@ViewData["Title"]</strong></span><div class="admin-account"><span class="account-avatar">@name.Substring(0, 1).ToUpperInvariant()</span><span>@name<small>Administrator</small></span></div></header>
+            <main id="main-content" class="admin-main">@RenderBody()</main>
+            <footer class="admin-footer">© @DateTime.Now.Year Green City Reporter <span>City care, coordinated.</span></footer>
+        </div>
+    }
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,44 +1,36 @@
-@model GreenCityReporter.ViewModels.LoginViewModel
+﻿@model GreenCityReporter.ViewModels.LoginViewModel
 @{
-	ViewData["Title"] = "Log in";
+    Layout = "_AdminLayout";
+    ViewData["IsLogin"] = true;
+    var returnUrl = ViewData["ReturnUrl"] as string;
+    var adminLogin = returnUrl != null && (returnUrl.Equals("/Admin", StringComparison.OrdinalIgnoreCase) || returnUrl.StartsWith("/Admin/", StringComparison.OrdinalIgnoreCase) || returnUrl.StartsWith("/Admin?", StringComparison.OrdinalIgnoreCase));
+    ViewData["Title"] = adminLogin ? "Admin sign in" : "Sign in";
 }
-
-<div class="row justify-content-center mt-5">
-	<div class="col-md-6 col-lg-5">
-		<div class="card shadow-sm border-0 rounded-3">
-			<div class="card-body p-4 p-md-5">
-				<h3 class="text-center fw-bold mb-4">Welcome Back</h3>
-				<form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
-					<div asp-validation-summary="All" class="text-danger mb-3"></div>
-
-					<div class="form-floating mb-3">
-						<input asp-for="Email" class="form-control" placeholder="name@example.com" />
-						<label asp-for="Email">Email address</label>
-						<span asp-validation-for="Email" class="text-danger small"></span>
-					</div>
-
-					<div class="form-floating mb-3">
-						<input asp-for="Password" class="form-control" placeholder="Password" />
-						<label asp-for="Password">Password</label>
-						<span asp-validation-for="Password" class="text-danger small"></span>
-					</div>
-
-					<div class="form-check mb-4">
-						<input asp-for="RememberMe" class="form-check-input" />
-						<label asp-for="RememberMe" class="form-check-label">Remember me</label>
-					</div>
-
-					<button type="submit" class="btn btn-success w-100 py-2 fw-bold rounded-pill">Log in</button>
-
-					<div class="text-center mt-4">
-						<p class="mb-0 text-muted">Don't have an account? <a asp-action="Register" class="text-success text-decoration-none fw-medium">Register here</a></p>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-</div>
-
+<section class="login-story">
+    <div class="brand"><span class="brand-icon"><i class="fa-solid fa-leaf" aria-hidden="true"></i></span><span>Green City<small>REPORTER</small></span></div>
+    <div class="login-story-copy"><span class="eyebrow">BETTER TOGETHER</span><h1>A cleaner city.<br />A stronger community.</h1><p>Connect local concerns with meaningful action. Every report is a step toward a better Green City.</p><div class="login-benefit"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Local issues. Lasting improvements.</div></div>
+    <span class="login-story-footer">Small actions. A greener tomorrow.</span>
+</section>
+<section class="login-form-panel">
+    <div class="login-form-wrap">
+        <span class="login-lock"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span>
+        <span class="eyebrow">@(adminLogin ? "ADMINISTRATION" : "GREEN CITY WORKSPACE")</span>
+        <h2>Welcome back</h2>
+        <p class="muted mb-4">@(adminLogin ? "Sign in to review reports and coordinate city services." : "Sign in to your Green City account to continue.")</p>
+        <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@returnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+            <div class="mb-4"><label asp-for="Email" class="form-label">Email address</label><input asp-for="Email" class="form-control" placeholder="you@example.com" autocomplete="username" /><span asp-validation-for="Email" class="text-danger small"></span></div>
+            <div class="mb-4"><label asp-for="Password" class="form-label">Password</label><input asp-for="Password" class="form-control" placeholder="Enter your password" autocomplete="current-password" /><span asp-validation-for="Password" class="text-danger small"></span></div>
+            <div class="form-check mb-4"><input asp-for="RememberMe" class="form-check-input" /><label asp-for="RememberMe" class="form-check-label">Remember me</label></div>
+            <button type="submit" class="btn btn-success w-100">Sign in <i class="fa-solid fa-arrow-right ms-2" aria-hidden="true"></i></button>
+        </form>
+        @if (!adminLogin)
+        {
+            <p class="login-register">New to Green City? <a asp-action="Register">Create an account</a></p>
+        }
+        <div class="login-security"><i class="fa-solid fa-lock me-2" aria-hidden="true"></i> @(adminLogin ? "Authorized administrators only" : "Your community. Your Green City account.")</div>
+    </div>
+</section>
 @section Scripts {
-	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

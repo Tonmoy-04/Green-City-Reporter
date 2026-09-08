@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GreenCityReporter")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9e64e83cc88f668e1d89a248743ca4eb2338e607")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+99566f889a0a7a0172891ae7103deb87711dead2")]
 [assembly: System.Reflection.AssemblyProductAttribute("GreenCityReporter")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GreenCityReporter")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

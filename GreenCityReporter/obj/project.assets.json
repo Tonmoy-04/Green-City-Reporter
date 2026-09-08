@@ -3502,11 +3502,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\Project\\Green City\\Green-City-Reporter\\GreenCityReporter\\GreenCityReporter.csproj",
+      "projectUniqueName": "E:\\Project\\GreenCity\\Green-City-Reporter\\GreenCityReporter\\GreenCityReporter.csproj",
       "projectName": "GreenCityReporter",
-      "projectPath": "E:\\Project\\Green City\\Green-City-Reporter\\GreenCityReporter\\GreenCityReporter.csproj",
+      "projectPath": "E:\\Project\\GreenCity\\Green-City-Reporter\\GreenCityReporter\\GreenCityReporter.csproj",
       "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
-      "outputPath": "E:\\Project\\Green City\\Green-City-Reporter\\GreenCityReporter\\obj\\",
+      "outputPath": "E:\\Project\\GreenCity\\Green-City-Reporter\\GreenCityReporter\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\USER\\AppData\\Roaming\\NuGet\\NuGet.Config"
