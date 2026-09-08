@@ -10,110 +10,116 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Green City Reporter</title>
-    <script type="importmap"></script>
+    
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
     <!-- FontAwesome and Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/GreenCityReporter.styles.css" asp-append-version="true" />
 </head>
 
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-4 py-3">
+<body class="d-flex flex-column min-vh-100">
+    <!-- Top Scroll Progress Indicator -->
+    <div id="scroll-progress" class="scroll-progress-bar"></div>
+
+    <header class="sticky-top">
+        <nav class="navbar navbar-expand-lg navbar-light bg-glass border-bottom py-3">
             <div class="container">
 
-                <!-- Brand -->
-                <a class="navbar-brand fw-bold text-success d-flex align-items-center"
+                <!-- Brand Logo with Glow Accent -->
+                <a class="navbar-brand fw-bold text-success d-flex align-items-center me-4"
                    asp-area=""
                    asp-controller="Home"
                    asp-action="Index">
-                    <i class="fa-solid fa-leaf me-2"></i> Green City
+                    <span class="brand-icon-wrapper me-2">
+                        <i class="fa-solid fa-leaf text-success"></i>
+                    </span>
+                    <span class="brand-text">Green City<span class="brand-subtext text-muted ms-1 fw-normal">Reporter</span></span>
                 </a>
 
-                <!-- Mobile Toggle -->
-                <button class="navbar-toggler border-0"
+                <!-- Mobile Toggle Button -->
+                <button class="navbar-toggler border-0 shadow-none"
                         type="button"
                         data-bs-toggle="collapse"
-                        data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent"
+                        data-bs-target="#mainNavbarCollapse"
+                        aria-controls="mainNavbarCollapse"
                         aria-expanded="false"
                         aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="collapse navbar-collapse" id="mainNavbarCollapse">
 
-                    <!-- Main Navigation -->
-                    <ul class="navbar-nav mx-auto">
+                    <!-- Main Navigation Links -->
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
 
                         <li class="nav-item">
-                            <a class="nav-link text-dark fw-medium mx-2"
+                            <a class="nav-link fw-medium mx-1"
                                asp-area=""
                                asp-controller="Home"
                                asp-action="Index">
-                                <i class="fa-solid fa-house me-1 text-success"></i> Home
+                                <i class="fa-solid fa-house me-1 text-success opacity-75"></i> Home
                             </a>
                         </li>
 
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark fw-medium mx-2"
+                                <a class="nav-link fw-medium mx-1"
                                    asp-area=""
                                    asp-controller="Report"
                                    asp-action="Dashboard">
-                                    <i class="fa-solid fa-chart-pie me-1 text-success"></i> Dashboard
+                                    <i class="fa-solid fa-chart-pie me-1 text-success opacity-75"></i> Dashboard
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link text-dark fw-medium mx-2"
+                                <a class="nav-link fw-medium mx-1"
                                    asp-area=""
                                    asp-controller="Report"
                                    asp-action="Create">
-                                    <i class="fa-solid fa-plus-circle me-1 text-success"></i> Report Issue
+                                    <i class="fa-solid fa-plus-circle me-1 text-success opacity-75"></i> Report Issue
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link text-dark fw-medium mx-2"
+                                <a class="nav-link fw-medium mx-1"
                                    asp-area=""
                                    asp-controller="Report"
                                    asp-action="MyReports">
-                                    <i class="fa-solid fa-list-check me-1 text-success"></i> My Reports
+                                    <i class="fa-solid fa-list-check me-1 text-success opacity-75"></i> My Reports
                                 </a>
                             </li>
                         }
 
                         <li class="nav-item">
-                            <a class="nav-link text-dark fw-medium mx-2"
+                            <a class="nav-link fw-medium mx-1"
                                asp-area=""
                                asp-controller="Report"
                                asp-action="Track">
-                                <i class="fa-solid fa-magnifying-glass me-1 text-success"></i> Track Report
+                                <i class="fa-solid fa-magnifying-glass me-1 text-success opacity-75"></i> Track Report
                             </a>
                         </li>
 
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark fw-medium mx-2"
+                                <a class="nav-link fw-medium mx-1 text-primary-gradient"
                                    asp-area=""
                                    asp-controller="Admin"
                                    asp-action="Index">
-                                    <i class="fa-solid fa-user-shield me-1 text-primary"></i> Dashboard
+                                    <i class="fa-solid fa-user-shield me-1 text-primary"></i> Admin Portal
                                 </a>
                             </li>
                         }
 
                     </ul>
 
-                    <!-- User Navigation -->
-                    <ul class="navbar-nav align-items-center">
+                    <!-- Right User Actions / Auth Buttons -->
+                    <ul class="navbar-nav align-items-lg-center">
 
                         @if (User.Identity?.IsAuthenticated == true)
                         {
@@ -124,14 +130,15 @@
                                 unreadCount = DbContext.Notifications.Count(n => n.UserId == currentUser.Id && !n.IsRead);
                             }
 
-                            <li class="nav-item me-2">
-                                <a class="nav-link text-dark fw-medium position-relative p-1"
+                            <!-- Notification Icon Badge -->
+                            <li class="nav-item me-lg-2 mb-2 mb-lg-0">
+                                <a class="nav-link text-dark position-relative p-2 d-inline-flex align-items-center"
                                    asp-area=""
                                    asp-controller="Notification"
                                    asp-action="Index"
                                    title="Notifications">
-                                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle @(unreadCount > 0 ? "bg-warning bg-opacity-20 text-warning-emphasis" : "bg-success bg-opacity-10 text-success") shadow-sm" style="width: 38px; height: 38px;">
-                                        <i class="fa-solid fa-bell @(unreadCount > 0 ? "text-warning" : "text-success") fa-lg"></i>
+                                    <span class="notification-bell-wrapper d-inline-flex align-items-center justify-content-center rounded-circle @(unreadCount > 0 ? "bg-warning bg-opacity-20 text-warning" : "bg-success bg-opacity-10 text-success") transition-all" style="width: 40px; height: 40px;">
+                                        <i class="fa-solid fa-bell @(unreadCount > 0 ? "text-warning" : "text-success")"></i>
                                     </span>
                                     @if (unreadCount > 0)
                                     {
@@ -143,88 +150,85 @@
                                 </a>
                             </li>
 
+                            <!-- Profile Dropdown -->
                             <li class="nav-item dropdown">
-
-                                <a class="nav-link dropdown-toggle text-dark fw-medium"
+                                <a class="nav-link dropdown-toggle text-dark fw-medium d-flex align-items-center"
                                    href="#"
                                    id="navbarDropdown"
                                    role="button"
                                    data-bs-toggle="dropdown"
                                    aria-expanded="false">
-
-                                    <i class="fa-solid fa-user-circle me-1 text-success"></i>
-
-                                    @(currentUser?.FullName ?? "User")
-
+                                    <span class="user-avatar-initial me-2 bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold" style="width: 34px; height: 34px; font-size: 0.85rem;">
+                                        @((currentUser?.FullName ?? "U").Substring(0, 1).ToUpper())
+                                    </span>
+                                    <span>@(currentUser?.FullName ?? "User")</span>
                                 </a>
 
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0"
+                                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-2 p-2"
                                     aria-labelledby="navbarDropdown">
-
+                                    <li class="px-3 py-2 border-bottom mb-2 bg-light rounded-3">
+                                        <small class="text-muted d-block">Signed in as</small>
+                                        <strong class="text-dark small text-truncate d-block">@(currentUser?.Email ?? "")</strong>
+                                    </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Report" asp-action="Dashboard">
+                                        <a class="dropdown-item py-2 rounded-3" asp-controller="Report" asp-action="Dashboard">
                                             <i class="fa-solid fa-chart-line me-2 text-success"></i> Citizen Dashboard
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
-                                            <i class="fa-solid fa-user-gear me-2 text-success"></i> My Profile
+                                        <a class="dropdown-item py-2 rounded-3" asp-controller="Account" asp-action="Profile">
+                                            <i class="fa-solid fa-user-gear me-2 text-success"></i> Profile & Settings
                                         </a>
                                     </li>
-                                    <li><hr class="dropdown-divider"></li>
+                                    <li><hr class="dropdown-divider my-2"></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Report" asp-action="MyReports">
+                                        <a class="dropdown-item py-2 rounded-3" asp-controller="Report" asp-action="MyReports">
                                             <i class="fa-solid fa-folder-open me-2 text-muted"></i> My Reports
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Notification" asp-action="Index">
-                                            <i class="fa-solid fa-bell me-2 text-muted"></i> Notifications
+                                        <a class="dropdown-item py-2 rounded-3 d-flex justify-content-between align-items-center" asp-controller="Notification" asp-action="Index">
+                                            <span><i class="fa-solid fa-bell me-2 text-muted"></i> Notifications</span>
                                             @if (unreadCount > 0)
                                             {
-                                                <span class="badge bg-danger ms-1">@unreadCount</span>
+                                                <span class="badge bg-danger rounded-pill ms-2">@unreadCount</span>
                                             }
                                         </a>
                                     </li>
-                                    <li><hr class="dropdown-divider"></li>
-
+                                    <li><hr class="dropdown-divider my-2"></li>
                                     <li>
                                         <form class="form-inline"
                                               asp-area=""
                                               asp-controller="Account"
                                               asp-action="Logout"
                                               method="post">
-
                                             <button type="submit"
-                                                    class="dropdown-item text-danger">
+                                                    class="dropdown-item text-danger py-2 rounded-3">
                                                 <i class="fa-solid fa-right-from-bracket me-2"></i>
-                                                Logout
+                                                Sign Out
                                             </button>
-
                                         </form>
                                     </li>
-
                                 </ul>
-
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark fw-medium"
+                                <a class="nav-link text-dark fw-medium me-2"
                                    asp-area=""
                                    asp-controller="Account"
                                    asp-action="Login">
-                                    Login
+                                    Sign In
                                 </a>
                             </li>
 
-                            <li class="nav-item ms-2">
-                                <a class="btn btn-success px-4 rounded-pill"
+                            <li class="nav-item mt-2 mt-lg-0">
+                                <a class="btn btn-success px-4 rounded-pill shadow-sm text-white fw-bold d-inline-flex align-items-center"
                                    asp-area=""
                                    asp-controller="Account"
                                    asp-action="Register">
-                                    Register
+                                    <i class="fa-solid fa-user-plus me-2"></i> Register
                                 </a>
                             </li>
                         }
@@ -236,18 +240,84 @@
         </nav>
     </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <!-- Main Content Container -->
+    <main role="main" class="flex-grow-1">
+        @RenderBody()
+    </main>
 
-    <footer class="border-top footer text-muted">
+    <!-- Premium Footer Section -->
+    <footer class="footer-modern mt-auto bg-dark text-white border-top border-secondary border-opacity-25 pt-5 pb-4">
         <div class="container">
-            &copy; 2026 - Green City Reporter
+            <div class="row g-4 mb-4">
+                <!-- Brand & Mission Column -->
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="bg-success text-white p-2 rounded-3 me-2 d-inline-flex align-items-center justify-content-center" style="width:36px; height:36px;">
+                            <i class="fa-solid fa-leaf"></i>
+                        </span>
+                        <h5 class="fw-bold mb-0 text-white font-display">Green City Reporter</h5>
+                    </div>
+                    <p class="text-white-50 small mb-4 pe-lg-3">
+                        Empowering citizens to report urban and environmental issues directly to municipal services, creating cleaner, safer, and greener cities together.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="social-icon-btn rounded-circle d-flex align-items-center justify-content-center text-white-50" title="Twitter/X"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" class="social-icon-btn rounded-circle d-flex align-items-center justify-content-center text-white-50" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon-btn rounded-circle d-flex align-items-center justify-content-center text-white-50" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#" class="social-icon-btn rounded-circle d-flex align-items-center justify-content-center text-white-50" title="GitHub"><i class="fa-brands fa-github"></i></a>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="col-lg-2 col-md-6 col-6 mb-3">
+                    <h6 class="text-white fw-bold mb-3 font-display">Quick Links</h6>
+                    <ul class="list-unstyled footer-links small mb-0">
+                        <li class="mb-2"><a asp-controller="Home" asp-action="Index" class="text-white-50 text-decoration-none">Home</a></li>
+                        <li class="mb-2"><a asp-controller="Report" asp-action="Create" class="text-white-50 text-decoration-none">Report Issue</a></li>
+                        <li class="mb-2"><a asp-controller="Report" asp-action="Track" class="text-white-50 text-decoration-none">Track Status</a></li>
+                        <li class="mb-2"><a asp-controller="Report" asp-action="Dashboard" class="text-white-50 text-decoration-none">Citizen Dashboard</a></li>
+                    </ul>
+                </div>
+
+                <!-- Platform Info -->
+                <div class="col-lg-3 col-md-6 col-6 mb-3">
+                    <h6 class="text-white fw-bold mb-3 font-display">Categories</h6>
+                    <ul class="list-unstyled footer-links small mb-0">
+                        <li class="mb-2"><span class="text-white-50"><i class="fa-solid fa-trash me-2 text-success"></i> Waste & Litter</span></li>
+                        <li class="mb-2"><span class="text-white-50"><i class="fa-solid fa-road me-2 text-warning"></i> Roads & Potholes</span></li>
+                        <li class="mb-2"><span class="text-white-50"><i class="fa-solid fa-droplet me-2 text-info"></i> Water & Drainage</span></li>
+                        <li class="mb-2"><span class="text-white-50"><i class="fa-solid fa-tree me-2 text-success"></i> Parks & Greenery</span></li>
+                    </ul>
+                </div>
+
+                <!-- Emergency Contact -->
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <h6 class="text-white fw-bold mb-3 font-display">Civic Support</h6>
+                    <div class="footer-contact-box p-3 rounded-3 bg-secondary bg-opacity-10 border border-secondary border-opacity-25 small mb-2">
+                        <div class="d-flex align-items-center mb-2 text-white">
+                            <i class="fa-solid fa-headset me-2 text-success"></i>
+                            <strong>Civic Helpline: 311</strong>
+                        </div>
+                        <p class="text-white-50 small mb-0">Available 24/7 for urgent public infrastructure emergencies.</p>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-secondary border-opacity-25 my-4" />
+
+            <!-- Bottom Sub-Footer -->
+            <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between small text-white-50">
+                <p class="mb-2 mb-sm-0">&copy; 2026 Green City Reporter. Built for sustainable civic engagement.</p>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="d-inline-flex align-items-center"><span class="pulse-dot bg-success me-2"></span> Systems Operational</span>
+                    <a href="#" class="text-white-50 text-decoration-none">Privacy Policy</a>
+                    <a href="#" class="text-white-50 text-decoration-none">Terms of Service</a>
+                </div>
+            </div>
         </div>
     </footer>
 
+    <!-- Core Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
@@ -255,4 +325,5 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
 
