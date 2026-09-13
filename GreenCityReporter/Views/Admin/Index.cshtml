@@ -194,6 +194,77 @@
 
     </section>
 
+    <form asp-controller="Admin" asp-action="Index" method="get" class="row g-3 mb-4">
+
+        <div class="col-md-4">
+
+            <label for="priority" class="form-label fw-medium">
+                Priority
+            </label>
+
+            <select id="priority" name="priority" class="form-select">
+                <option value="">All priorities</option>
+                @foreach (var priorityOption in Enum.GetValues<GreenCityReporter.Models.Enums.Priority>())
+                {
+                    <option value="@priorityOption"
+                            selected="@(ViewBag.SelectedPriority == priorityOption)">
+                        @priorityOption
+                    </option>
+                }
+            </select>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <label for="status" class="form-label fw-medium">
+                Status
+            </label>
+
+            <select id="status" name="status" class="form-select">
+                <option value="">All statuses</option>
+                @foreach (var statusOption in Enum.GetValues<GreenCityReporter.Models.Enums.ReportStatus>())
+                {
+                    <option value="@statusOption"
+                            selected="@(ViewBag.SelectedStatus == statusOption)">
+                        @(statusOption == GreenCityReporter.Models.Enums.ReportStatus.InProgress
+                            ? "In Progress"
+                            : statusOption == GreenCityReporter.Models.Enums.ReportStatus.InReview
+                                ? "In Review"
+                                : statusOption.ToString())
+                    </option>
+                }
+            </select>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <label for="categoryId" class="form-label fw-medium">
+                Category
+            </label>
+
+            <select id="categoryId" name="categoryId" asp-items="ViewBag.Categories" class="form-select">
+                <option value="">All categories</option>
+            </select>
+
+        </div>
+
+        <div class="col-12 d-flex gap-2">
+
+            <button type="submit" class="btn btn-success">
+                <i class="fa-solid fa-filter me-2"></i>
+                Filter reports
+            </button>
+
+            <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-secondary">
+                Clear filters
+            </a>
+
+        </div>
+
+    </form>
+
 
     <!-- ================= REPORT TABLE ================= -->
 
@@ -216,7 +287,7 @@
                     </h3>
 
                     <p class="table-subtitle mb-0">
-                        Newest submissions appear first
+                        Highest priority reports appear first
                     </p>
 
                 </div>
@@ -249,8 +320,6 @@
 
                             <th>Citizen</th>
 
-                            <th>Status</th>
-
                             <th>Priority</th>
 
                             <th>Submitted</th>
@@ -259,13 +328,10 @@
                                 Action
                             </th>
 
-                        </tr>
-
                     </thead>
 
 
                     <tbody>
-
                         @foreach (var report in reports)
                         {
                             var status =
@@ -280,12 +346,12 @@
                                 <!-- Tracking -->
 
                                 <td>
-
                                     <span class="tracking-chip">
                                         @report.TrackingNumber
                                     </span>
 
                                 </td>
+
 
 
                                 <!-- Report -->
@@ -402,29 +468,33 @@
 
                                 <td>
 
-                                    @switch (priority)
+                                    @switch (report.Priority)
                                     {
-                                        case "High":
+                                        case GreenCityReporter.Models.Enums.Priority.Critical:
 
-                                            <span class="priority priority-high">
-
-                                                <i class="fa-solid fa-arrow-up"></i>
-
-                                                High
-
+                                            <span class="badge bg-dark">
+                                                <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                                                Critical
                                             </span>
 
                                             break;
 
 
-                                        case "Medium":
+                                        case GreenCityReporter.Models.Enums.Priority.High:
 
-                                            <span class="priority priority-medium">
+                                            <span class="badge bg-danger">
+                                                <i class="fa-solid fa-arrow-up me-1"></i>
+                                                High
+                                            </span>
 
-                                                <i class="fa-solid fa-minus"></i>
+                                            break;
 
+
+                                        case GreenCityReporter.Models.Enums.Priority.Medium:
+
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fa-solid fa-minus me-1"></i>
                                                 Medium
-
                                             </span>
 
                                             break;
@@ -432,12 +502,9 @@
 
                                         default:
 
-                                            <span class="priority priority-low">
-
-                                                <i class="fa-solid fa-arrow-down"></i>
-
+                                            <span class="badge bg-secondary">
+                                                <i class="fa-solid fa-arrow-down me-1"></i>
                                                 Low
-
                                             </span>
 
                                             break;

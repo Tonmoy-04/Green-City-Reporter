@@ -20,12 +20,18 @@ namespace GreenCityReporter.Models
         [Required]
         public int CategoryId { get; set; }
 
+        [MaxLength(20)]
+        public string CategorySource { get; set; } = "Manual";
+
         [Required]
         [StringLength(200)]
         public string Title { get; set; } = string.Empty;
 
         [Required]
         public string Description { get; set; } = string.Empty;
+
+        [MaxLength(1000)]
+        public string? AISummary { get; set; }
 
         [StringLength(255)]
         public string? ImagePath { get; set; }
