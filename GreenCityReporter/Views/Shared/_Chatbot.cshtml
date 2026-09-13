@@ -1,0 +1,60 @@
+<div id="green-city-chatbot" class="gcr-chatbot">
+    <button id="gcr-chatbot-toggle"
+            type="button"
+            class="gcr-chatbot-toggle"
+            aria-expanded="false"
+            aria-controls="gcr-chatbot-panel"
+            title="Open Green City AI Assistant">
+        <i class="fa-solid fa-comments" aria-hidden="true"></i>
+        <span class="visually-hidden">Open Green City AI Assistant</span>
+    </button>
+
+    <section id="gcr-chatbot-panel"
+             class="gcr-chatbot-panel"
+             aria-labelledby="gcr-chatbot-title"
+             hidden>
+        <div class="gcr-chatbot-header">
+            <div>
+                <span class="gcr-chatbot-eyebrow">Green City Reporter</span>
+                <h2 id="gcr-chatbot-title">AI Assistant</h2>
+            </div>
+            <button id="gcr-chatbot-close"
+                    type="button"
+                    class="btn btn-sm btn-link text-white p-1"
+                    title="Close chat">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                <span class="visually-hidden">Close chat</span>
+            </button>
+        </div>
+
+        <div id="gcr-chatbot-messages"
+             class="gcr-chatbot-messages"
+             role="log"
+             aria-live="polite">
+            <div class="gcr-chatbot-message gcr-chatbot-message-assistant">
+                Ask about submitting reports, statuses, tracking, or your latest report.
+            </div>
+        </div>
+
+        <form id="gcr-chatbot-form" class="gcr-chatbot-form">
+            @Html.AntiForgeryToken()
+            <label for="gcr-chatbot-input" class="visually-hidden">Ask the AI Assistant</label>
+            <div class="input-group">
+                <input id="gcr-chatbot-input"
+                       name="message"
+                       class="form-control"
+                       maxlength="500"
+                       placeholder="Ask a question..."
+                       autocomplete="off"
+                       required />
+                <button id="gcr-chatbot-send"
+                        type="submit"
+                        class="btn btn-success"
+                        title="Send message">
+                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                    <span class="visually-hidden">Send message</span>
+                </button>
+            </div>
+        </form>
+    </section>
+</div>

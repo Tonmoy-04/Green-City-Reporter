@@ -2048,3 +2048,112 @@ textarea.form-control {
     padding-left: 0;
   }
 }
+
+.gcr-chatbot {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 1050;
+}
+
+.gcr-chatbot-toggle {
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--gcr-pine);
+  box-shadow: var(--gcr-shadow-lg);
+  transition: transform var(--gcr-transition), background var(--gcr-transition);
+}
+
+.gcr-chatbot-toggle:hover,
+.gcr-chatbot-toggle:focus-visible {
+  background: var(--gcr-pine-dark);
+  transform: translateY(-2px);
+}
+
+.gcr-chatbot-panel {
+  position: absolute;
+  right: 0;
+  bottom: 4.25rem;
+  display: flex;
+  flex-direction: column;
+  width: min(22rem, calc(100vw - 2rem));
+  max-height: min(34rem, calc(100vh - 6rem));
+  overflow: hidden;
+  border: 1px solid var(--gcr-border);
+  border-radius: var(--gcr-radius);
+  background: var(--gcr-surface);
+  box-shadow: var(--gcr-shadow-lg);
+}
+
+.gcr-chatbot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .85rem 1rem;
+  color: #fff;
+  background: var(--gcr-pine-dark);
+}
+
+.gcr-chatbot-eyebrow {
+  display: block;
+  color: rgba(255, 255, 255, .7);
+  font-size: .7rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.gcr-chatbot-header h2 {
+  margin: .1rem 0 0;
+  color: #fff;
+  font-family: var(--gcr-font-display);
+  font-size: 1rem;
+}
+
+.gcr-chatbot-messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: .65rem;
+  min-height: 12rem;
+  max-height: 23rem;
+  overflow-y: auto;
+  padding: 1rem;
+  background: var(--gcr-green-xlight);
+}
+
+.gcr-chatbot-message {
+  max-width: 88%;
+  padding: .6rem .75rem;
+  border-radius: .75rem;
+  font-size: .88rem;
+  white-space: pre-wrap;
+}
+
+.gcr-chatbot-message-assistant {
+  align-self: flex-start;
+  color: var(--gcr-ink);
+  background: #fff;
+  border: 1px solid var(--gcr-border);
+}
+
+.gcr-chatbot-message-user {
+  align-self: flex-end;
+  color: #fff;
+  background: var(--gcr-pine);
+}
+
+.gcr-chatbot-form {
+  padding: .75rem;
+  background: #fff;
+  border-top: 1px solid var(--gcr-border);
+}
+
+@media (max-width: 575.98px) {
+  .gcr-chatbot {
+    right: 1rem;
+    bottom: 1rem;
+  }
+}

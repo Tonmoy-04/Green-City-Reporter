@@ -95,6 +95,26 @@
 
                     </div>
 
+                    @if (!string.IsNullOrWhiteSpace(Model.AISummary))
+                    {
+                        <div class="alert alert-light border mb-4">
+
+                            <h6 class="fw-bold mb-1">
+                                <i class="fa-solid fa-wand-magic-sparkles me-2 text-success"></i>
+                                AI Summary
+                            </h6>
+
+                            <p class="text-muted small mb-2">
+                                A concise summary generated when the citizen submitted the report.
+                            </p>
+
+                            <p class="mb-0">
+                                @Model.AISummary
+                            </p>
+
+                        </div>
+                    }
+
                     <div class="mb-4">
 
                         <h6 class="fw-bold">
@@ -112,7 +132,7 @@
 
                     <div class="row mt-3">
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
 
                             <small class="text-muted d-block">
                                 Category
@@ -122,9 +142,29 @@
                                 @Model.Category?.Name
                             </strong>
 
+                            <span class="badge @(Model.CategorySource == "AI" ? "bg-success" : "bg-secondary") ms-1">
+                                @(Model.CategorySource == "AI" ? "AI Categorized" : "Manual Category")
+                            </span>
+
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+
+                            <small class="text-muted d-block">
+                                Priority
+                            </small>
+
+                            <strong>
+                                @Model.Priority
+                            </strong>
+
+                            <small class="text-muted d-block mt-1">
+                                Initial priority may be AI-assisted. Administrators can override it.
+                            </small>
+
+                        </div>
+
+                        <div class="col-md-3">
 
                             <small class="text-muted d-block">
                                 Citizen
@@ -136,7 +176,7 @@
 
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
 
                             <small class="text-muted d-block">
                                 Submitted
@@ -144,8 +184,7 @@
 
                             <strong>
                                 @Model.CreatedAt
-                                .ToLocalTime()
-                                .ToString("dd MMM yyyy, hh:mm tt")
+                              
                             </strong>
 
                         </div>
@@ -189,8 +228,7 @@
 
                                     <small class="text-muted">
                                         @history.UpdatedAt
-                                        .ToLocalTime()
-                                        .ToString("dd MMM yyyy, hh:mm tt")
+                                        
                                     </small>
 
                                 </div>
@@ -267,8 +305,7 @@
 
                                 <small class="text-muted">
                                     @comment.CreatedAt
-                                    .ToLocalTime()
-                                    .ToString("dd MMM yyyy, hh:mm tt")
+                                  
                                 </small>
 
                             </div>

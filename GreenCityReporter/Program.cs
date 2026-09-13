@@ -1,12 +1,42 @@
 using GreenCityReporter.Data;
 using GreenCityReporter.Models;
+using GreenCityReporter.Services.AI;
+using GreenCityReporter.Services.Background;
+using GreenCityReporter.Services.Chat;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Bind AI options
+builder.Services.Configure<AIOptions>(
+    builder.Configuration.GetSection("AI"));
+
+builder.Services.Configure<ReportMonitoringOptions>(
+    builder.Configuration.GetSection("ReportMonitoring"));
+
+builder.Services.AddHostedService<ReportMonitoringService>();
+builder.Services.AddScoped<IChatService, GreenCityChatService>();
+
+// Register Ollama AI service with typed HttpClient
+builder.Services.AddHttpClient<IAIService, OllamaAIService>((sp, client) =>
+{
+    var opts = sp.GetRequiredService<IOptions<AIOptions>>().Value;
+    try
+    {
+        client.BaseAddress = new Uri(opts.Ollama.BaseUrl);
+    }
+    catch
+    {
+        // If invalid, leave BaseAddress unset; OllamaAIService will log a warning
+    }
+
+    client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds);
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(

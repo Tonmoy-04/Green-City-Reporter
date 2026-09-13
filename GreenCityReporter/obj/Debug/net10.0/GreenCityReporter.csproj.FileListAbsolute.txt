@@ -233,7 +233,6 @@ D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\appsettings.Developme
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\appsettings.json
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\GreenCityReporter.staticwebassets.endpoints.json
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\GreenCityReporter.staticwebassets.runtime.json
-D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\GreenCityReporter.exe
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\GreenCityReporter.deps.json
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\GreenCityReporter.runtimeconfig.json
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\GreenCityReporter.dll
@@ -387,7 +386,6 @@ D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\scopedcss\Views\Share
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\scopedcss\bundle\GreenCityReporter.styles.css
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\scopedcss\projectbundle\GreenCityReporter.bundle.scp.css
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\5z1vbo3csq-{0}-61n19gt1b8-61n19gt1b8.gz
-D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\otepga981r-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\rsho8hkrih-{0}-bqjiyaj88i-bqjiyaj88i.gz
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\rf0r8genva-{0}-c2jlpeoesf-c2jlpeoesf.gz
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\0c3h9v4xas-{0}-erw9l3u2r3-erw9l3u2r3.gz
@@ -447,8 +445,6 @@ D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\9gvz8nf454
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\f0z4eq0u1j-{0}-muycvpuwrr-muycvpuwrr.gz
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\99r88ksi6q-{0}-87fc7y1x7t-87fc7y1x7t.gz
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\5nymp9tsyd-{0}-mlv21k5csn-mlv21k5csn.gz
-D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\yyuk90h6b7-{0}-2uogzfxf3t-2uogzfxf3t.gz
-D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\imibzq6l2l-{0}-2uogzfxf3t-2uogzfxf3t.gz
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\staticwebassets.build.json
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\staticwebassets.build.json.cache
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\staticwebassets.development.json
@@ -461,7 +457,6 @@ D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\GreenCityReporter.pdb
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\GreenCityReporter.genruntimeconfig.cache
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\ref\GreenCityReporter.dll
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
-D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\o4vj28aicm-{0}-g21gqcf6ax-g21gqcf6ax.gz
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\Microsoft.Data.Sqlite.dll
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Sqlite.dll
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\SQLitePCLRaw.batteries_v2.dll
@@ -489,7 +484,6 @@ D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\runtimes\osx-x64\nati
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\runtimes\win-arm64\native\e_sqlite3.dll
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\runtimes\win-x64\native\e_sqlite3.dll
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\runtimes\win-x86\native\e_sqlite3.dll
-D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
 E:\Project\Green City\Green-City-Reporter\GreenCityReporter\bin\Debug\net10.0\appsettings.Development.json
 E:\Project\Green City\Green-City-Reporter\GreenCityReporter\bin\Debug\net10.0\appsettings.json
 E:\Project\Green City\Green-City-Reporter\GreenCityReporter\bin\Debug\net10.0\GreenCityReporter.staticwebassets.runtime.json
@@ -750,3 +744,9 @@ E:\Project\Green City\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\re
 E:\Project\Green City\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\yyuk90h6b7-{0}-0j1nc8hvaq-0j1nc8hvaq.gz
 E:\Project\Green City\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\imibzq6l2l-{0}-0j1nc8hvaq-0j1nc8hvaq.gz
 E:\Project\Green City\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\o4vj28aicm-{0}-0m454aiex2-0m454aiex2.gz
+D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\package-lock.json
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\yyuk90h6b7-{0}-0j1nc8hvaq-0j1nc8hvaq.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\imibzq6l2l-{0}-0j1nc8hvaq-0j1nc8hvaq.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\o4vj28aicm-{0}-rzn4r8dqik-rzn4r8dqik.gz
+D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\GreenCityReporter.exe
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\otepga981r-{0}-ui79in27yi-ui79in27yi.gz

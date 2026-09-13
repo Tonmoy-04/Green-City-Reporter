@@ -1,8 +1,10 @@
 using GreenCityReporter.Data;
 using GreenCityReporter.Models;
+using GreenCityReporter.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace GreenCityReporter.Controllers
@@ -22,13 +24,44 @@ namespace GreenCityReporter.Controllers
         }
 
         // GET: /Admin
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+            Priority? priority,
+            ReportStatus? status,
+            int? categoryId)
         {
-            var reports = await _context.Reports
+            var reportsQuery = _context.Reports
                 .Include(r => r.Category)
                 .Include(r => r.User)
-                .OrderByDescending(r => r.CreatedAt)
+                .AsQueryable();
+
+            if (priority.HasValue)
+            {
+                reportsQuery = reportsQuery.Where(r => r.Priority == priority.Value);
+            }
+
+            if (status.HasValue)
+            {
+                reportsQuery = reportsQuery.Where(r => r.CurrentStatus == status.Value);
+            }
+
+            if (categoryId.HasValue)
+            {
+                reportsQuery = reportsQuery.Where(r => r.CategoryId == categoryId.Value);
+            }
+
+            var reports = await reportsQuery
+                .OrderByDescending(r => r.Priority)
+                .ThenBy(r => r.CreatedAt)
                 .ToListAsync();
+
+            var categories = await _context.Categories
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+
+            ViewBag.Categories = new SelectList(categories, "Id", "Name", categoryId);
+            ViewBag.SelectedPriority = priority;
+            ViewBag.SelectedStatus = status;
+            ViewBag.SelectedCategoryId = categoryId;
 
             return View(reports);
         }
