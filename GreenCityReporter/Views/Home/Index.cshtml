@@ -1,52 +1,54 @@
 @{
-    ViewData["Title"] = "Civic Infrastructure & Environmental Reporting";
+    ViewData["Title"] = "Report. Track. Improve Your City.";
 }
 
 <!-- Hero Section -->
-<div class="py-5" style="background: linear-gradient(180deg, #f0f7f3 0%, var(--gcr-bg) 100%); border-bottom: 1px solid var(--gcr-border);">
+<div class="py-5" style="background: linear-gradient(180deg, #f0fdf4 0%, var(--background) 100%); border-bottom: 1px solid var(--border);">
     <div class="container py-4">
         <div class="row align-items-center g-5">
             <div class="col-lg-7 text-center text-lg-start">
                 <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill mb-3 fw-bold">
-                    <i class="fa-solid fa-leaf me-1 text-warning"></i> Sustainable Civic Technology Initiative
+                    <i class="fa-solid fa-leaf me-1 text-success"></i> Public Civic Infrastructure Portal
                 </span>
                 <h1 class="display-4 fw-bold text-dark lh-sm mb-3">
-                    Empowering Citizens to Build a <span class="text-success" style="color: var(--gcr-primary-emerald) !important;">Cleaner, Safer City</span>
+                    Report. Track. <span style="color: var(--primary) !important;">Improve Your City.</span>
                 </h1>
                 <p class="lead text-muted mb-4 pe-lg-4 fs-5">
-                    Green City Reporter provides a seamless platform for citizens to report municipal infrastructure issues, waste management hazards, and environmental concerns directly to city authorities.
+                    Green City Reporter empowers citizens to log municipal hazards, waste accumulation, and infrastructure issues directly with city service authorities for fast resolution.
                 </p>
                 <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3 mb-4">
                     <a asp-controller="Report" asp-action="Create" class="btn btn-success btn-lg px-4 py-3 fw-bold">
                         <i class="fa-solid fa-bullhorn me-2"></i> Report an Issue
                     </a>
-                    <a asp-controller="Report" asp-action="Track" class="btn btn-outline-secondary btn-lg px-4 py-3 fw-bold">
-                        <i class="fa-solid fa-magnifying-glass me-2 text-success"></i> Track Report Status
+                    <a href="#how-it-works" class="btn btn-outline-secondary btn-lg px-4 py-3 fw-bold">
+                        <i class="fa-solid fa-circle-info me-2 text-success"></i> Explore How It Works
                     </a>
                 </div>
 
+                <!-- Feature Highlights Bar -->
                 <div class="row pt-4 border-top text-center text-lg-start g-3">
                     <div class="col-4">
-                        <h3 class="fw-bold text-dark mb-0 font-monospace">1.2K+</h3>
-                        <p class="text-muted small mb-0 fw-semibold">Issues Resolved</p>
+                        <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-map-pin text-success me-1"></i> Precise Pins</h6>
+                        <p class="text-muted small mb-0">Dhaka GPS Mapping</p>
                     </div>
                     <div class="col-4 border-start border-end">
-                        <h3 class="fw-bold text-dark mb-0 font-monospace">24h</h3>
-                        <p class="text-muted small mb-0 fw-semibold">Average Response</p>
+                        <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-robot text-primary me-1"></i> AI Assisted</h6>
+                        <p class="text-muted small mb-0">Smart Categorization</p>
                     </div>
                     <div class="col-4">
-                        <h3 class="fw-bold text-dark mb-0 font-monospace">8K+</h3>
-                        <p class="text-muted small mb-0 fw-semibold">Active Citizens</p>
+                        <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-bell text-success me-1"></i> Live Alerts</h6>
+                        <p class="text-muted small mb-0">Real-Time Status</p>
                     </div>
                 </div>
             </div>
 
             <div class="col-lg-5">
                 <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                    <div class="card-header bg-white p-4 border-bottom">
+                    <div class="card-header bg-white p-4 border-bottom d-flex align-items-center justify-content-between">
                         <h5 class="fw-bold mb-0 text-dark d-flex align-items-center">
-                            <i class="fa-solid fa-bolt text-warning me-2"></i> Live Civic Monitoring
+                            <i class="fa-solid fa-shield-halved text-success me-2"></i> Municipal Action Flow
                         </h5>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1">Dhaka City</span>
                     </div>
                     <div class="card-body p-4">
                         <div class="d-flex mb-3.5 p-3 rounded-3 bg-light border">
@@ -54,8 +56,8 @@
                                 <i class="fa-solid fa-road fa-lg"></i>
                             </div>
                             <div>
-                                <h6 class="fw-bold mb-1 text-dark">Road Damage &amp; Pothole</h6>
-                                <p class="text-muted small mb-0">Banani, Dhaka &bull; <span class="badge-in-progress">In Progress</span></p>
+                                <h6 class="fw-bold mb-1 text-dark">Road Repairs &amp; Potholes</h6>
+                                <p class="text-muted small mb-0">Pinpoint roads needing maintenance &bull; <span class="badge-in-progress">In Action</span></p>
                             </div>
                         </div>
 
@@ -64,8 +66,8 @@
                                 <i class="fa-solid fa-trash fa-lg"></i>
                             </div>
                             <div>
-                                <h6 class="fw-bold mb-1 text-dark">Overflowing Waste Bin</h6>
-                                <p class="text-muted small mb-0">Dhanmondi, Dhaka &bull; <span class="badge-resolved">Resolved</span></p>
+                                <h6 class="fw-bold mb-1 text-dark">Waste Clearance Hazards</h6>
+                                <p class="text-muted small mb-0">Report overflowing bins &amp; dumps &bull; <span class="badge-resolved">Resolved</span></p>
                             </div>
                         </div>
 
@@ -75,13 +77,13 @@
                             </div>
                             <div>
                                 <h6 class="fw-bold mb-1 text-dark">Water Logging &amp; Drainage</h6>
-                                <p class="text-muted small mb-0">Mirpur, Dhaka &bull; <span class="badge-pending">Under Review</span></p>
+                                <p class="text-muted small mb-0">Blocked culverts &amp; storm drains &bull; <span class="badge-pending">Under Review</span></p>
                             </div>
                         </div>
                     </div>
                     <div class="card-footer bg-light border-top text-center py-3">
-                        <a asp-controller="Account" asp-action="Login" class="text-decoration-none text-success fw-bold small">
-                            Sign in to log and monitor your issues <i class="fa-solid fa-arrow-right ms-1"></i>
+                        <a asp-controller="Report" asp-action="Track" class="text-decoration-none text-success fw-bold small">
+                            Track any report with a tracking number <i class="fa-solid fa-arrow-right ms-1"></i>
                         </a>
                     </div>
                 </div>
@@ -90,45 +92,188 @@
     </div>
 </div>
 
-<!-- Key Platform Capabilities -->
-<div class="py-5">
+<!-- Why Green City Reporter -->
+<div class="py-5 bg-white border-bottom">
+    <div class="container py-3">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="text-success fw-bold text-uppercase small" style="letter-spacing: 1px;">Why Green City Reporter</span>
+                <h2 class="fw-bold text-dark mt-1 mb-3">Transforming Municipal Reporting into Action</h2>
+                <p class="text-muted mb-4">
+                    Traditional reporting often leads to delays and lost tickets. Green City Reporter combines geolocation mapping, automated AI priority estimation, and real-time status notifications to keep municipal services accountable.
+                </p>
+
+                <div class="d-flex align-items-start mb-3">
+                    <div class="bg-success bg-opacity-10 text-success p-2 rounded-circle me-3 flex-shrink-0">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-dark mb-1">Guaranteed Geographical Accuracy</h6>
+                        <p class="text-muted small mb-0">Reports are validated within Dhaka City bounds to ensure correct ward department assignment.</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-start mb-3">
+                    <div class="bg-success bg-opacity-10 text-success p-2 rounded-circle me-3 flex-shrink-0">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-dark mb-1">Automated AI Severity &amp; Category Detection</h6>
+                        <p class="text-muted small mb-0">Smart natural language processing extracts key details, category, and urgency automatically.</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-start">
+                    <div class="bg-success bg-opacity-10 text-success p-2 rounded-circle me-3 flex-shrink-0">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-dark mb-1">Transparent Citizen Updates</h6>
+                        <p class="text-muted small mb-0">Citizens receive notification alerts as administrators change status and add official remarks.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="p-4 rounded-4 bg-light border">
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-list-check text-success me-2"></i>Platform Comparison</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered bg-white mb-0 small">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>Traditional Hotline</th>
+                                    <th>Green City Reporter</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="fw-semibold">Location Pinpoint</td>
+                                    <td class="text-danger"><i class="fa-solid fa-xmark me-1"></i> Vague text</td>
+                                    <td class="text-success fw-bold"><i class="fa-solid fa-check me-1"></i> Precise GPS Pin</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold">Priority Ranking</td>
+                                    <td class="text-danger"><i class="fa-solid fa-xmark me-1"></i> Manual queue</td>
+                                    <td class="text-success fw-bold"><i class="fa-solid fa-check me-1"></i> AI Priority Sorting</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold">Real-Time Tracking</td>
+                                    <td class="text-danger"><i class="fa-solid fa-xmark me-1"></i> No status visibility</td>
+                                    <td class="text-success fw-bold"><i class="fa-solid fa-check me-1"></i> Live Tracking #</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-semibold">AI Assistant</td>
+                                    <td class="text-danger"><i class="fa-solid fa-xmark me-1"></i> None</td>
+                                    <td class="text-success fw-bold"><i class="fa-solid fa-check me-1"></i> 24/7 Smart Bot</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div id="how-it-works" class="py-5">
     <div class="container py-3">
         <div class="text-center max-w-2xl mx-auto mb-5">
-            <span class="text-success fw-bold text-uppercase small" style="letter-spacing: 1px;">Key Capabilities</span>
-            <h2 class="fw-bold text-dark mt-1">Smart Public Infrastructure Reporting</h2>
-            <p class="text-muted">Designed for fast issue logging, transparent tracking, and automated AI assistance.</p>
+            <span class="text-success fw-bold text-uppercase small" style="letter-spacing: 1px;">Simple 3-Step Process</span>
+            <h2 class="fw-bold text-dark mt-1">How Green City Reporter Works</h2>
+            <p class="text-muted">From photo evidence to municipal resolution, experience seamless civic service.</p>
         </div>
 
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="feature-card h-100">
-                    <div class="feature-icon-wrapper">
-                        <i class="fa-solid fa-map-location-dot"></i>
+                <div class="feature-card text-center h-100">
+                    <div class="feature-icon-wrapper mx-auto">
+                        <i class="fa-solid fa-camera"></i>
                     </div>
-                    <h5 class="fw-bold text-dark mb-2">Pinpoint Map Location</h5>
-                    <p class="text-muted small mb-0">Interactive Leaflet map boundary tool ensuring precise Dhaka location coordinates for municipal field teams.</p>
+                    <span class="badge bg-success mb-2">Step 1</span>
+                    <h5 class="fw-bold text-dark mb-2">Log Issue &amp; Location</h5>
+                    <p class="text-muted small mb-0">Take a photo, describe the issue, and select your location on our interactive Dhaka map.</p>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="feature-card h-100">
-                    <div class="feature-icon-wrapper" style="background-color: #fef9c3; color: var(--gcr-accent-gold);">
-                        <i class="fa-solid fa-robot"></i>
+                <div class="feature-card text-center h-100">
+                    <div class="feature-icon-wrapper mx-auto" style="background-color: var(--secondary-light); color: var(--secondary);">
+                        <i class="fa-solid fa-microchip"></i>
                     </div>
-                    <h5 class="fw-bold text-dark mb-2">AI Assisted Processing</h5>
-                    <p class="text-muted small mb-0">Smart classification, priority estimation, and automated summary generation to accelerate response times.</p>
+                    <span class="badge bg-secondary mb-2">Step 2</span>
+                    <h5 class="fw-bold text-dark mb-2">AI Processing &amp; Review</h5>
+                    <p class="text-muted small mb-0">Our AI categorizes the issue, suggests priority urgency, and generates a summary before you submit.</p>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <div class="feature-card h-100">
-                    <div class="feature-icon-wrapper" style="background-color: #e0f2fe; color: #0284c7;">
-                        <i class="fa-solid fa-shield-halved"></i>
+                <div class="feature-card text-center h-100">
+                    <div class="feature-icon-wrapper mx-auto" style="background-color: #e0f2fe; color: #0284c7;">
+                        <i class="fa-solid fa-circle-check"></i>
                     </div>
-                    <h5 class="fw-bold text-dark mb-2">Transparent Progress</h5>
-                    <p class="text-muted small mb-0">Real-time status updates, notification alerts, and official comment history from city administration.</p>
+                    <span class="badge bg-info text-white mb-2">Step 3</span>
+                    <h5 class="fw-bold text-dark mb-2">Municipal Resolution</h5>
+                    <p class="text-muted small mb-0">City staff review the ticket, update status in real-time, and notify you upon complete resolution.</p>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="py-5 bg-white border-top border-bottom">
+    <div class="container py-3">
+        <div class="text-center max-w-2xl mx-auto mb-5">
+            <span class="text-success fw-bold text-uppercase small" style="letter-spacing: 1px;">Key Capabilities</span>
+            <h2 class="fw-bold text-dark mt-1">Built for Dhaka's Environmental Needs</h2>
+            <p class="text-muted">Empowering municipal departments and citizens with modern technology.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 border bg-light h-100">
+                    <div class="text-success fs-3 mb-3"><i class="fa-solid fa-map-location-dot"></i></div>
+                    <h5 class="fw-bold text-dark">Dhaka City Boundary Guard</h5>
+                    <p class="text-muted small mb-0">Ensures all coordinates fall strictly within Dhaka city boundaries, preventing off-jurisdiction submission errors.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 border bg-light h-100">
+                    <div class="text-primary fs-3 mb-3"><i class="fa-solid fa-robot"></i></div>
+                    <h5 class="fw-bold text-dark">Integrated AI Assistant</h5>
+                    <p class="text-muted small mb-0">Floating AI assistant ready to answer questions about civic services, tracking numbers, and guidelines.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 border bg-light h-100">
+                    <div class="text-warning fs-3 mb-3"><i class="fa-solid fa-bell"></i></div>
+                    <h5 class="fw-bold text-dark">Real-Time Notification Hub</h5>
+                    <p class="text-muted small mb-0">Instant notification alerts whenever administrative staff post remarks or update your report's status.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action Banner -->
+<div class="py-5" style="background: linear-gradient(180deg, var(--background) 0%, #dcfce7 100%); border-top: 1px solid var(--border);">
+    <div class="container py-4 text-center">
+        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill mb-3 fw-bold">
+            <i class="fa-solid fa-leaf me-1 text-success"></i> Take Civic Action Today
+        </span>
+        <h2 class="display-6 fw-bold mb-3 text-dark">Ready to Make Your Neighborhood Cleaner?</h2>
+        <p class="lead text-muted mb-4 mx-auto pe-lg-4" style="max-width: 620px;">
+            Join thousands of active citizens logging infrastructure issues to improve city living standards today.
+        </p>
+        <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+            <a asp-controller="Report" asp-action="Create" class="btn btn-success btn-lg px-5 py-3 fw-bold shadow-sm">
+                <i class="fa-solid fa-bullhorn me-2"></i> Report an Issue Now
+            </a>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-secondary btn-lg px-4 py-3 fw-bold">
+                <i class="fa-solid fa-user-plus me-2"></i> Register Account
+            </a>
         </div>
     </div>
 </div>

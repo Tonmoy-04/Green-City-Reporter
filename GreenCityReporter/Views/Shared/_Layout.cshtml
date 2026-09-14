@@ -3,18 +3,23 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject GreenCityReporter.Data.ApplicationDbContext DbContext
 
+@{
+    string currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    string currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Green City Reporter</title>
-    
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
     <!-- FontAwesome and Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/GreenCityReporter.styles.css" asp-append-version="true" />
@@ -79,26 +84,26 @@
                             if (!User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link fw-medium mx-1" asp-area="" asp-controller="Report" asp-action="Dashboard">
+                                    <a class="nav-link fw-medium mx-1 @(currentController == "Report" && currentAction == "Dashboard" ? "active" : "")" asp-area="" asp-controller="Report" asp-action="Dashboard">
                                         <i class="fa-solid fa-chart-pie me-1 text-success"></i> Dashboard
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link fw-medium mx-1" asp-area="" asp-controller="Report" asp-action="Create">
+                                    <a class="nav-link fw-medium mx-1 @(currentController == "Report" && currentAction == "Create" ? "active" : "")" asp-area="" asp-controller="Report" asp-action="Create">
                                         <i class="fa-solid fa-circle-plus me-1 text-success"></i> Report Issue
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link fw-medium mx-1" asp-area="" asp-controller="Report" asp-action="MyReports">
+                                    <a class="nav-link fw-medium mx-1 @(currentController == "Report" && currentAction == "MyReports" ? "active" : "")" asp-area="" asp-controller="Report" asp-action="MyReports">
                                         <i class="fa-solid fa-folder-open me-1 text-success"></i> My Reports
                                     </a>
                                 </li>
                             }
 
                             <li class="nav-item">
-                                <a class="nav-link fw-medium mx-1" asp-area="" asp-controller="Report" asp-action="Track">
+                                <a class="nav-link fw-medium mx-1 @(currentController == "Report" && currentAction == "Track" ? "active" : "")" asp-area="" asp-controller="Report" asp-action="Track">
                                     <i class="fa-solid fa-magnifying-glass me-1 text-success"></i> Track Report
                                 </a>
                             </li>
@@ -106,7 +111,7 @@
                             if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link fw-medium mx-1 text-primary fw-bold" asp-area="" asp-controller="Admin" asp-action="Index">
+                                    <a class="nav-link fw-medium mx-1 text-success fw-bold @(currentController == "Admin" ? "active" : "")" asp-area="" asp-controller="Admin" asp-action="Index">
                                         <i class="fa-solid fa-user-shield me-1"></i> Admin Dashboard
                                     </a>
                                 </li>
@@ -115,13 +120,13 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link fw-medium mx-1" asp-area="" asp-controller="Home" asp-action="Index">
+                                <a class="nav-link fw-medium mx-1 @(currentController == "Home" && currentAction == "Index" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
                                     <i class="fa-solid fa-house me-1 text-success"></i> Home
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link fw-medium mx-1" asp-area="" asp-controller="Report" asp-action="Track">
+                                <a class="nav-link fw-medium mx-1 @(currentController == "Report" && currentAction == "Track" ? "active" : "")" asp-area="" asp-controller="Report" asp-action="Track">
                                     <i class="fa-solid fa-magnifying-glass me-1 text-success"></i> Track Report
                                 </a>
                             </li>
@@ -169,7 +174,7 @@
                                    role="button"
                                    data-bs-toggle="dropdown"
                                    aria-expanded="false">
-                                    <span class="user-avatar-initial me-2 text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 34px; height: 34px; font-size: 0.85rem; background-color: var(--gcr-primary);">
+                                    <span class="user-avatar-initial me-2 text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 34px; height: 34px; font-size: 0.85rem; background-color: var(--primary);">
                                         @((currentUser?.FullName ?? "U").Substring(0, 1).ToUpper())
                                     </span>
                                     <span>@(currentUser?.FullName ?? "User")</span>
@@ -270,7 +275,7 @@
                 <!-- Brand & Mission Column -->
                 <div class="col-lg-4 col-md-6 mb-3">
                     <div class="d-flex align-items-center mb-3">
-                        <span class="bg-success text-white p-2 rounded-3 me-2 d-inline-flex align-items-center justify-content-center" style="width:36px; height:36px; background-color: var(--gcr-primary-dark) !important;">
+                        <span class="bg-success text-white p-2 rounded-3 me-2 d-inline-flex align-items-center justify-content-center" style="width:36px; height:36px; background-color: var(--primary-dark) !important;">
                             <i class="fa-solid fa-leaf text-warning"></i>
                         </span>
                         <h5 class="fw-bold mb-0 text-white font-display">Green City Reporter</h5>

@@ -8,10 +8,10 @@
 
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
-            <span class="badge bg-light text-success border px-3 py-1 mb-1 fw-bold">
+            <span class="tracking-chip me-2" style="font-size: 0.95rem;">
                 <i class="fa-solid fa-hashtag me-1"></i> @Model.TrackingNumber
             </span>
-            <h2 class="fw-bold text-dark mb-0">@Model.Title</h2>
+            <h2 class="fw-bold text-dark mb-0 mt-1">@Model.Title</h2>
         </div>
 
         <a asp-controller="Report"
@@ -21,14 +21,16 @@
         </a>
     </div>
 
+    <!-- 2-Column Desktop Layout (Switches to 1-Column on Mobile) -->
     <div class="row g-4">
 
-        <!-- Main Report Information -->
+        <!-- LEFT COLUMN (8 Cols): Information, Photo, AI Summary, Comments -->
         <div class="col-lg-8">
 
             <div class="card mb-4">
                 <div class="card-body p-4">
 
+                    <!-- Category & Status Bar -->
                     <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
                         <div>
                             <span class="text-muted small d-block mb-1">Issue Category</span>
@@ -73,11 +75,12 @@
                         </div>
                     </div>
 
+                    <!-- Report Evidence Image -->
                     @if (!string.IsNullOrEmpty(Model.ImagePath))
                     {
                         <div class="mb-4 text-center bg-light p-2 rounded-3 border">
                             <img src="@Model.ImagePath"
-                                 alt="Report evidence"
+                                 alt="Report evidence photo"
                                  class="img-fluid rounded-2"
                                  style="max-height: 420px; width: 100%; object-fit: cover;" />
                         </div>
@@ -93,9 +96,9 @@
                         </p>
                     </div>
 
+                    <!-- AI Analysis Summary -->
                     @if (!string.IsNullOrWhiteSpace(Model.AISummary))
                     {
-                        <!-- AI Summary -->
                         <div class="mb-4">
                             <h6 class="fw-bold text-dark">
                                 <i class="fa-solid fa-robot me-2 text-primary"></i> AI Analysis Summary
@@ -106,47 +109,13 @@
                         </div>
                     }
 
-                    <!-- Address & Location -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold text-dark">
-                            <i class="fa-solid fa-location-dot me-2 text-danger"></i> Location Address
-                        </h6>
-                        <p class="text-dark mb-0">@Model.Address</p>
-                        @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
-                        {
-                            <small class="text-muted font-monospace d-block mt-1">
-                                Coordinates: @Model.Latitude.Value.ToString("F6"), @Model.Longitude.Value.ToString("F6")
-                            </small>
-                        }
-                    </div>
-
-                    <!-- Metadata Row -->
+                    <!-- Metadata Footer -->
                     <div class="row pt-3 border-top g-3">
-                        <div class="col-6 col-md-3">
-                            <small class="text-muted d-block">Priority</small>
-                            @switch (Model.Priority.ToString())
-                            {
-                                case "High":
-                                    <span class="badge-priority-high"><i class="fa-solid fa-arrow-up me-1"></i> High</span>
-                                    break;
-                                case "Medium":
-                                    <span class="badge-priority-medium"><i class="fa-solid fa-minus me-1"></i> Medium</span>
-                                    break;
-                                case "Critical":
-                                    <span class="badge-priority-urgent"><i class="fa-solid fa-triangle-exclamation me-1"></i> Critical</span>
-                                    break;
-                                default:
-                                    <span class="badge-priority-low"><i class="fa-solid fa-arrow-down me-1"></i> Low</span>
-                                    break;
-                            }
-                        </div>
-
-                        <div class="col-6 col-md-3">
+                        <div class="col-6 col-md-4">
                             <small class="text-muted d-block">Reported On</small>
                             <span class="fw-semibold text-dark small">@Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")</span>
                         </div>
-
-                        <div class="col-6 col-md-3">
+                        <div class="col-6 col-md-4">
                             <small class="text-muted d-block">Last Updated</small>
                             <span class="fw-semibold text-dark small">@Model.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")</span>
                         </div>
@@ -155,11 +124,11 @@
                 </div>
             </div>
 
-            <!-- Comments Card -->
+            <!-- Discussion & Official Comments Card -->
             <div class="card mb-4">
                 <div class="card-header bg-white p-3">
                     <h5 class="fw-bold mb-0 fs-6 text-dark">
-                        <i class="fa-solid fa-comments me-2 text-success"></i> Discussion &amp; Updates
+                        <i class="fa-solid fa-comments me-2 text-success"></i> Discussion &amp; Official Updates
                     </h5>
                 </div>
 
@@ -238,9 +207,56 @@
 
         </div>
 
-        <!-- Right Column: Status History Timeline -->
+        <!-- RIGHT COLUMN (4 Cols): Status, Priority, Location & Timeline -->
         <div class="col-lg-4">
-            <div class="card">
+            
+            <!-- Quick Summary Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-white p-3">
+                    <h5 class="fw-bold mb-0 fs-6 text-dark">
+                        <i class="fa-solid fa-circle-info text-success me-2"></i> Report Overview
+                    </h5>
+                </div>
+                <div class="card-body p-3">
+                    <div class="mb-3 pb-3 border-bottom">
+                        <small class="text-muted d-block mb-1">Tracking Number</small>
+                        <span class="tracking-chip">@Model.TrackingNumber</span>
+                    </div>
+
+                    <div class="mb-3 pb-3 border-bottom">
+                        <small class="text-muted d-block mb-1">Priority Level</small>
+                        @switch (Model.Priority.ToString())
+                        {
+                            case "High":
+                                <span class="badge-priority-high"><i class="fa-solid fa-arrow-up me-1"></i> High</span>
+                                break;
+                            case "Medium":
+                                <span class="badge-priority-medium"><i class="fa-solid fa-minus me-1"></i> Medium</span>
+                                break;
+                            case "Critical":
+                                <span class="badge-priority-urgent"><i class="fa-solid fa-triangle-exclamation me-1"></i> Critical</span>
+                                break;
+                            default:
+                                <span class="badge-priority-low"><i class="fa-solid fa-arrow-down me-1"></i> Low</span>
+                                break;
+                        }
+                    </div>
+
+                    <div class="mb-0">
+                        <small class="text-muted d-block mb-1">Location Address</small>
+                        <p class="text-dark small mb-1 fw-medium">@Model.Address</p>
+                        @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                        {
+                            <span class="badge bg-light text-muted border font-monospace small">
+                                <i class="fa-solid fa-location-dot text-danger me-1"></i> @Model.Latitude.Value.ToString("F6"), @Model.Longitude.Value.ToString("F6")
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status History Timeline Card -->
+            <div class="card mb-4">
                 <div class="card-header bg-white p-3">
                     <h5 class="fw-bold mb-0 fs-6 text-dark">
                         <i class="fa-solid fa-clock-rotate-left me-2 text-success"></i> Status History
@@ -297,6 +313,7 @@
                     }
                 </div>
             </div>
+
         </div>
 
     </div>

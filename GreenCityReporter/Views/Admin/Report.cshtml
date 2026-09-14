@@ -1,482 +1,307 @@
-﻿@model GreenCityReporter.Models.Report
+@model GreenCityReporter.Models.Report
 
 @{
     ViewData["Title"] = "Manage Report";
 }
 
-<div class="container py-5">
+<div class="container py-4">
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success rounded-3 mb-4">
-            <i class="fa-solid fa-check-circle me-2"></i>
-            @TempData["SuccessMessage"]
+        <div class="alert alert-success py-2.5 px-3 mb-4 small d-flex align-items-center">
+            <i class="fa-solid fa-circle-check me-2 fs-5"></i>
+            <div>@TempData["SuccessMessage"]</div>
         </div>
     }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
-            <h1 class="fw-bold mb-1">
-                Manage Report
-            </h1>
-
-            <p class="text-muted mb-0">
-                @Model.TrackingNumber
-            </p>
+            <span class="tracking-chip me-2" style="font-size: 0.95rem;">
+                <i class="fa-solid fa-hashtag me-1"></i> @Model.TrackingNumber
+            </span>
+            <h2 class="fw-bold text-dark mb-0 mt-1">Manage Report</h2>
         </div>
 
         <a asp-controller="Admin"
            asp-action="Index"
-           class="btn btn-outline-secondary rounded-pill px-4">
-
-            <i class="fa-solid fa-arrow-left me-2"></i>
-            All Reports
-
+           class="btn btn-outline-secondary px-4 mt-3 mt-md-0">
+            <i class="fa-solid fa-arrow-left me-2"></i> All Reports
         </a>
-
     </div>
 
-
+    <!-- 2-COLUMN ADMIN LAYOUT -->
     <div class="row g-4">
 
-        <!-- Report Information -->
+        <!-- LEFT COLUMN (8 Cols): Report Info, Image, Description, AI Summary, Comments & History -->
         <div class="col-lg-8">
 
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-
+            <div class="card mb-4 shadow-sm">
                 <div class="card-body p-4">
 
-                    <div class="d-flex justify-content-between align-items-start mb-4">
-
+                    <div class="d-flex justify-content-between align-items-start mb-4 pb-3 border-bottom">
                         <div>
-
-                            <small class="text-muted">
-                                Tracking Number
-                            </small>
-
-                            <h5 class="fw-bold text-success">
-                                @Model.TrackingNumber
-                            </h5>
-
+                            <small class="text-muted d-block">Report Tracking Number</small>
+                            <span class="tracking-chip fs-6">@Model.TrackingNumber</span>
                         </div>
 
-                        <span class="badge bg-secondary px-3 py-2">
-                            @Model.CurrentStatus
-                        </span>
-
+                        <div>
+                            @{
+                                string statusStr = Model.CurrentStatus.ToString() == "InProgress" ? "In Progress" : Model.CurrentStatus.ToString();
+                                string badgeClass = Model.CurrentStatus.ToString() switch
+                                {
+                                    "Pending" => "badge-pending",
+                                    "InProgress" => "badge-in-progress",
+                                    "Resolved" => "badge-resolved",
+                                    "Rejected" => "badge-rejected",
+                                    _ => "badge bg-secondary"
+                                };
+                            }
+                            <span class="@badgeClass fs-6 px-3 py-1">@statusStr</span>
+                        </div>
                     </div>
 
-                    <h2 class="fw-bold mb-4">
-                        @Model.Title
-                    </h2>
+                    <h3 class="fw-bold text-dark mb-4">@Model.Title</h3>
 
                     @if (!string.IsNullOrEmpty(Model.ImagePath))
                     {
-                        <div class="mb-4">
-
+                        <div class="mb-4 text-center bg-light p-2 rounded-3 border">
                             <img src="@Model.ImagePath"
-                                 alt="Report image"
-                                 class="img-fluid rounded-4 shadow-sm"
-                                 style="max-height:450px;width:100%;object-fit:cover;" />
-
+                                 alt="Report evidence photo"
+                                 class="img-fluid rounded-2"
+                                 style="max-height: 420px; width: 100%; object-fit: cover;" />
                         </div>
                     }
 
                     <div class="mb-4">
-
-                        <h6 class="fw-bold">
-                            Description
-                        </h6>
-
-                        <p class="text-muted">
-                            @Model.Description
-                        </p>
-
+                        <h6 class="fw-bold text-dark"><i class="fa-solid fa-align-left me-2 text-success"></i> Issue Description</h6>
+                        <p class="text-dark mb-0 bg-light p-3 rounded-3 border">@Model.Description</p>
                     </div>
 
                     @if (!string.IsNullOrWhiteSpace(Model.AISummary))
                     {
-                        <div class="alert alert-light border mb-4">
-
-                            <h6 class="fw-bold mb-1">
-                                <i class="fa-solid fa-wand-magic-sparkles me-2 text-success"></i>
-                                AI Summary
-                            </h6>
-
-                            <p class="text-muted small mb-2">
-                                A concise summary generated when the citizen submitted the report.
-                            </p>
-
-                            <p class="mb-0">
-                                @Model.AISummary
-                            </p>
-
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-dark"><i class="fa-solid fa-robot me-2 text-primary"></i> AI Analysis Summary</h6>
+                            <div class="p-3 bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-3">
+                                <p class="text-dark small mb-0">@Model.AISummary</p>
+                            </div>
                         </div>
                     }
 
                     <div class="mb-4">
-
-                        <h6 class="fw-bold">
-                            <i class="fa-solid fa-location-dot me-2 text-danger"></i>
-                            Address
-                        </h6>
-
-                        <p class="text-muted mb-0">
-                            @Model.Address
-                        </p>
-
+                        <h6 class="fw-bold text-dark"><i class="fa-solid fa-location-dot me-2 text-danger"></i> Address / Area</h6>
+                        <p class="text-dark mb-0">@Model.Address</p>
+                        @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                        {
+                            <small class="text-muted font-monospace d-block mt-1">
+                                Coordinates: @Model.Latitude.Value.ToString("F6"), @Model.Longitude.Value.ToString("F6")
+                            </small>
+                        }
                     </div>
 
                     <hr />
 
-                    <div class="row mt-3">
-
-                        <div class="col-md-3">
-
-                            <small class="text-muted d-block">
-                                Category
-                            </small>
-
-                            <strong>
-                                @Model.Category?.Name
-                            </strong>
-
-                            <span class="badge @(Model.CategorySource == "AI" ? "bg-success" : "bg-secondary") ms-1">
+                    <div class="row g-3">
+                        <div class="col-6 col-md-3">
+                            <small class="text-muted d-block mb-1">Category</small>
+                            <strong class="text-dark d-block">@(Model.Category?.Name ?? "Uncategorized")</strong>
+                            <span class="badge @(Model.CategorySource == "AI" ? "bg-success" : "bg-secondary") mt-1" style="font-size:0.7rem;">
                                 @(Model.CategorySource == "AI" ? "AI Categorized" : "Manual Category")
                             </span>
-
                         </div>
 
-                        <div class="col-md-3">
-
-                            <small class="text-muted d-block">
-                                Priority
-                            </small>
-
-                            <strong>
-                                @Model.Priority
-                            </strong>
-
-                            <small class="text-muted d-block mt-1">
-                                Initial priority may be AI-assisted. Administrators can override it.
-                            </small>
-
+                        <div class="col-6 col-md-3">
+                            <small class="text-muted d-block mb-1">Priority</small>
+                            @switch (Model.Priority.ToString())
+                            {
+                                case "High":
+                                    <span class="badge-priority-high"><i class="fa-solid fa-arrow-up me-1"></i> High</span>
+                                    break;
+                                case "Medium":
+                                    <span class="badge-priority-medium"><i class="fa-solid fa-minus me-1"></i> Medium</span>
+                                    break;
+                                case "Critical":
+                                    <span class="badge-priority-urgent"><i class="fa-solid fa-triangle-exclamation me-1"></i> Critical</span>
+                                    break;
+                                default:
+                                    <span class="badge-priority-low"><i class="fa-solid fa-arrow-down me-1"></i> Low</span>
+                                    break;
+                            }
                         </div>
 
-                        <div class="col-md-3">
-
-                            <small class="text-muted d-block">
-                                Citizen
-                            </small>
-
-                            <strong>
-                                @Model.User?.FullName
-                            </strong>
-
+                        <div class="col-6 col-md-3">
+                            <small class="text-muted d-block mb-1">Citizen</small>
+                            <strong class="text-dark">@(Model.User?.FullName ?? "Unknown User")</strong>
                         </div>
 
-                        <div class="col-md-3">
-
-                            <small class="text-muted d-block">
-                                Submitted
-                            </small>
-
-                            <strong>
-                                @Model.CreatedAt
-                              
-                            </strong>
-
+                        <div class="col-6 col-md-3">
+                            <small class="text-muted d-block mb-1">Submitted Date</small>
+                            <span class="fw-semibold text-dark small">@Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")</span>
                         </div>
-
                     </div>
 
                 </div>
-
             </div>
 
-
-            <!-- Status History -->
-
-            <div class="card border-0 shadow-sm rounded-4">
-
-                <div class="card-header bg-white border-0 p-4">
-
-                    <h5 class="fw-bold mb-0">
-                        <i class="fa-solid fa-clock-rotate-left me-2 text-success"></i>
-                        Status History
+            <!-- Status History Card -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-white p-3">
+                    <h5 class="fw-bold mb-0 fs-6 text-dark">
+                        <i class="fa-solid fa-clock-rotate-left me-2 text-success"></i> Status Change Timeline
                     </h5>
-
                 </div>
-
                 <div class="card-body p-4">
-
-                    @if (Model.StatusHistories.Any())
+                    @if (Model.StatusHistories != null && Model.StatusHistories.Any())
                     {
-                        @foreach (var history in Model.StatusHistories
-                            .OrderByDescending(h => h.UpdatedAt))
+                        @foreach (var history in Model.StatusHistories.OrderByDescending(h => h.UpdatedAt))
                         {
                             <div class="border-bottom pb-3 mb-3">
-
-                                <div class="d-flex justify-content-between">
-
-                                    <strong>
-                                        @history.PreviousStatus
-                                        →
-                                        @history.NewStatus
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong class="text-dark small">
+                                        @history.PreviousStatus &rarr; @history.NewStatus
                                     </strong>
-
-                                    <small class="text-muted">
-                                        @history.UpdatedAt
-                                        
+                                    <small class="text-muted" style="font-size:0.75rem;">
+                                        @history.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
                                     </small>
-
                                 </div>
-
                                 @if (!string.IsNullOrWhiteSpace(history.Remarks))
                                 {
-                                    <p class="text-muted small mt-2 mb-0">
-                                        @history.Remarks
+                                    <p class="text-muted small mt-2 mb-0 bg-light p-2 rounded border">
+                                        <i class="fa-solid fa-comment-dots me-1"></i> @history.Remarks
                                     </p>
                                 }
-
                             </div>
                         }
                     }
                     else
                     {
-                        <p class="text-muted mb-0">
-                            No status changes have been made yet.
-                        </p>
+                        <p class="text-muted small mb-0 text-center py-3">No status changes recorded yet.</p>
                     }
-
                 </div>
-
             </div>
 
-        </div>
-        <!-- Comments -->
-
-        <div class="card border-0 shadow-sm rounded-4 mt-4">
-
-            <div class="card-header bg-white border-0 p-4">
-
-                <h5 class="fw-bold mb-0">
-                    <i class="fa-solid fa-comments me-2 text-success"></i>
-                    Comments
-                </h5>
-
-            </div>
-
-            <div class="card-body p-4">
-
-                @if (TempData["CommentSuccess"] != null)
-                {
-                    <div class="alert alert-success rounded-3">
-                        <i class="fa-solid fa-check-circle me-2"></i>
-                        @TempData["CommentSuccess"]
-                    </div>
-                }
-
-                @if (TempData["CommentError"] != null)
-                {
-                    <div class="alert alert-danger rounded-3">
-                        <i class="fa-solid fa-circle-exclamation me-2"></i>
-                        @TempData["CommentError"]
-                    </div>
-                }
-
-
-                <!-- Existing Comments -->
-                @if (Model.Comments != null && Model.Comments.Any())
-                {
-                    @foreach (var comment in Model.Comments
-                        .OrderByDescending(c => c.CreatedAt))
-                    {
-                        <div class="border-bottom pb-3 mb-3">
-
-                            <div class="d-flex justify-content-between align-items-center">
-
-                                <div>
-                                    <strong>
-                                        @comment.User?.FullName
-                                    </strong>
-                                </div>
-
-                                <small class="text-muted">
-                                    @comment.CreatedAt
-                                  
-                                </small>
-
-                            </div>
-
-                            <p class="text-muted mt-2 mb-0">
-                                @comment.Message
-                            </p>
-
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div class="text-center py-4">
-
-                        <i class="fa-regular fa-comment-dots fa-2x text-muted mb-3"></i>
-
-                        <p class="text-muted mb-0">
-                            No comments yet.
-                        </p>
-
-                    </div>
-                }
-
-
-                <!-- Admin Add Comment Form -->
-
-                <div class="border-top pt-4 mt-4">
-
-                    <h6 class="fw-bold mb-3">
-                        Add Admin Comment
-                    </h6>
-
-                    <form asp-controller="Admin"
-                          asp-action="AddComment"
-                          method="post">
-
-                        @Html.AntiForgeryToken()
-
-                        <input type="hidden"
-                               name="reportId"
-                               value="@Model.Id" />
-
-                        <div class="mb-3">
-
-                            <textarea name="message"
-                                      class="form-control"
-                                      rows="4"
-                                      maxlength="1000"
-                                      placeholder="Write an update or message to the citizen..."
-                                      required></textarea>
-
-                            <div class="form-text">
-                                Maximum 1000 characters.
-                            </div>
-
-                        </div>
-
-                        <button type="submit"
-                                class="btn btn-success rounded-pill px-4">
-
-                            <i class="fa-solid fa-paper-plane me-2"></i>
-                            Add Comment
-
-                        </button>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- Admin Controls -->
-        <div class="col-lg-4">
-
-            <div class="card border-0 shadow-sm rounded-4">
-
-                <div class="card-header bg-white border-0 p-4">
-
-                    <h5 class="fw-bold mb-0">
-                        <i class="fa-solid fa-sliders me-2 text-success"></i>
-                        Update Report
+            <!-- Discussion Comments Card -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white p-3">
+                    <h5 class="fw-bold mb-0 fs-6 text-dark">
+                        <i class="fa-solid fa-comments me-2 text-success"></i> Comments &amp; Communication
                     </h5>
-
                 </div>
 
                 <div class="card-body p-4">
+                    @if (TempData["CommentSuccess"] != null)
+                    {
+                        <div class="alert alert-success py-2 px-3 mb-3 small">
+                            <i class="fa-solid fa-circle-check me-2"></i> @TempData["CommentSuccess"]
+                        </div>
+                    }
+                    @if (TempData["CommentError"] != null)
+                    {
+                        <div class="alert alert-danger py-2 px-3 mb-3 small">
+                            <i class="fa-solid fa-circle-exclamation me-2"></i> @TempData["CommentError"]
+                        </div>
+                    }
 
-                    <form asp-controller="Admin"
-                          asp-action="UpdateStatus"
-                          method="post">
+                    <!-- Existing Comments List -->
+                    @if (Model.Comments != null && Model.Comments.Any())
+                    {
+                        @foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedAt))
+                        {
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <span class="rounded-circle bg-secondary text-white me-2 d-inline-flex align-items-center justify-content-center fw-bold" style="width:28px; height:28px; font-size:0.75rem;">
+                                            @((comment.User?.FullName ?? "U").Substring(0, 1).ToUpper())
+                                        </span>
+                                        <strong class="text-dark small me-2">@(comment.User?.FullName ?? "User")</strong>
+                                    </div>
+                                    <small class="text-muted" style="font-size:0.75rem;">
+                                        @comment.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                    </small>
+                                </div>
+                                <p class="text-dark small mt-2 mb-0">@comment.Message</p>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4 text-muted mb-3">
+                            <i class="fa-regular fa-comment-dots fa-2x mb-2 text-muted opacity-50"></i>
+                            <p class="mb-0 small">No comments posted yet.</p>
+                        </div>
+                    }
 
+                    <!-- Admin Add Comment Form -->
+                    <div class="border-top pt-3 mt-3">
+                        <h6 class="fw-bold mb-2 text-dark fs-6">Post Admin Update Comment</h6>
+                        <form asp-controller="Admin" asp-action="AddComment" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="reportId" value="@Model.Id" />
+                            <div class="mb-3">
+                                <textarea name="message" class="form-control" rows="3" maxlength="1000" placeholder="Write an update or message to the citizen..." required></textarea>
+                                <div class="form-text">Maximum 1000 characters.</div>
+                            </div>
+                            <button type="submit" class="btn btn-success fw-bold px-4">
+                                <i class="fa-solid fa-paper-plane me-1"></i> Post Comment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN (4 Cols): Update Controls Card -->
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm border">
+                <div class="card-header bg-white p-3">
+                    <h5 class="fw-bold mb-0 fs-6 text-dark d-flex align-items-center">
+                        <i class="fa-solid fa-sliders text-success me-2"></i> Update Status &amp; Priority
+                    </h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-controller="Admin" asp-action="UpdateStatus" method="post">
                         @Html.AntiForgeryToken()
+                        <input type="hidden" name="reportId" value="@Model.Id" />
 
-                        <input type="hidden"
-                               name="reportId"
-                               value="@Model.Id" />
-
-                        <!-- Status -->
-                        <div class="mb-4">
-
-                            <label class="form-label fw-medium">
-                                Status
-                            </label>
-
-                            <select name="newStatus"
-                                    class="form-select">
-
+                        <!-- Status Control -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Status</label>
+                            <select name="newStatus" class="form-select">
                                 @foreach (var status in Enum.GetValues<GreenCityReporter.Models.Enums.ReportStatus>())
                                 {
-                                    <option value="@status"
-                                            selected="@(status == Model.CurrentStatus)">
-                                        @status
+                                    <option value="@status" selected="@(status == Model.CurrentStatus)">
+                                        @(status == GreenCityReporter.Models.Enums.ReportStatus.InProgress ? "In Progress" : status.ToString())
                                     </option>
                                 }
-
                             </select>
-
                         </div>
 
-                        <!-- Priority -->
-                        <div class="mb-4">
-
-                            <label class="form-label fw-medium">
-                                Priority
-                            </label>
-
-                            <select name="priority"
-                                    class="form-select">
-
+                        <!-- Priority Control -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Priority Level</label>
+                            <select name="priority" class="form-select">
                                 @foreach (var priority in Enum.GetValues<GreenCityReporter.Models.Enums.Priority>())
                                 {
-                                    <option value="@priority"
-                                            selected="@(priority == Model.Priority)">
+                                    <option value="@priority" selected="@(priority == Model.Priority)">
                                         @priority
                                     </option>
                                 }
-
                             </select>
-
                         </div>
 
-                        <!-- Remarks -->
+                        <!-- Remarks Control -->
                         <div class="mb-4">
-
-                            <label class="form-label fw-medium">
-                                Remarks
-                            </label>
-
-                            <textarea name="remarks"
-                                      class="form-control"
-                                      rows="4"
-                                      maxlength="500"
-                                      placeholder="Add remarks about this update..."></textarea>
-
+                            <label class="form-label fw-bold">Remarks / Internal Notes</label>
+                            <textarea name="remarks" class="form-control" rows="4" maxlength="500" placeholder="Add official remarks about this update..."></textarea>
                         </div>
 
-                        <button type="submit"
-                                class="btn btn-success w-100 rounded-pill py-2">
-
-                            <i class="fa-solid fa-save me-2"></i>
-                            Update Report
-
+                        <button type="submit" class="btn btn-success w-100 py-2.5 fw-bold shadow-sm">
+                            <i class="fa-solid fa-floppy-disk me-2"></i> Save Status Update
                         </button>
-
                     </form>
-
                 </div>
-
             </div>
 
         </div>

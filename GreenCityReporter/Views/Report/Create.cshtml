@@ -2,7 +2,7 @@
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 
 @{
-    ViewData["Title"] = "Submit a Report";
+    ViewData["Title"] = "Submit an Environmental Report";
     string googleMapsApiKey = Configuration["GoogleMaps:ApiKey"] 
                               ?? Environment.GetEnvironmentVariable("GoogleMapsApiKey") 
                               ?? Environment.GetEnvironmentVariable("GoogleMaps__ApiKey") 
@@ -12,64 +12,100 @@
 @section Styles {
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <style>
-        #location-picker-map {
-            height: 420px;
-            width: 100%;
-            border-radius: 10px;
-            z-index: 1;
-        }
         .location-card-header {
-            background-color: var(--gcr-secondary-light);
+            background-color: var(--primary-light);
         }
         .search-suggestion-item:hover {
-            background-color: var(--gcr-secondary-light);
+            background-color: var(--primary-light);
             cursor: pointer;
         }
     </style>
 }
 
 <div class="container py-4">
+    
+    <!-- PAGE HEADER -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle px-3 py-1 mb-1 fw-semibold">
+                <i class="fa-solid fa-leaf me-1 text-warning"></i> Civic Reporting Tool
+            </span>
+            <h2 class="fw-bold text-dark mb-0">Submit an Environmental Report</h2>
+            <p class="text-muted small mb-0">Help keep Dhaka clean &amp; safe by logging municipal infrastructure hazards.</p>
+        </div>
+        <a asp-controller="Report" asp-action="Dashboard" class="btn btn-outline-secondary px-4 mt-3 mt-md-0">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- PROGRESS / INFORMATION AREA -->
+    <div class="alert alert-success border-success border-opacity-25 bg-success bg-opacity-10 mb-4 py-3 px-4 rounded-3 d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-success text-white p-2.5 me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fa-solid fa-wand-magic-sparkles fs-5"></i>
+            </div>
+            <div>
+                <strong class="text-dark small d-block">AI-Assisted Issue Processing</strong>
+                <span class="text-muted small">Our AI engine will analyze your title and description to auto-detect urgency, category, and summary on the review step.</span>
+            </div>
+        </div>
+        <span class="badge bg-success d-none d-md-inline-block">Step 1 of 2</span>
+    </div>
+
     <div class="row justify-content-center">
-        <div class="col-md-9 col-lg-8">
-            <div class="card mb-4">
-                <div class="card-header bg-white p-4">
-                    <h3 class="fw-bold mb-1 text-success">
-                        <i class="fa-solid fa-file-circle-plus me-2"></i>Submit an Environmental Report
-                    </h3>
-                    <p class="text-muted small mb-0">Help keep Dhaka clean and sustainable by logging civic infrastructure issues.</p>
-                </div>
+        <div class="col-lg-9 col-xl-8">
+            
+            <form asp-action="Review" method="post" enctype="multipart/form-data" id="report-submission-form">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
-                <div class="card-body p-4">
-                    <form asp-action="Review" method="post" enctype="multipart/form-data" id="report-submission-form">
+                <!-- Hidden fields to store selected coordinates -->
+                <input type="hidden" asp-for="Latitude" id="Latitude" />
+                <input type="hidden" asp-for="Longitude" id="Longitude" />
 
-                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
-
-                        <!-- Hidden fields to store selected coordinates -->
-                        <input type="hidden" asp-for="Latitude" id="Latitude" />
-                        <input type="hidden" asp-for="Longitude" id="Longitude" />
-
+                <!-- CARD 1: REPORT DETAILS -->
+                <div class="card mb-4">
+                    <div class="card-header bg-white p-3">
+                        <h5 class="fw-bold mb-0 fs-6 text-dark d-flex align-items-center">
+                            <i class="fa-solid fa-pen-to-square text-success me-2"></i> 1. Report Details
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
                         <div class="mb-3">
                             <label asp-for="Title" class="form-label fw-bold">
                                 Report Title <span class="text-danger">*</span>
                             </label>
                             <input asp-for="Title"
                                    class="form-control"
-                                   placeholder="Enter a clear title (e.g., Overflowing waste bin near Gulshan 2 circle)" required />
+                                   placeholder="e.g. Overflowing waste bin near Gulshan 2 circle" required />
                             <span asp-validation-for="Title" class="text-danger small"></span>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-0">
                             <label asp-for="Description" class="form-label fw-bold">
                                 Issue Description <span class="text-danger">*</span>
                             </label>
                             <textarea asp-for="Description"
                                       class="form-control"
                                       rows="4"
-                                      placeholder="Provide details about the issue, severity, and any landmark context..." required></textarea>
+                                      placeholder="Provide detailed context about the issue, landmark context, and hazard severity..." required></textarea>
                             <span asp-validation-for="Description" class="text-danger small"></span>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Address Input (Synced with Map) -->
+                <!-- CARD 2: LOCATION CARD & INTERACTIVE MAP -->
+                <div class="card mb-4" id="map-section">
+                    <div class="card-header location-card-header p-3 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0 fs-6 text-dark d-flex align-items-center">
+                            <i class="fa-solid fa-map-location-dot text-success me-2"></i> 2. Pin Location on Dhaka Map
+                        </h5>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">
+                            <i class="fa-solid fa-shield-halved me-1"></i>Dhaka Boundary Protected
+                        </span>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- Address Text Input -->
                         <div class="mb-3">
                             <label asp-for="Address" class="form-label fw-bold">
                                 Selected Address / Area <span class="text-danger">*</span>
@@ -78,113 +114,100 @@
                                       id="Address"
                                       class="form-control"
                                       rows="2"
-                                      placeholder="Search on map below or type street name, area, landmark in Dhaka..." required></textarea>
+                                      placeholder="Search address below, click on map, or type street name..." required></textarea>
                             <span asp-validation-for="Address" class="text-danger small"></span>
                         </div>
 
-                        <!-- Google Maps-Style Location Picker Section -->
-                        <div class="mb-4" id="map-section">
-                            <div class="card border rounded-3 overflow-hidden">
-                                <div class="card-header location-card-header p-3 d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-0 fw-bold text-dark">
-                                            <i class="fa-solid fa-map-location-dot me-2 text-success"></i>Interactive Location Picker
-                                        </h6>
-                                        <small class="text-muted">Search an address, click anywhere on map, or drag marker to pinpoint.</small>
-                                    </div>
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">
-                                        <i class="fa-solid fa-shield-halved me-1"></i>Dhaka Boundary Protected
+                        <!-- Search & Current Location Controls -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-7 position-relative">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white text-success border-end-0">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
                                     </span>
+                                    <input type="text"
+                                           id="address-search-input"
+                                           class="form-control border-start-0"
+                                           placeholder="Search address or landmark in Dhaka..."
+                                           autocomplete="off" />
                                 </div>
-
-                                <div class="card-body p-3">
-
-                                    <!-- Search & Current Location Controls -->
-                                    <div class="row g-2 mb-3">
-                                        <div class="col-md-7 position-relative">
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-white text-success border-end-0">
-                                                    <i class="fa-solid fa-magnifying-glass"></i>
-                                                </span>
-                                                <input type="text"
-                                                       id="address-search-input"
-                                                       class="form-control border-start-0"
-                                                       placeholder="Search address or landmark (e.g. Mirpur 10, Dhaka)..."
-                                                       autocomplete="off" />
-                                            </div>
-                                            <!-- Custom Suggestion Dropdown for search -->
-                                            <div id="search-results-dropdown" class="dropdown-menu w-100 border p-1 shadow mt-1 d-none position-absolute" style="z-index: 1050; max-height: 240px; overflow-y: auto;"></div>
-                                        </div>
-                                        <div class="col-md-5">
-                                            <button type="button" id="use-current-location-btn" class="btn btn-outline-success w-100 fw-semibold">
-                                                <i class="fa-solid fa-location-crosshairs me-1"></i> Use My Current Location
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Map Canvas -->
-                                    <div id="location-picker-map" class="shadow-sm"></div>
-
-                                    <!-- Boundary or validation alert message -->
-                                    <div id="map-error-alert" class="alert alert-danger d-none mt-3 py-2 px-3 small align-items-center">
-                                        <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
-                                        <span id="map-error-text">Please select a valid location inside Dhaka city.</span>
-                                    </div>
-
-                                    <!-- Selected Location Banner -->
-                                    <div id="location-info-selected" class="alert alert-success d-none mt-3 mb-0 py-2.5 px-3 d-flex align-items-center justify-content-between rounded-3">
-                                        <div class="d-flex align-items-center">
-                                            <i class="fa-solid fa-location-dot text-danger fs-4 me-3"></i>
-                                            <div>
-                                                <div class="fw-bold text-dark small" id="banner-address-display">Selected Location</div>
-                                                <small class="text-muted font-monospace" id="banner-coords-display"></small>
-                                                <span class="badge bg-success ms-2">Dhaka City, Bangladesh</span>
-                                            </div>
-                                        </div>
-                                        <button type="button" id="clear-location-btn" class="btn btn-sm btn-outline-danger">
-                                            <i class="fa-solid fa-xmark me-1"></i>Clear
-                                        </button>
-                                    </div>
-
-                                    <div id="location-info-empty" class="alert alert-light border mt-3 mb-0 py-2 px-3 d-flex align-items-center text-muted rounded-3 small">
-                                        <i class="fa-solid fa-circle-info text-primary me-2"></i>
-                                        <span>No location pinned yet. Search an address, click on map, or tap "Use My Current Location".</span>
-                                    </div>
-
-                                    <span asp-validation-for="Latitude" class="text-danger small d-block mt-2"></span>
-                                    <span asp-validation-for="Longitude" class="text-danger small d-block mt-1"></span>
-                                </div>
+                                <!-- Suggestion Dropdown -->
+                                <div id="search-results-dropdown" class="dropdown-menu w-100 border p-1 shadow mt-1 d-none position-absolute" style="z-index: 1050; max-height: 240px; overflow-y: auto;"></div>
+                            </div>
+                            <div class="col-md-5">
+                                <button type="button" id="use-current-location-btn" class="btn btn-outline-success w-100 fw-semibold">
+                                    <i class="fa-solid fa-location-crosshairs me-1"></i> Use My Current Location
+                                </button>
                             </div>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">
-                                Upload Photo Evidence
-                            </label>
+                        <!-- Map Canvas Container -->
+                        <div id="location-picker-map" class="shadow-sm"></div>
+
+                        <!-- Validation / Boundary Error Alert -->
+                        <div id="map-error-alert" class="alert alert-danger d-none mt-3 py-2 px-3 small align-items-center">
+                            <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
+                            <span id="map-error-text">Please select a valid location inside Dhaka city bounds.</span>
+                        </div>
+
+                        <!-- Selected Location Banner -->
+                        <div id="location-info-selected" class="alert alert-success d-none mt-3 mb-0 py-2.5 px-3 d-flex align-items-center justify-content-between rounded-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-location-dot text-danger fs-4 me-3"></i>
+                                <div>
+                                    <div class="fw-bold text-dark small" id="banner-address-display">Selected Location</div>
+                                    <small class="text-muted font-monospace" id="banner-coords-display"></small>
+                                    <span class="badge bg-success ms-2">Dhaka City, Bangladesh</span>
+                                </div>
+                            </div>
+                            <button type="button" id="clear-location-btn" class="btn btn-sm btn-outline-danger">
+                                <i class="fa-solid fa-xmark me-1"></i>Clear
+                            </button>
+                        </div>
+
+                        <div id="location-info-empty" class="alert alert-light border mt-3 mb-0 py-2 px-3 d-flex align-items-center text-muted rounded-3 small">
+                            <i class="fa-solid fa-circle-info text-primary me-2"></i>
+                            <span>No location pinned yet. Search an address, click on map, or tap "Use My Current Location".</span>
+                        </div>
+
+                        <span asp-validation-for="Latitude" class="text-danger small d-block mt-2"></span>
+                        <span asp-validation-for="Longitude" class="text-danger small d-block mt-1"></span>
+                    </div>
+                </div>
+
+                <!-- CARD 3: PHOTO EVIDENCE UPLOAD -->
+                <div class="card mb-4">
+                    <div class="card-header bg-white p-3">
+                        <h5 class="fw-bold mb-0 fs-6 text-dark d-flex align-items-center">
+                            <i class="fa-solid fa-camera text-success me-2"></i> 3. Upload Photo Evidence
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-0">
+                            <label class="form-label fw-bold">Attach Image</label>
                             <input type="file"
                                    name="image"
                                    class="form-control"
                                    accept="image/*" />
                             <div class="form-text">
-                                Upload a clear image showing the issue (Optional, JPG/PNG max 5MB).
+                                Upload a photo showing the issue clear view (Optional, JPG/PNG max 5MB).
                             </div>
                         </div>
-
-                        <div class="d-flex justify-content-between pt-2 border-top">
-                            <a asp-controller="Report"
-                               asp-action="Dashboard"
-                               class="btn btn-outline-secondary px-4">
-                                Cancel
-                            </a>
-
-                            <button type="submit" class="btn btn-success px-4 fw-bold">
-                                <i class="fa-solid fa-arrow-right me-1"></i> Review Report
-                            </button>
-                        </div>
-
-                    </form>
+                    </div>
                 </div>
-            </div>
+
+                <!-- ACTION BUTTONS -->
+                <div class="d-flex justify-content-between pt-2">
+                    <a asp-controller="Report" asp-action="Dashboard" class="btn btn-outline-secondary px-4">
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="btn btn-success px-5 py-2.5 fw-bold shadow-sm">
+                        <i class="fa-solid fa-arrow-right me-1"></i> Proceed to Review Report
+                    </button>
+                </div>
+
+            </form>
         </div>
     </div>
 </div>
@@ -264,7 +287,6 @@
                 hideMapError();
             }
 
-            // Reverse Geocoding using Nominatim (Leaflet engine)
             function reverseGeocodeNominatim(lat, lng) {
                 const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
                 $.getJSON(url, function (data) {
@@ -278,7 +300,6 @@
                 });
             }
 
-            // Reverse Geocoding using Google Geocoder
             function reverseGeocodeGoogle(lat, lng) {
                 if (!googleGeocoder) return;
                 const latlng = { lat: parseFloat(lat), lng: parseFloat(lng) };
@@ -330,9 +351,6 @@
                 return true;
             }
 
-            // ----------------------------------------------------
-            // INITIALIZE GOOGLE MAPS ENGINE
-            // ----------------------------------------------------
             function initGoogleMapsEngine() {
                 try {
                     const mapElement = document.getElementById('location-picker-map');
@@ -357,7 +375,6 @@
                     googleGeocoder = new google.maps.Geocoder();
                     isGoogleMapsActive = true;
 
-                    // Google Autocomplete on Search Input
                     const searchInput = document.getElementById('address-search-input');
                     const autocomplete = new google.maps.places.Autocomplete(searchInput, {
                         componentRestrictions: { country: 'bd' }
@@ -372,12 +389,10 @@
                         }
                     });
 
-                    // Map Click
                     googleMap.addListener('click', function (e) {
                         processLocationSelection(e.latLng.lat(), e.latLng.lng());
                     });
 
-                    // Marker Drag End
                     googleMarker.addListener('dragend', function (e) {
                         processLocationSelection(e.latLng.lat(), e.latLng.lng());
                     });
@@ -388,9 +403,6 @@
                 }
             }
 
-            // ----------------------------------------------------
-            // INITIALIZE LEAFLET ENGINE (FALLBACK)
-            // ----------------------------------------------------
             function initLeafletEngine() {
                 isGoogleMapsActive = false;
                 const DHAKA_SW = L.latLng(DHAKA_LAT_MIN, DHAKA_LNG_MIN);
@@ -408,14 +420,13 @@
 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     maxZoom: 19,
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    attribution: '&copy; OpenStreetMap contributors'
                 }).addTo(leafletMap);
 
                 leafletMap.on('click', function (e) {
                     processLocationSelection(e.latlng.lat, e.latlng.lng);
                 });
 
-                // Nominatim Autocomplete for search input
                 let searchTimeout = null;
                 $('#address-search-input').on('input', function () {
                     const query = $(this).val();
@@ -455,14 +466,12 @@
                 });
             }
 
-            // Launch Map Engine
             if (GOOGLE_MAPS_KEY && typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
                 initGoogleMapsEngine();
             } else {
                 initLeafletEngine();
             }
 
-            // "Use My Current Location" Handler
             $('#use-current-location-btn').on('click', function () {
                 const btn = $(this);
                 const originalHtml = btn.html();
@@ -491,7 +500,6 @@
                 );
             });
 
-            // Clear Button
             $('#clear-location-btn').on('click', function () {
                 clearLocationUI();
                 if (googleMarker) googleMarker.setVisible(false);
@@ -501,14 +509,12 @@
                 }
             });
 
-            // Restore location if existing (e.g. model validation failure)
             const existingLat = parseFloat($('#Latitude').val());
             const existingLng = parseFloat($('#Longitude').val());
             if (!isNaN(existingLat) && !isNaN(existingLng)) {
                 processLocationSelection(existingLat, existingLng, $('#Address').val());
             }
 
-            // Form Submit Check
             $('#report-submission-form').on('submit', function (e) {
                 const lat = $('#Latitude').val();
                 const lng = $('#Longitude').val();

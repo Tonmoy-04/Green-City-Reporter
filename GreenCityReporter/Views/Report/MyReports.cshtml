@@ -8,19 +8,17 @@
 
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
-            <h2 class="fw-bold text-dark mb-1">
-                <i class="fa-solid fa-folder-open text-success me-2"></i>My Reports
-            </h2>
-            <p class="text-muted small mb-0">
-                Track status and progress of all civic issues you have reported.
-            </p>
+            <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle px-3 py-1 mb-1 fw-semibold">
+                <i class="fa-solid fa-folder-open me-1"></i> Submissions History
+            </span>
+            <h2 class="fw-bold text-dark mb-0">My Submitted Reports</h2>
+            <p class="text-muted small mb-0">Track status and resolution progress of all civic issues you have reported.</p>
         </div>
 
         <a asp-controller="Report"
            asp-action="Create"
-           class="btn btn-success px-4 mt-3 mt-md-0">
-            <i class="fa-solid fa-plus me-1"></i>
-            Submit New Report
+           class="btn btn-success px-4 mt-3 mt-md-0 shadow-sm fw-bold">
+            <i class="fa-solid fa-plus me-1"></i> Submit New Report
         </a>
     </div>
 
@@ -38,15 +36,15 @@
                 <a asp-controller="Report"
                    asp-action="Create"
                    class="btn btn-success px-4">
-                    <i class="fa-solid fa-bullhorn me-1"></i>
-                    Report an Issue
+                    <i class="fa-solid fa-bullhorn me-1"></i> Report an Issue
                 </a>
             </div>
         </div>
     }
     else
     {
-        <div class="card overflow-hidden">
+        <!-- Desktop Table View (d-none d-md-block) -->
+        <div class="card overflow-hidden d-none d-md-block shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead>
@@ -65,9 +63,7 @@
                         {
                             <tr>
                                 <td class="px-4">
-                                    <span class="fw-bold font-monospace text-success small">
-                                        @report.TrackingNumber
-                                    </span>
+                                    <span class="tracking-chip">@report.TrackingNumber</span>
                                 </td>
 
                                 <td class="fw-semibold text-dark">
@@ -162,6 +158,65 @@
                         }
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Mobile Card View (d-block d-md-none) -->
+        <div class="d-block d-md-none">
+            <div class="row g-3">
+                @foreach (var report in Model)
+                {
+                    <div class="col-12">
+                        <div class="card p-3 border shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="tracking-chip">@report.TrackingNumber</span>
+                                @switch (report.CurrentStatus.ToString())
+                                {
+                                    case "Pending":
+                                        <span class="badge-pending">Pending</span>
+                                        break;
+                                    case "InProgress":
+                                        <span class="badge-in-progress">In Progress</span>
+                                        break;
+                                    case "Resolved":
+                                        <span class="badge-resolved">Resolved</span>
+                                        break;
+                                    case "Rejected":
+                                        <span class="badge-rejected">Rejected</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-secondary">@report.CurrentStatus</span>
+                                        break;
+                                }
+                            </div>
+                            <h6 class="fw-bold text-dark mb-1">@report.Title</h6>
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="badge bg-light text-dark border">@(report.Category?.Name ?? "Uncategorized")</span>
+                                <small class="text-muted">&bull; @report.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</small>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                @switch (report.Priority.ToString())
+                                {
+                                    case "High":
+                                        <span class="badge-priority-high"><i class="fa-solid fa-arrow-up me-1"></i> High</span>
+                                        break;
+                                    case "Medium":
+                                        <span class="badge-priority-medium"><i class="fa-solid fa-minus me-1"></i> Medium</span>
+                                        break;
+                                    case "Critical":
+                                        <span class="badge-priority-urgent"><i class="fa-solid fa-triangle-exclamation me-1"></i> Critical</span>
+                                        break;
+                                    default:
+                                        <span class="badge-priority-low"><i class="fa-solid fa-arrow-down me-1"></i> Low</span>
+                                        break;
+                                }
+                                <a asp-controller="Report" asp-action="Details" asp-route-id="@report.Id" class="btn btn-sm btn-outline-success">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     }
