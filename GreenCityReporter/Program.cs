@@ -3,6 +3,9 @@ using GreenCityReporter.Models;
 using GreenCityReporter.Services.AI;
 using GreenCityReporter.Services.Background;
 using GreenCityReporter.Services.Chat;
+using GreenCityReporter.Services.Payments;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -11,6 +14,23 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDataProtection();
+builder.Services.AddOptions<PaymentOptions>().BindConfiguration("Donations:Gateway").Validate(o => o.DemoMode || !o.Enabled || o.IsReady, "Configure valid payment credentials, organization contact details, and a public HTTPS base URL.").ValidateOnStart();
+builder.Services.AddOptions<DonationEmailOptions>().BindConfiguration("Donations:Email").Validate(o => !o.Enabled || (o.IsReady && (builder.Environment.IsDevelopment() || o.UseStartTls)), "Configure a valid SMTP server and sender. Production email requires STARTTLS.").ValidateOnStart();
+builder.Services.AddHttpClient<IDonationGateway, SslCommerzGateway>(client => client.Timeout = TimeSpan.FromSeconds(25))
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false })
+    .RemoveAllLoggers(); // The validation API uses credentials in its query string; never log gateway URLs.
+builder.Services.AddScoped<DonationPaymentService>();
+builder.Services.AddScoped<IDonationReceiptSender, SmtpDonationReceiptSender>();
+builder.Services.AddScoped<DonationReceiptEmailService>();
+builder.Services.AddHostedService<DonationProcessingWorker>();
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("donation-checkout", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+});
 
 // Bind AI options
 builder.Services.Configure<AIOptions>(
@@ -91,6 +111,7 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapStaticAssets();
 

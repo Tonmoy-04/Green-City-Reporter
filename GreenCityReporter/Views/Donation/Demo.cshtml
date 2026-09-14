@@ -1,0 +1,29 @@
+@model GreenCityReporter.Models.Donation
+@{ ViewData["Title"] = "Demo payment"; }
+@section Styles { <link rel="stylesheet" href="~/css/donation.css" asp-append-version="true" /> }
+<div class="container py-5"><div class="card p-4 p-md-5 mx-auto donation-receipt">
+    <div class="alert alert-info"><strong>Demo payment only.</strong> No money is transferred. Enter sample information only, never real card details, wallet PINs or OTPs.</div>
+    <span class="text-success fw-bold small mb-2">STEP 3 OF 4</span>
+    <h1 class="h3 fw-bold"><i class="fa-solid @(Model.PaymentMethod == "Card" ? "fa-credit-card" : "fa-mobile-screen-button") me-2 text-success"></i>@Model.PaymentMethod demo checkout</h1>
+    <p class="text-muted">Enter your sample payment details, then choose the result you want to demonstrate.</p>
+    <div class="bg-light rounded-3 p-3 mb-4"><strong>@Model.DonorName</strong><div class="fs-3 fw-bold text-success">BDT @Model.Amount.ToString("N2")</div><small class="text-break">@Model.TransactionId</small></div>
+    <form asp-action="CompleteDemo" method="post" id="demo-payment-form" autocomplete="off">
+        <input type="hidden" name="token" value="@Model.ReceiptToken" />
+        @* Payment sample inputs intentionally have no name: only token and outcome are posted. *@
+        @if (Model.PaymentMethod == "Card") {
+            <div class="mb-3"><label for="demo-card-name" class="form-label">Demo cardholder name</label><input id="demo-card-name" class="form-control" placeholder="e.g. Demo Donor" required maxlength="50" pattern=".*\S.*" /></div>
+            <div class="mb-3"><label for="demo-card-number" class="form-label">Demo card number</label><input id="demo-card-number" class="form-control" placeholder="4111 1111 1111 1111" inputmode="numeric" required maxlength="23" pattern="[0-9 ]{13,23}" aria-describedby="demo-card-help" /><div id="demo-card-help" class="form-text">Sample number: 4111 1111 1111 1111. Use 13–19 digits.</div></div>
+            <div class="row g-3 mb-4"><div class="col-6"><label for="demo-expiry" class="form-label">Expiry (MM/YY)</label><input id="demo-expiry" class="form-control" placeholder="12/30" inputmode="numeric" required maxlength="5" pattern="(0[1-9]|1[0-2])/[0-9]{2}" /></div><div class="col-6"><label for="demo-cvv" class="form-label">Demo CVV</label><input id="demo-cvv" class="form-control" type="password" placeholder="123" inputmode="numeric" required minlength="3" maxlength="4" pattern="[0-9]{3,4}" /></div></div>
+        } else {
+            <div class="mb-3"><label for="demo-wallet" class="form-label">Demo @Model.PaymentMethod wallet number</label><input id="demo-wallet" class="form-control" type="tel" placeholder="@(Model.PaymentMethod == "Rocket" ? "017000000001" : "01700000000")" inputmode="numeric" required maxlength="@(Model.PaymentMethod == "Rocket" ? 12 : 11)" pattern="@(Model.PaymentMethod == "Rocket" ? "01[3-9][0-9]{8,9}" : "01[3-9][0-9]{8}")" /><div class="form-text">Enter a made-up number for this demonstration.</div></div>
+            <div class="mb-4"><label for="demo-otp" class="form-label">Demo verification code</label><input id="demo-otp" class="form-control" placeholder="123456" inputmode="numeric" required maxlength="6" pattern="123456" aria-describedby="demo-code-help" /><div id="demo-code-help" class="form-text">Enter 123456. No SMS is sent.</div></div>
+        }
+        <div class="d-flex flex-wrap gap-2">
+            <button name="outcome" value="success" class="btn btn-success flex-grow-1 py-3">Simulate successful payment</button>
+            <button name="outcome" value="failure" class="btn btn-outline-danger" formnovalidate>Simulate failure</button>
+            <button name="outcome" value="cancel" class="btn btn-outline-secondary" formnovalidate>Cancel demo payment</button>
+        </div>
+    </form>
+    <p class="small text-muted mt-3 mb-0">Sample fields are checked only in your browser. Only the simulated donation result is saved. Card and wallet details are not submitted or stored. No confirmation email is sent.</p>
+</div></div>
+@section Scripts { <script src="~/js/donation-demo.js" asp-append-version="true"></script> }

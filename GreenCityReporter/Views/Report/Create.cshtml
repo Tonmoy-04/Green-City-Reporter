@@ -129,10 +129,11 @@
                                            id="address-search-input"
                                            class="form-control border-start-0"
                                            placeholder="Search address or landmark in Dhaka..."
-                                           autocomplete="off" />
+                                           autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="search-results-dropdown" aria-describedby="location-search-help" />
                                 </div>
+                                <div id="location-search-help" class="form-text">Type at least 3 characters, then choose a place to pin it on the map.</div>
                                 <!-- Suggestion Dropdown -->
-                                <div id="search-results-dropdown" class="dropdown-menu w-100 border p-1 shadow mt-1 d-none position-absolute" style="z-index: 1050; max-height: 240px; overflow-y: auto;"></div>
+                                <div id="search-results-dropdown" role="listbox" aria-label="Location suggestions" class="dropdown-menu w-100 border p-1 shadow mt-1 d-none position-absolute" style="z-index: 1050; max-height: 240px; overflow-y: auto;"></div>
                             </div>
                             <div class="col-md-5">
                                 <button type="button" id="use-current-location-btn" class="btn btn-outline-success w-100 fw-semibold">
@@ -222,6 +223,7 @@
         <script src="https://maps.googleapis.com/maps/api/js?key=@googleMapsApiKey&libraries=places"></script>
     }
 
+    <script src="~/js/location-search.js" asp-append-version="true"></script>
     <script>
         $(document).ready(function () {
             const GOOGLE_MAPS_KEY = "@googleMapsApiKey";
@@ -377,7 +379,10 @@
 
                     const searchInput = document.getElementById('address-search-input');
                     const autocomplete = new google.maps.places.Autocomplete(searchInput, {
-                        componentRestrictions: { country: 'bd' }
+                        componentRestrictions: { country: 'bd' },
+                        bounds: { south: DHAKA_LAT_MIN, north: DHAKA_LAT_MAX, west: DHAKA_LNG_MIN, east: DHAKA_LNG_MAX },
+                        strictBounds: true,
+                        fields: ['geometry', 'formatted_address', 'name']
                     });
 
                     autocomplete.addListener('place_changed', function () {
@@ -427,45 +432,19 @@
                     processLocationSelection(e.latlng.lat, e.latlng.lng);
                 });
 
-                let searchTimeout = null;
-                $('#address-search-input').on('input', function () {
-                    const query = $(this).val();
-                    clearTimeout(searchTimeout);
-                    if (!query || query.length < 3) {
-                        $('#search-results-dropdown').addClass('d-none').empty();
-                        return;
-                    }
-                    searchTimeout = setTimeout(function () {
-                        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Dhaka, Bangladesh')}&countrycodes=bd&limit=5`;
-                        $.getJSON(url, function (results) {
-                            const dropdown = $('#search-results-dropdown').empty();
-                            if (results && results.length > 0) {
-                                results.forEach(function (item) {
-                                    const lat = parseFloat(item.lat);
-                                    const lon = parseFloat(item.lon);
-                                    const btn = $(`<button type="button" class="dropdown-item search-suggestion-item text-truncate small py-2 px-3 border-bottom">${item.display_name}</button>`);
-                                    btn.on('click', function () {
-                                        $('#address-search-input').val(item.display_name);
-                                        dropdown.addClass('d-none');
-                                        processLocationSelection(lat, lon, item.display_name);
-                                    });
-                                    dropdown.append(btn);
-                                });
-                                dropdown.removeClass('d-none');
-                            } else {
-                                dropdown.addClass('d-none');
-                            }
-                        });
-                    }, 350);
-                });
-
-                $(document).on('click', function (e) {
-                    if (!$(e.target).closest('#map-section').length) {
-                        $('#search-results-dropdown').addClass('d-none');
-                    }
+                initLocationSearch({
+                    input: document.getElementById('address-search-input'),
+                    dropdown: document.getElementById('search-results-dropdown'),
+                    selectLocation: function (lat, lng, address) {
+                        if (processLocationSelection(lat, lng, address)) {
+                            leafletMap.setView([lat, lng], 16);
+                            return true;
+                        }
+                        return false;
+                    },
+                    isInsideBounds: isInsideDhaka
                 });
             }
-
             if (GOOGLE_MAPS_KEY && typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
                 initGoogleMapsEngine();
             } else {
