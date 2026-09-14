@@ -4,51 +4,81 @@
 }
 
 <div class="container py-5">
-	<div class="row justify-content-center">
-		<div class="col-md-6 col-lg-5">
-			<div class="card border mb-4">
-				<div class="card-body p-4 p-md-5">
-					<div class="text-center mb-4">
-						<div class="rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-2 text-success" style="width: 56px; height: 56px; background-color: var(--gcr-secondary-light);">
-							<i class="fa-solid fa-user-plus fa-xl"></i>
+	<div class="row justify-content-center align-items-center">
+		<div class="col-lg-10 col-xl-9">
+			<div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+				<div class="row g-0">
+					
+					<!-- Left Branding Illustration Banner (Desktop) -->
+					<div class="col-md-5 d-none d-md-flex flex-column justify-content-between p-5 text-white" style="background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);">
+						<div>
+							<div class="d-flex align-items-center mb-4">
+								<span class="bg-white bg-opacity-20 text-white p-2 rounded-3 me-2 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+									<i class="fa-solid fa-leaf text-warning"></i>
+								</span>
+								<h5 class="fw-bold mb-0 text-white font-display">Green City Reporter</h5>
+							</div>
+							<h3 class="fw-bold mb-3">Join the Civic Movement</h3>
+							<p class="text-white-50 small mb-0">
+								Create an account to report public hazards, track resolution progress, receive real-time alerts, and collaborate with Dhaka City services.
+							</p>
 						</div>
-						<h3 class="fw-bold text-dark mb-1">Create Citizen Account</h3>
-						<p class="text-muted small mb-0">Join Green City Reporter to log & track civic issues.</p>
+
+						<div class="pt-4 border-top border-white border-opacity-25">
+							<div class="d-flex align-items-center small text-white-50">
+								<i class="fa-solid fa-shield-halved text-warning me-2 fs-5"></i>
+								<span>Official Municipal Public Service Portal</span>
+							</div>
+						</div>
 					</div>
 
-					<form asp-controller="Account" asp-action="Register" method="post">
-						<div asp-validation-summary="All" class="text-danger small mb-3"></div>
-
-						<div class="form-floating mb-3">
-							<input asp-for="FullName" class="form-control" placeholder="John Doe" required />
-							<label asp-for="FullName">Full Name</label>
-							<span asp-validation-for="FullName" class="text-danger small"></span>
+					<!-- Right Form Area -->
+					<div class="col-md-7 p-4 p-md-5 bg-white">
+						<div class="text-center text-md-start mb-4">
+							<div class="d-md-none rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3 text-success" style="width: 56px; height: 56px; background-color: var(--primary-light);">
+								<i class="fa-solid fa-user-plus fa-xl"></i>
+							</div>
+							<h3 class="fw-bold text-dark mb-1">Create Citizen Account</h3>
+							<p class="text-muted small mb-0">Fill out your details to join Green City Reporter.</p>
 						</div>
 
-						<div class="form-floating mb-3">
-							<input asp-for="Email" class="form-control" placeholder="name@example.com" required />
-							<label asp-for="Email">Email address</label>
-							<span asp-validation-for="Email" class="text-danger small"></span>
-						</div>
+						<form asp-controller="Account" asp-action="Register" method="post">
+							<div asp-validation-summary="All" class="text-danger small mb-3"></div>
 
-						<div class="form-floating mb-3">
-							<input asp-for="Password" class="form-control" placeholder="Password" required />
-							<label asp-for="Password">Password</label>
-							<span asp-validation-for="Password" class="text-danger small"></span>
-						</div>
+							<div class="form-floating mb-3">
+								<input asp-for="FullName" class="form-control" placeholder="John Doe" required />
+								<label asp-for="FullName">Full Name</label>
+								<span asp-validation-for="FullName" class="text-danger small"></span>
+							</div>
 
-						<div class="form-floating mb-4">
-							<input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password" required />
-							<label asp-for="ConfirmPassword">Confirm Password</label>
-							<span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-						</div>
+							<div class="form-floating mb-3">
+								<input asp-for="Email" class="form-control" placeholder="name@example.com" required />
+								<label asp-for="Email">Email address</label>
+								<span asp-validation-for="Email" class="text-danger small"></span>
+							</div>
 
-						<button type="submit" class="btn btn-success w-100 py-2.5 fw-bold">Register Account</button>
+							<div class="form-floating mb-3">
+								<input asp-for="Password" class="form-control" placeholder="Password" required />
+								<label asp-for="Password">Password</label>
+								<span asp-validation-for="Password" class="text-danger small"></span>
+							</div>
 
-						<div class="text-center mt-4 pt-3 border-top">
-							<p class="mb-0 text-muted small">Already have an account? <a asp-action="Login" class="text-success fw-bold text-decoration-none">Sign in here</a></p>
-						</div>
-					</form>
+							<div class="form-floating mb-4">
+								<input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password" required />
+								<label asp-for="ConfirmPassword">Confirm Password</label>
+								<span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+							</div>
+
+							<button type="submit" class="btn btn-success w-100 py-3 fw-bold shadow-sm">
+								<i class="fa-solid fa-user-plus me-2"></i> Register Account
+							</button>
+
+							<div class="text-center mt-4 pt-3 border-top">
+								<p class="mb-0 text-muted small">Already have an account? <a asp-action="Login" class="text-success fw-bold text-decoration-none">Sign in here</a></p>
+							</div>
+						</form>
+					</div>
+
 				</div>
 			</div>
 		</div>

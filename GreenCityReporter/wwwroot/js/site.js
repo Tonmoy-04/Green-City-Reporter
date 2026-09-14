@@ -1,9 +1,18 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+// Green City Reporter - Frontend Script
 
 document.addEventListener('DOMContentLoaded', () => {
+	// Scroll Progress Bar
+	const scrollProgress = document.getElementById('scroll-progress');
+	if (scrollProgress) {
+		window.addEventListener('scroll', () => {
+			const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+			const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+			const scrolled = (winScroll / height) * 100;
+			scrollProgress.style.width = scrolled + '%';
+		});
+	}
+
+	// Chatbot Widget Handler
 	const chatbot = document.getElementById('green-city-chatbot');
 	if (!chatbot) {
 		return;
@@ -50,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			return;
 		}
 
-		console.log('Sending chat message:', message);
 		const formData = new FormData(form);
 		formData.set('message', message);
 		appendMessage(message, 'user');
@@ -78,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			input.value = '';
 		} catch {
 			loading.remove();
-			appendMessage('The AI assistant is temporarily unavailable. You can still use the normal Green City Reporter features.', 'assistant');
+			appendMessage('The AI assistant is temporarily unavailable. You can still use all Green City Reporter features.', 'assistant');
 		} finally {
 			input.disabled = false;
 			send.disabled = false;
