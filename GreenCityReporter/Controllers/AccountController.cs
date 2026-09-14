@@ -47,7 +47,7 @@ namespace GreenCityReporter.Controllers
                     await _userManager.AddToRoleAsync(user, "Citizen");
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Dashboard", "Report");
                 }
 
                 foreach (var error in result.Errors)
@@ -211,13 +211,17 @@ public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl =
 
         private IActionResult RedirectToLocal(string? returnUrl)
         {
-            if (Url.IsLocalUrl(returnUrl))
+            if (!string.IsNullOrEmpty(returnUrl) &&
+                Url.IsLocalUrl(returnUrl) &&
+                !string.Equals(returnUrl, "/", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(returnUrl, "/Home", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(returnUrl, "/Home/Index", StringComparison.OrdinalIgnoreCase))
             {
                 return Redirect(returnUrl);
             }
             else
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToAction("Dashboard", "Report");
             }
         }
     }

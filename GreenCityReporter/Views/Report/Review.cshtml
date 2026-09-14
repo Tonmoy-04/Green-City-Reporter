@@ -4,13 +4,15 @@
     ViewData["Title"] = "Review Report";
 }
 
-<div class="container py-5">
+<div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-white border-0 p-4">
-                    <h2 class="fw-bold mb-1">Review Your Report</h2>
-                    <p class="text-muted mb-0">Check the details and confirm submission.</p>
+            <div class="card mb-4">
+                <div class="card-header bg-white p-4">
+                    <h3 class="fw-bold mb-1 text-success">
+                        <i class="fa-solid fa-clipboard-check me-2"></i>Review Your Report
+                    </h3>
+                    <p class="text-muted small mb-0">Please verify your submission details before final confirmation.</p>
                 </div>
 
                 <div class="card-body p-4">
@@ -18,31 +20,48 @@
 
                     @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
                     {
-                        <img src="@Model.ImagePath" alt="Report image" class="img-fluid rounded-3 mb-4" style="max-height: 360px; width: 100%; object-fit: cover;" />
+                        <div class="mb-4 text-center bg-light p-2 rounded-3 border">
+                            <img src="@Model.ImagePath" alt="Report evidence" class="img-fluid rounded-2" style="max-height: 320px; width: 100%; object-fit: cover;" />
+                        </div>
                     }
 
-                    <dl class="row">
-                        <dt class="col-sm-3">Title</dt>
-                        <dd class="col-sm-9">@Model.Title</dd>
+                    <div class="p-3 bg-light rounded-3 border mb-4">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-3 text-muted">Title</dt>
+                            <dd class="col-sm-9 fw-bold text-dark">@Model.Title</dd>
 
-                        <dt class="col-sm-3">Description</dt>
-                        <dd class="col-sm-9">@Model.Description</dd>
+                            <dt class="col-sm-3 text-muted">Description</dt>
+                            <dd class="col-sm-9 text-dark">@Model.Description</dd>
 
-                        <dt class="col-sm-3">Address</dt>
-                        <dd class="col-sm-9">@Model.Address</dd>
+                            <dt class="col-sm-3 text-muted">Address / Area</dt>
+                            <dd class="col-sm-9 text-dark">@Model.Address</dd>
 
-                        @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
-                        {
-                            <dt class="col-sm-3">Coordinates</dt>
-                            <dd class="col-sm-9">@Model.Latitude, @Model.Longitude</dd>
-                        }
+                            @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                            {
+                                <dt class="col-sm-3 text-muted">Location</dt>
+                                <dd class="col-sm-9 font-monospace text-dark">
+                                    <i class="fa-solid fa-location-dot text-danger me-1"></i> @Model.Latitude.Value.ToString("F6"), @Model.Longitude.Value.ToString("F6")
+                                </dd>
+                            }
 
-                        <dt class="col-sm-3">AI Summary</dt>
-                        <dd class="col-sm-9">@(Model.AISummary ?? "AI summary unavailable.")</dd>
+                            <dt class="col-sm-3 text-muted">AI Summary</dt>
+                            <dd class="col-sm-9 text-dark">@(Model.AISummary ?? "AI summary unavailable.")</dd>
 
-                        <dt class="col-sm-3">Priority</dt>
-                        <dd class="col-sm-9"><span class="badge bg-secondary">@Model.Priority</span></dd>
-                    </dl>
+                            <dt class="col-sm-3 text-muted">Assigned Priority</dt>
+                            <dd class="col-sm-9">
+                                @{
+                                    string prioClass = Model.Priority switch {
+                                        GreenCityReporter.Models.Enums.Priority.Low => "badge-priority-low",
+                                        GreenCityReporter.Models.Enums.Priority.Medium => "badge-priority-medium",
+                                        GreenCityReporter.Models.Enums.Priority.High => "badge-priority-high",
+                                        GreenCityReporter.Models.Enums.Priority.Critical => "badge-priority-urgent",
+                                        _ => "badge bg-secondary"
+                                    };
+                                }
+                                <span class="@prioClass">@Model.Priority</span>
+                            </dd>
+                        </dl>
+                    </div>
 
                     <form asp-action="Confirm" method="post">
                         @Html.AntiForgeryToken()
@@ -56,26 +75,32 @@
                         @if (Model.RequiresManualCategory)
                         {
                             <div class="mb-4">
-                                <label asp-for="SelectedCategoryId" class="form-label">Category</label>
-                                <p class="text-muted small">Category could not be determined automatically. Please select a category.</p>
+                                <label asp-for="SelectedCategoryId" class="form-label fw-bold">Issue Category <span class="text-danger">*</span></label>
+                                <p class="text-muted small mb-2">Category could not be determined automatically. Please select the appropriate category.</p>
                                 <select asp-for="SelectedCategoryId" asp-items="Model.Categories" class="form-select">
                                     <option value="">-- Select Category --</option>
                                 </select>
-                                <span asp-validation-for="SelectedCategoryId" class="text-danger"></span>
+                                <span asp-validation-for="SelectedCategoryId" class="text-danger small"></span>
                             </div>
                         }
                         else
                         {
-                            <div class="mb-4">
-                                <span class="form-label d-block">Detected Category</span>
-                                <strong>@Model.AICategoryName</strong>
-                                <span class="badge bg-success ms-2">AI Categorized</span>
+                            <div class="mb-4 p-3 bg-success bg-opacity-10 border border-success border-opacity-25 rounded-3 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="text-muted small d-block">Detected Category</span>
+                                    <strong class="text-dark fs-6">@Model.AICategoryName</strong>
+                                </div>
+                                <span class="badge bg-success"><i class="fa-solid fa-robot me-1"></i> Auto-Categorized</span>
                             </div>
                         }
 
-                        <div class="d-flex justify-content-between">
-                            <a asp-action="Create" class="btn btn-outline-secondary">Back / Edit Report</a>
-                            <button type="submit" class="btn btn-success">Confirm &amp; Submit</button>
+                        <div class="d-flex justify-content-between pt-2">
+                            <a asp-action="Create" class="btn btn-outline-secondary">
+                                <i class="fa-solid fa-arrow-left me-1"></i> Back to Edit
+                            </a>
+                            <button type="submit" class="btn btn-success fw-bold px-4">
+                                <i class="fa-solid fa-paper-plane me-1"></i> Confirm &amp; Submit
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -85,5 +110,5 @@
 </div>
 
 @section Scripts {
-    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

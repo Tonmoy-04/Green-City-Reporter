@@ -16,7 +16,12 @@ namespace GreenCityReporter.ViewModels
         [Required]
         public string Address { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Please select an issue location on the map.")]
+        [Range(23.60, 23.95, ErrorMessage = "Selected location latitude must be within Dhaka city boundary (23.60 to 23.95).")]
         public double? Latitude { get; set; }
+
+        [Required(ErrorMessage = "Please select an issue location on the map.")]
+        [Range(90.25, 90.55, ErrorMessage = "Selected location longitude must be within Dhaka city boundary (90.25 to 90.55).")]
         public double? Longitude { get; set; }
     }
 
