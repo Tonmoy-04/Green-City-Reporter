@@ -1,117 +1,109 @@
-
 @model IEnumerable<GreenCityReporter.Models.Report>
 
 @{
     ViewData["Title"] = "My Reports";
 }
 
-<div class="container py-5">
+<div class="container py-4">
 
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
-            <h1 class="fw-bold mb-1">My Reports</h1>
-            <p class="text-muted mb-0">
-                View and track the environmental issues you have reported.
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="fa-solid fa-folder-open text-success me-2"></i>My Reports
+            </h2>
+            <p class="text-muted small mb-0">
+                Track status and progress of all civic issues you have reported.
             </p>
         </div>
 
         <a asp-controller="Report"
            asp-action="Create"
-           class="btn btn-success rounded-pill px-4 mt-3 mt-md-0">
-            <i class="fa-solid fa-plus me-2"></i>
+           class="btn btn-success px-4 mt-3 mt-md-0">
+            <i class="fa-solid fa-plus me-1"></i>
             Submit New Report
         </a>
     </div>
 
     @if (!Model.Any())
     {
-        <div class="card border-0 shadow-sm rounded-4">
+        <div class="card mb-4">
             <div class="card-body text-center py-5">
-
                 <div class="mb-3">
-                    <i class="fa-solid fa-file-circle-xmark fa-3x text-muted"></i>
+                    <i class="fa-solid fa-file-circle-xmark fa-3x text-muted opacity-50"></i>
                 </div>
-
-                <h4 class="fw-bold">No Reports Yet</h4>
-
-                <p class="text-muted mb-4">
-                    You haven't submitted any environmental reports yet.
+                <h4 class="fw-bold text-dark">No Reports Found</h4>
+                <p class="text-muted mb-4 small">
+                    You haven't submitted any environmental or infrastructure reports yet.
                 </p>
-
                 <a asp-controller="Report"
                    asp-action="Create"
-                   class="btn btn-success rounded-pill px-4">
-                    <i class="fa-solid fa-bullhorn me-2"></i>
+                   class="btn btn-success px-4">
+                    <i class="fa-solid fa-bullhorn me-1"></i>
                     Report an Issue
                 </a>
-
             </div>
         </div>
     }
     else
     {
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-
+        <div class="card overflow-hidden">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th class="px-4">Tracking Number</th>
                             <th>Title</th>
                             <th>Category</th>
                             <th>Status</th>
                             <th>Priority</th>
-                            <th>Date</th>
+                            <th>Submitted Date</th>
                             <th class="text-end px-4">Action</th>
                         </tr>
                     </thead>
-
                     <tbody>
                         @foreach (var report in Model)
                         {
                             <tr>
-
                                 <td class="px-4">
-                                    <span class="fw-medium text-success">
+                                    <span class="fw-bold font-monospace text-success small">
                                         @report.TrackingNumber
                                     </span>
                                 </td>
 
-                                <td>
-                                    <span class="fw-medium">
-                                        @report.Title
-                                    </span>
+                                <td class="fw-semibold text-dark">
+                                    @report.Title
                                 </td>
 
                                 <td>
-                                    @report.Category?.Name
+                                    <span class="badge bg-light text-dark border">
+                                        @(report.Category?.Name ?? "Uncategorized")
+                                    </span>
                                 </td>
 
                                 <td>
                                     @switch (report.CurrentStatus.ToString())
                                     {
                                         case "Pending":
-                                            <span class="badge bg-warning text-dark">
+                                            <span class="badge-pending">
                                                 <i class="fa-regular fa-clock me-1"></i> Pending
                                             </span>
                                             break;
 
                                         case "InProgress":
-                                            <span class="badge bg-primary">
+                                            <span class="badge-in-progress">
                                                 <i class="fa-solid fa-spinner me-1"></i> In Progress
                                             </span>
                                             break;
 
                                         case "Resolved":
-                                            <span class="badge bg-success">
-                                                <i class="fa-solid fa-check-circle me-1"></i> Resolved
+                                            <span class="badge-resolved">
+                                                <i class="fa-solid fa-circle-check me-1"></i> Resolved
                                             </span>
                                             break;
 
                                         case "Rejected":
-                                            <span class="badge bg-danger">
-                                                <i class="fa-solid fa-xmark-circle me-1"></i> Rejected
+                                            <span class="badge-rejected">
+                                                <i class="fa-solid fa-circle-xmark me-1"></i> Rejected
                                             </span>
                                             break;
 
@@ -127,31 +119,34 @@
                                     @switch (report.Priority.ToString())
                                     {
                                         case "High":
-                                            <span class="text-danger fw-medium">
-                                                <i class="fa-solid fa-arrow-up me-1"></i>
-                                                High
+                                            <span class="badge-priority-high">
+                                                <i class="fa-solid fa-arrow-up me-1"></i> High
                                             </span>
                                             break;
 
                                         case "Medium":
-                                            <span class="text-warning fw-medium">
-                                                <i class="fa-solid fa-minus me-1"></i>
-                                                Medium
+                                            <span class="badge-priority-medium">
+                                                <i class="fa-solid fa-minus me-1"></i> Medium
+                                            </span>
+                                            break;
+
+                                        case "Critical":
+                                            <span class="badge-priority-urgent">
+                                                <i class="fa-solid fa-triangle-exclamation me-1"></i> Critical
                                             </span>
                                             break;
 
                                         default:
-                                            <span class="text-success fw-medium">
-                                                <i class="fa-solid fa-arrow-down me-1"></i>
-                                                Low
+                                            <span class="badge-priority-low">
+                                                <i class="fa-solid fa-arrow-down me-1"></i> Low
                                             </span>
                                             break;
                                     }
                                 </td>
 
                                 <td>
-                                    <span class="text-muted">
-                                        @report.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")
+                                    <span class="text-muted small">
+                                        @report.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
                                     </span>
                                 </td>
 
@@ -159,20 +154,16 @@
                                     <a asp-controller="Report"
                                        asp-action="Details"
                                        asp-route-id="@report.Id"
-                                       class="btn btn-sm btn-outline-success rounded-pill px-3">
-                                        View
+                                       class="btn btn-sm btn-outline-success">
+                                        View Details
                                     </a>
                                 </td>
-
                             </tr>
                         }
                     </tbody>
-
                 </table>
             </div>
-
         </div>
     }
 
 </div>
-

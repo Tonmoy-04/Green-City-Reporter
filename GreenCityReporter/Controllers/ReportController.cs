@@ -51,6 +51,13 @@ namespace GreenCityReporter.Controllers
             ReportSubmissionViewModel model,
             IFormFile? image)
         {
+            if (!model.Latitude.HasValue || !model.Longitude.HasValue ||
+                model.Latitude.Value < 23.60 || model.Latitude.Value > 23.95 ||
+                model.Longitude.Value < 90.25 || model.Longitude.Value > 90.55)
+            {
+                ModelState.AddModelError(string.Empty, "Please select a valid issue location inside Dhaka on the map.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View("Create", model);
