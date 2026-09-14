@@ -1,0 +1,33 @@
+.donation-hero { background: linear-gradient(115deg, var(--primary-dark), var(--secondary)); color: white; }
+.donation-hero .badge { background: rgba(255,255,255,.13); color: #e5f9ed; }
+.donation-hero p { color: #e0f2e9; max-width: 660px; }
+.checkout-progress { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; padding: 0; }
+.checkout-progress li { font-size: .8rem; color: var(--muted); display: flex; align-items: center; gap: .4rem; }
+.checkout-progress span { display: grid; place-items: center; width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%; background: var(--surface-alt); border: 1px solid var(--border); }
+.checkout-progress [aria-current="step"] { color: var(--primary); font-weight: 700; }
+.checkout-progress [aria-current="step"] span { background: var(--primary); border-color: var(--primary); color: white; }
+.amount-grid, .payment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.amount-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.donation-amount { border: 1px solid var(--border); padding: .9rem .3rem; background: var(--surface-alt); font-weight: 600; }
+.donation-amount[aria-pressed="true"] { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+.payment-choice { display: flex; align-items: center; gap: .8rem; border: 1px solid var(--border); border-radius: 12px; padding: 1rem; cursor: pointer; position: relative; }
+.payment-choice input { width: 16px; height: 16px; accent-color: var(--primary); flex-shrink: 0; }
+.payment-choice:has(input:checked) { border-color: var(--primary); background: var(--background); box-shadow: 0 0 0 1px var(--primary); }
+.payment-choice:focus-within { outline: 3px solid var(--secondary-light); outline-offset: 2px; }
+.payment-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; color: var(--primary); background: var(--primary-light); flex-shrink: 0; font-size: 1.2rem; }
+.method-bkash .payment-icon { background: #fce7f0; color: #bd145b; }
+.method-nagad .payment-icon { background: #fff0e5; color: #b84016; }
+.method-rocket .payment-icon { background: #f3e8ff; color: #792bb4; }
+.payment-choice strong { display: block; font-size: .9rem; }
+.payment-choice small { display: block; color: var(--muted); font-size: .75rem; margin-top: .2rem; }
+.choice-check { display: none; }
+.payment-choice.unavailable { opacity: .5; cursor: default; }
+.payment-process { background: var(--surface-alt); border: 1px solid var(--border); }
+.donation-summary { position: sticky; top: 95px; }
+.donation-receipt { max-width: 760px; }
+.receipt-details { display: grid; grid-template-columns: 1fr 1.5fr; gap: .9rem; font-size: .9rem; }
+.receipt-details dt { color: var(--muted); font-weight: 500; }
+.receipt-details dd { margin: 0; }
+[hidden] { display: none !important; }
+@media (max-width: 575px) { .payment-grid { grid-template-columns: 1fr; } .checkout-progress li { flex-direction: column; text-align: center; font-size: .7rem; } .receipt-details { grid-template-columns: 1fr; gap: .35rem; } .receipt-details dd { margin-bottom: .7rem; } }
+@media print { header, footer, .receipt-actions, #scroll-progress, .checkout-progress, #green-city-chatbot { display: none !important; } .donation-receipt { max-width: none; border: 0; box-shadow: none; } body { background: white; } }

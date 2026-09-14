@@ -145,6 +145,149 @@ namespace GreenCityReporter.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("GreenCityReporter.Models.Donation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("BankTransactionId")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("CheckoutKey")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("CheckoutUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DonorName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("EmailAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("EmailLeaseUntil")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EmailNextAttemptAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GatewayPaymentType")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("GatewayStoreId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsSandbox")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastCheckedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Message")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("ReceiptEmailSentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReceiptToken")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReviewedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderPhone")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransactionId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ValidationId")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CheckoutKey")
+                        .IsUnique()
+                        .HasFilter("[CheckoutKey] IS NOT NULL");
+
+                    b.HasIndex("ReceiptToken")
+                        .IsUnique()
+                        .HasFilter("[ReceiptToken] IS NOT NULL");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("PaymentMethod", "TransactionId")
+                        .IsUnique();
+
+                    b.HasIndex("Provider", "TransactionId")
+                        .IsUnique()
+                        .HasFilter("[Provider] = 'SSLCommerz'");
+
+                    b.HasIndex("Provider", "IsSandbox", "BankTransactionId")
+                        .IsUnique()
+                        .HasFilter("[BankTransactionId] IS NOT NULL");
+
+                    b.HasIndex("Provider", "Status", "LastCheckedAt");
+
+                    b.ToTable("Donations");
+                });
+
             modelBuilder.Entity("GreenCityReporter.Models.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -439,6 +582,16 @@ namespace GreenCityReporter.Migrations
                         .IsRequired();
 
                     b.Navigation("Report");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("GreenCityReporter.Models.Donation", b =>
+                {
+                    b.HasOne("GreenCityReporter.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
                 });

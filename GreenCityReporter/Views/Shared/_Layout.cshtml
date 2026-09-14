@@ -132,6 +132,9 @@
                             </li>
                         }
 
+                        <li class="nav-item">
+                            <a class="nav-link fw-medium mx-1 @(currentController == "Donation" ? "active" : "")" asp-controller="Donation" asp-action="Index"><i class="fa-solid fa-heart me-1 text-success"></i> Donate</a>
+                        </li>
                     </ul>
 
                     <!-- Right User Actions / Auth Buttons -->
@@ -302,6 +305,7 @@
                             <li class="mb-2"><a asp-controller="Account" asp-action="Register" class="text-white-50 text-decoration-none"><i class="fa-solid fa-angle-right me-1 text-success"></i> Register</a></li>
                         }
                         <li class="mb-2"><a asp-controller="Report" asp-action="Track" class="text-white-50 text-decoration-none"><i class="fa-solid fa-angle-right me-1 text-success"></i> Track Status</a></li>
+                        <li class="mb-2"><a asp-controller="Donation" asp-action="Index" class="text-white-50 text-decoration-none"><i class="fa-solid fa-heart me-1 text-success"></i> Donate</a></li>
                     </ul>
                 </div>
 

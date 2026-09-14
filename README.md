@@ -470,3 +470,9 @@ This project was developed for academic and educational purposes.
 - Md Jonayed Bagdadi — ID: 20230104061
 
 All team members are from the Department of Computer Science and Engineering (CSE), Ahsanullah University of Science and Technology (AUST).
+
+## Donations
+
+`/Donation` provides a four-step checkout for Credit/Debit Card, bKash, Nagad and Rocket through SSLCommerz hosted payment pages. Guest and signed-in donors receive a receipt after server-side payment validation. Optional receipt emails use a durable retry queue. `/Donation/Manage` shows transactions and supports legacy manual donations and verified risk reviews.
+
+Development runs in local demo mode: no merchant account is needed. Choose a payment method and simulate success, failure or cancellation to show a clearly labeled demo receipt. For actual gateway sandbox testing, disable DemoMode and configure merchant credentials, real organization contact details, and a public HTTPS callback origin. See [donation payment setup and verification](docs/donation-payments.md) for gateway keys, email settings, migrations, tests, and deployment requirements.

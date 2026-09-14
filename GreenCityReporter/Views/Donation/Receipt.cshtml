@@ -1,0 +1,25 @@
+@model GreenCityReporter.Models.Donation
+@{
+    ViewData["Title"] = Model.Status == DonationStatus.Confirmed ? "Donation receipt" : "Donation payment status";
+    var demo = Model.Provider == "Demo";
+    var confirmed = Model.Status == DonationStatus.Confirmed;
+    var pending = Model.Status == DonationStatus.Pending || Model.Status == DonationStatus.UnderReview;
+}
+@section Styles { <link rel="stylesheet" href="~/css/donation.css" asp-append-version="true" /> }
+<div class="container py-5"><div class="card p-4 p-md-5 mx-auto donation-receipt">
+    <ol class="checkout-progress mb-4" aria-label="Donation checkout steps"><li><span>1</span> Amount</li><li><span>2</span> Method</li><li><span>3</span> Payment</li><li aria-current="step"><span>4</span> Receipt</li></ol>
+    <div class="text-center mb-4"><i class="fa-solid @(confirmed ? "fa-circle-check text-success" : pending ? "fa-clock text-warning" : "fa-circle-xmark text-danger") display-4 mb-3"></i><h1 class="h3 fw-bold">@(demo && confirmed ? "Demo payment successful!" : confirmed ? "Thank you for your donation!" : pending ? "Your payment is awaiting confirmation" : Model.Status == DonationStatus.Cancelled ? "Payment cancelled" : "Payment was not completed")</h1><p class="text-muted">@(demo ? "This is a simulated payment result for a project demonstration. No money was transferred." : confirmed ? "Your payment has been verified. Keep this receipt for your records." : Model.Status == DonationStatus.UnderReview ? "The payment provider flagged this payment for review. Confirmation will follow after the review." : pending ? "We are checking your transaction with the payment provider. This is a payment status page, not a confirmed receipt." : "This donation has not been confirmed. You can start a new checkout.")</p></div>
+    @if (demo) { <div class="alert alert-info"><strong>DEMO RECEIPT — NOT A REAL PAYMENT.</strong> No bank or wallet transaction occurred. No confirmation email is sent.</div> }
+    else if (Model.IsSandbox) { <div class="alert alert-info"><strong>Sandbox transaction</strong> — this is a test payment. No real donation was collected.</div> }
+    @if (TempData["DonationNotice"] is string notice) { <div class="alert alert-info" role="status">@notice</div> }
+    <dl class="receipt-details"><dt>Donor</dt><dd>@Model.DonorName</dd><dt>Amount</dt><dd class="fw-bold">BDT @Model.Amount.ToString("N2")</dd><dt>Payment method</dt><dd>@Model.PaymentMethod</dd><dt>Transaction reference</dt><dd class="text-break">@Model.TransactionId</dd>@if (Model.BankTransactionId != null) { <dt>Bank transaction</dt><dd class="text-break">@Model.BankTransactionId</dd> }<dt>Status</dt><dd>@Model.Status</dd><dt>Created (UTC)</dt><dd>@Model.CreatedAt.ToString("dd MMM yyyy HH:mm:ss")</dd>@if (confirmed && Model.PaidAt != null) { <dt>@(demo ? "Simulated (UTC)" : "Verified (UTC)")</dt><dd>@Model.PaidAt?.ToString("dd MMM yyyy HH:mm:ss")</dd> }</dl>
+    @if (!demo && confirmed && Model.Email != null) { <p class="small text-muted">@(Model.ReceiptEmailSentAt != null ? "Your confirmation email has been sent." : (bool?)ViewData["EmailReady"] == true ? "Your confirmation email is queued for delivery." : "Email delivery is currently unavailable. Save or print this receipt.")</p> }
+    <div class="d-flex flex-wrap gap-2 mt-3 receipt-actions">
+        @if (demo && Model.Status == DonationStatus.Pending) { <a asp-action="Demo" asp-route-token="@Model.ReceiptToken" class="btn btn-success">Continue demo payment</a> }
+        else if (Model.Status == DonationStatus.Pending) { <form asp-action="Refresh" method="post"><input type="hidden" name="token" value="@Model.ReceiptToken" /><button class="btn btn-success">Check payment status</button></form> }
+        @if (confirmed) { <button type="button" class="btn btn-success" id="print-receipt">Print / save receipt</button> }
+        <a asp-action="Index" class="btn btn-outline-secondary">Back to donations</a>
+    </div>
+    <p class="small text-muted mt-3 mb-0">Keep your receipt link private. It gives access to these transaction details.</p>
+</div></div>
+@section Scripts { <script src="~/js/donation-receipt.js" asp-append-version="true"></script> }

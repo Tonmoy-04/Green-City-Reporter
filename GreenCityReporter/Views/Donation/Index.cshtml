@@ -1,0 +1,84 @@
+@model GreenCityReporter.ViewModels.DonationPageViewModel
+@{ ViewData["Title"] = "Donate for a greener Dhaka"; }
+@section Styles { <link rel="stylesheet" href="~/css/donation.css" asp-append-version="true" /> }
+<div class="container py-4 py-md-5 donation-page">
+    <div class="donation-hero rounded-4 p-4 p-md-5 mb-4">
+        <span class="badge rounded-pill px-3 py-2 mb-3"><i class="fa-solid fa-seedling me-1"></i> A little support. A lasting difference.</span>
+        <h1 class="display-5 fw-bold mb-3">Help build a greener Dhaka.</h1>
+        <p class="lead mb-0">Support the platform that helps citizens report issues and follow the progress of their neighborhoods.</p>
+    </div>
+    @if (TempData["DonationNotice"] is string notice) { <div class="alert alert-info" role="status">@notice</div> }
+    @if (Model.IsDemo) { <div class="alert alert-info"><strong>Demo mode</strong> — no gateway account is required and no real money is collected.</div> }
+    else if (Model.IsSandbox) { <div class="alert alert-info d-flex gap-2 align-items-center"><i class="fa-solid fa-flask"></i><span><strong>Sandbox checkout</strong> — test payments only. No real money is collected.</span></div> }
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card p-4 p-md-5 donation-checkout">
+                <ol class="checkout-progress mb-4" aria-label="Donation checkout steps">
+                    <li data-progress="1" aria-current="step"><span>1</span> Amount</li><li data-progress="2"><span>2</span> Method</li><li data-progress="3"><span>3</span> Payment</li><li><span>4</span> Receipt</li>
+                </ol>
+                @if (!Model.GatewayReady) { <div class="alert alert-warning">Payment checkout is currently unavailable. Please check back soon.</div> }
+                <form asp-action="Submit" method="post" id="donation-form" data-ready="@Model.GatewayReady.ToString().ToLowerInvariant()">
+                    <input asp-for="Form.CheckoutToken" type="hidden" />
+                    <div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>
+                    <section data-step="1">
+                        <h2 class="h4 fw-bold">Choose your contribution</h2><p class="text-muted small">A one-time donation in Bangladeshi Taka (BDT).</p>
+                        <div class="amount-grid mb-3" role="group" aria-label="Suggested amounts">
+                            @foreach (var amount in new[] { 100, 500, 1000, 2000 }) { <button type="button" class="btn donation-amount" data-amount="@amount" aria-pressed="false">Tk @amount</button> }
+                        </div>
+                        <label asp-for="Form.Amount" class="form-label fw-semibold">Your amount (BDT)</label>
+                        <div class="input-group input-group-lg"><span class="input-group-text">Tk</span><input asp-for="Form.Amount" type="number" min="50" max="100000" step="0.01" required class="form-control" /></div>
+                        <p class="form-text">Minimum Tk 50 · Maximum Tk 100,000</p>
+                        <button type="button" class="btn btn-success px-4 py-2" data-next="2">Choose payment method <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                    </section>
+                    <section data-step="2">
+                        <h2 class="h4 fw-bold">How would you like to donate?</h2><p class="text-muted small">@(Model.IsDemo ? "Choose a card or wallet to try a simulated payment." : "Choose a card or mobile wallet for secure checkout.")</p>
+                        <div class="payment-grid mb-4">
+                            @foreach (var method in new[] { "Card", "bKash", "Nagad", "Rocket" }) {
+                                var available = Model.EnabledMethods.Contains(method);
+                                <label class="payment-choice method-@method.ToLowerInvariant() @(available ? "" : "unavailable")">
+                                    <input asp-for="Form.PaymentMethod" id="payment-@method" type="radio" value="@method" disabled="@(!available)" />
+                                    <span class="payment-icon"><i class="fa-solid @(method == "Card" ? "fa-credit-card" : method == "Rocket" ? "fa-rocket" : "fa-mobile-screen-button")"></i></span>
+                                    <span><strong>@(method == "Card" ? "Credit / Debit Card" : method)</strong><small>@(available ? method == "Card" ? "Visa, Mastercard & Amex" : "Mobile banking" : "Temporarily unavailable")</small></span>
+                                    <i class="fa-solid fa-circle-check choice-check" aria-hidden="true"></i>
+                                </label>
+                            }
+                        </div>
+                        <div class="d-flex gap-2"><button type="button" class="btn btn-outline-secondary" data-back="1">Back</button><button type="button" class="btn btn-success px-4" data-next="3">Continue <i class="fa-solid fa-arrow-right ms-2"></i></button></div>
+                    </section>
+                    <section data-step="3">
+                        <h2 class="h4 fw-bold">Complete your donation</h2>
+                        @if (Model.IsDemo) { <div class="alert alert-info">Continue to the demo payment screen. Sample details are provided; you can simulate success, failure or cancellation.</div> } else {
+                        <div class="payment-process rounded-3 p-3 mb-4" data-process="Card"><i class="fa-solid fa-lock me-2 text-success"></i><strong>Secure card payment</strong><p class="small text-muted mt-2 mb-0">Continue to the encrypted card form on SSLCommerz. Enter your cardholder name, card number, expiry date and CVV there, then complete your bank's verification.</p></div>
+                        @foreach (var wallet in new[] { "bKash", "Nagad", "Rocket" }) { <div class="payment-process rounded-3 p-3 mb-4" data-process="@wallet"><i class="fa-solid fa-mobile-screen-button me-2 text-success"></i><strong>Pay with @wallet</strong><p class="small text-muted mt-2 mb-0">Continue to @wallet checkout through SSLCommerz, enter your wallet details, and authorize the exact donation amount using the provider's prompts.</p></div> }
+                        }
+                        <div class="mb-3"><label asp-for="Form.DonorName" class="form-label fw-semibold"></label><input asp-for="Form.DonorName" maxlength="50" required autocomplete="name" class="form-control" /></div>
+                        <div class="row g-3 mb-3"><div class="col-md-6"><label asp-for="Form.Email" class="form-label"></label><input asp-for="Form.Email" type="email" maxlength="50" autocomplete="email" class="form-control" /><small class="text-muted">@(!Model.EmailReady ? "Your receipt will be available on this website." : "Receive your confirmation and receipt by email.")</small></div><div class="col-md-6"><label asp-for="Form.Phone" class="form-label"></label><input asp-for="Form.Phone" type="tel" autocomplete="tel" maxlength="20" class="form-control" /></div></div>
+                        <div class="mb-3"><label asp-for="Form.Message" class="form-label"></label><textarea asp-for="Form.Message" maxlength="500" rows="2" class="form-control"></textarea></div>
+                        <p class="small text-muted"><i class="fa-solid fa-shield-halved text-success me-1"></i>@(Model.IsDemo ? "This is a project demonstration. Use the provided sample details; no money is transferred." : "Card details and wallet authorization are handled by the payment provider. Keep your PIN and OTP private.")</p>
+                        <div class="d-flex flex-wrap gap-2"><button type="button" class="btn btn-outline-secondary" data-back="2">Back</button><button type="submit" class="btn btn-success flex-grow-1 py-3 fw-bold" disabled="@(!Model.GatewayReady)" id="donation-submit" data-label="@(Model.IsDemo ? "Continue to demo payment" : "Continue to secure payment")">@(Model.IsDemo ? "Continue to demo payment" : "Continue to secure payment") <i class="fa-solid fa-arrow-up-right-from-square ms-2"></i></button></div>
+                    </section>
+                    <p id="checkout-error" class="text-danger small mt-3 mb-0" role="alert"></p>
+                </form>
+                <noscript><p class="small text-muted mt-3">Choose an amount and payment method, complete your details, and use the secure payment button below.</p></noscript>
+            </div>
+        </div>
+        <aside class="col-lg-4">
+            <div class="card p-4 donation-summary mb-3">
+                <span class="text-uppercase text-success small fw-semibold mb-3">Your contribution</span>
+                <div class="display-6 fw-bold">Tk <span id="summary-amount">@Model.Form.Amount.ToString("N2")</span></div>
+                <p class="text-muted small">One-time donation · BDT</p><hr />
+                <div class="d-flex justify-content-between small mb-3"><span>Payment method</span><strong id="summary-method">@Model.Form.PaymentMethod</strong></div>
+                <div class="d-flex gap-3 align-items-start mb-3"><i class="fa-solid fa-server text-success mt-1"></i><div><strong class="small">Keep the platform running</strong><p class="small text-muted mb-0">Help support hosting, maintenance and improvements.</p></div></div>
+                <div class="d-flex gap-3 align-items-start"><i class="fa-solid fa-people-group text-success mt-1"></i><div><strong class="small">Support civic participation</strong><p class="small text-muted mb-0">Make reporting and tracking issues easier for everyone.</p></div></div>
+            </div>
+            <div class="border rounded-3 p-3 small text-muted"><i class="fa-solid fa-circle-check text-success me-1"></i>@(Model.IsDemo ? "A demo receipt is created after simulated success. No real payment or email is sent." : "A receipt is issued after your payment is verified. Save the transaction reference to track your donation.")</div>
+            @if (User.IsInRole("Admin")) { <a asp-action="Manage" class="btn btn-outline-success mt-3 w-100">Manage donations</a> }
+        </aside>
+    </div>
+    @if (Model.History.Count > 0) {
+        <section class="mt-5"><h2 class="h4 fw-bold mb-3">Your recent donations</h2><div class="card table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Reference</th><th>Date (UTC)</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead><tbody>
+        @foreach (var donation in Model.History) { <tr><td>@if (donation.ReceiptToken != null) { <a asp-action="Receipt" asp-route-token="@donation.ReceiptToken">@donation.TransactionId</a> } else { <span>GCR-D@donation.Id.ToString("D6")</span> } @if (donation.IsSandbox) { <span class="badge bg-info text-dark">@(donation.Provider == "Demo" ? "Demo" : "Test")</span> }</td><td>@donation.CreatedAt.ToString("dd MMM yyyy")</td><td>Tk @donation.Amount.ToString("N2")</td><td>@donation.PaymentMethod</td><td>@donation.Status</td></tr> }
+        </tbody></table></div></section>
+    }
+</div>
+@section Scripts { <script src="~/js/donation.js" asp-append-version="true"></script> }
