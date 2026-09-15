@@ -12,9 +12,14 @@
     <div class="card gcr-hero-card mb-4 shadow-sm">
         <div class="card-body p-4 p-md-5">
             <div class="d-flex flex-column flex-md-row align-items-center text-center text-md-start">
-                <div class="text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm me-md-4 mb-3 mb-md-0 flex-shrink-0" style="width: 80px; height: 80px; font-size: 2rem; background-color: rgba(255, 255, 255, 0.2);">
-                    @initials
-                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.ProfilePicturePath))
+                {
+                    <img src="@Model.ProfilePicturePath" alt="Profile picture" class="profile-avatar me-md-4 mb-3 mb-md-0 flex-shrink-0" />
+                }
+                else
+                {
+                    <div class="profile-avatar profile-avatar-initials text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm me-md-4 mb-3 mb-md-0 flex-shrink-0">@initials</div>
+                }
                 <div class="flex-grow-1">
                     <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
                         <h2 class="fw-bold mb-0 text-white">@Model.FullName</h2>
@@ -94,7 +99,7 @@
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-controller="Account" asp-action="Profile" method="post">
+                    <form asp-controller="Account" asp-action="Profile" method="post" enctype="multipart/form-data">
                         @Html.AntiForgeryToken()
                         <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
@@ -102,6 +107,13 @@
                             <label asp-for="FullName" class="form-label">Full Name</label>
                             <input asp-for="FullName" class="form-control" placeholder="Enter your full name" required />
                             <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProfilePicture" class="form-label">Profile Picture</label>
+                            <input asp-for="ProfilePicture" class="form-control" accept="image/jpeg,image/png,image/webp" />
+                            <div class="form-text">JPG, PNG, or WebP · maximum 5 MB.</div>
+                            <span asp-validation-for="ProfilePicture" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">

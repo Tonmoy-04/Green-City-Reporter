@@ -31,3 +31,7 @@
 [hidden] { display: none !important; }
 @media (max-width: 575px) { .payment-grid { grid-template-columns: 1fr; } .checkout-progress li { flex-direction: column; text-align: center; font-size: .7rem; } .receipt-details { grid-template-columns: 1fr; gap: .35rem; } .receipt-details dd { margin-bottom: .7rem; } }
 @media print { header, footer, .receipt-actions, #scroll-progress, .checkout-progress, #green-city-chatbot { display: none !important; } .donation-receipt { max-width: none; border: 0; box-shadow: none; } body { background: white; } }
+
+.payment-logo { display: grid; place-items: center; width: 88px; height: 60px; flex-shrink: 0; }
+.payment-logo img { display: block; width: 100%; height: 100%; object-fit: contain; }
+@media (max-width: 360px) { .payment-logo { width: 66px; height: 48px; } .payment-choice { gap: .55rem; padding: .8rem; } }

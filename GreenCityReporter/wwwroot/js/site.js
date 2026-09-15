@@ -1,6 +1,40 @@
 // Green City Reporter - Frontend Script
 
 document.addEventListener('DOMContentLoaded', () => {
+	// Persistent light/dark theme toggle. The inline head script applies the
+	// preference before paint so the page does not briefly flash white.
+	const themeToggle = document.getElementById('theme-toggle');
+	const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+	const getTheme = () => document.documentElement.getAttribute('data-bs-theme') || 'light';
+	const updateThemeToggle = () => {
+		if (!themeToggle) return;
+		const nextTheme = getTheme() === 'dark' ? 'light' : 'dark';
+		themeToggle.setAttribute('aria-label', `Switch to ${nextTheme} mode`);
+		themeToggle.setAttribute('title', `Switch to ${nextTheme} mode`);
+		const label = themeToggle.querySelector('.theme-toggle-label');
+		if (label) label.textContent = `${nextTheme[0].toUpperCase()}${nextTheme.slice(1)} mode`;
+	};
+	const applyTheme = (theme, persist = false) => {
+		document.documentElement.setAttribute('data-bs-theme', theme);
+		document.documentElement.style.colorScheme = theme;
+		if (persist) {
+			try { localStorage.setItem('gcr-theme', theme); } catch { }
+		}
+		updateThemeToggle();
+	};
+
+	updateThemeToggle();
+	themeToggle?.addEventListener('click', () => {
+		applyTheme(getTheme() === 'dark' ? 'light' : 'dark', true);
+	});
+	systemTheme.addEventListener?.('change', (event) => {
+		try {
+			if (!localStorage.getItem('gcr-theme')) applyTheme(event.matches ? 'dark' : 'light');
+		} catch {
+			applyTheme(event.matches ? 'dark' : 'light');
+		}
+	});
+
 	// Scroll Progress Bar
 	const scrollProgress = document.getElementById('scroll-progress');
 	if (scrollProgress) {
