@@ -39,11 +39,17 @@ public class DonationController(ApplicationDbContext context, IDonationGateway g
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index() => View(await Page());
+    public async Task<IActionResult> Index()
+    {
+        // Administrators manage donations from the protected report; they do not use the public checkout page.
+        if (User.IsInRole("Admin")) return RedirectToAction(nameof(Manage));
+        return View(await Page());
+    }
 
     [HttpPost, ValidateAntiForgeryToken, EnableRateLimiting("donation-checkout")]
     public async Task<IActionResult> Submit([Bind(Prefix = "Form")] DonationSubmissionViewModel form, CancellationToken cancellationToken)
     {
+        if (User.IsInRole("Admin")) return RedirectToAction(nameof(Manage));
         form.DonorName = (form.DonorName ?? "").Trim();
         form.Email = string.IsNullOrWhiteSpace(form.Email) ? null : form.Email.Trim();
         form.Phone = string.IsNullOrWhiteSpace(form.Phone) ? null : form.Phone.Trim();

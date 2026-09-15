@@ -37,7 +37,12 @@
                                 var available = Model.EnabledMethods.Contains(method);
                                 <label class="payment-choice method-@method.ToLowerInvariant() @(available ? "" : "unavailable")">
                                     <input asp-for="Form.PaymentMethod" id="payment-@method" type="radio" value="@method" disabled="@(!available)" />
-                                    <span class="payment-icon"><i class="fa-solid @(method == "Card" ? "fa-credit-card" : method == "Rocket" ? "fa-rocket" : "fa-mobile-screen-button")"></i></span>
+                                    @if (method == "Card") {
+                                        <span class="payment-icon" aria-hidden="true"><i class="fa-solid fa-credit-card"></i></span>
+                                    } else {
+                                        var logoFile = method == "bKash" ? "bkash.webp" : method == "Nagad" ? "nagad.png" : "rocket.png";
+                                        <span class="payment-logo"><img src="~/images/payments/@logoFile" asp-append-version="true" alt="" width="88" height="60" /></span>
+                                    }
                                     <span><strong>@(method == "Card" ? "Credit / Debit Card" : method)</strong><small>@(available ? method == "Card" ? "Visa, Mastercard & Amex" : "Mobile banking" : "Temporarily unavailable")</small></span>
                                     <i class="fa-solid fa-circle-check choice-check" aria-hidden="true"></i>
                                 </label>

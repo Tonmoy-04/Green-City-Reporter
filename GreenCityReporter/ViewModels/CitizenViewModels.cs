@@ -23,6 +23,8 @@ namespace GreenCityReporter.ViewModels
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Role { get; set; } = "Citizen";
+        public string? ProfilePicturePath { get; set; }
+        public IFormFile? ProfilePicture { get; set; }
         public DateTime JoinedDate { get; set; } = DateTime.UtcNow;
 
         public int TotalReportsCount { get; set; }

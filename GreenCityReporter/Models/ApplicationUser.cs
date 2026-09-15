@@ -9,6 +9,9 @@ namespace GreenCityReporter.Models
         [StringLength(100)]
         public string FullName { get; set; } = string.Empty;
 
+        [StringLength(500)]
+        public string? ProfilePicturePath { get; set; }
+
         // Navigation Properties
         public ICollection<Report> Reports { get; set; } = new List<Report>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();

@@ -9,24 +9,39 @@
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Green City Reporter</title>
 
+    <script>
+        (() => {
+            try {
+                const savedTheme = localStorage.getItem('gcr-theme');
+                const theme = savedTheme === 'light' || savedTheme === 'dark'
+                    ? savedTheme
+                    : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-bs-theme', theme);
+                document.documentElement.style.colorScheme = theme;
+            } catch { }
+        })();
+    </script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
     <!-- FontAwesome and Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/GreenCityReporter.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/loading.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 
 <body class="d-flex flex-column min-vh-100 gcr-body">
+    <partial name="_LoadingOverlay" />
     <!-- Top Scroll Progress Indicator -->
     <div id="scroll-progress" class="scroll-progress-bar"></div>
 
@@ -115,6 +130,11 @@
                                         <i class="fa-solid fa-user-shield me-1"></i> Admin Dashboard
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link fw-medium mx-1 @(currentController == "Donation" && currentAction == "Manage" ? "active" : "")" asp-controller="Donation" asp-action="Manage">
+                                        <i class="fa-solid fa-hand-holding-dollar me-1 text-success"></i> Donations
+                                    </a>
+                                </li>
                             }
                         }
                         else
@@ -132,13 +152,28 @@
                             </li>
                         }
 
-                        <li class="nav-item">
-                            <a class="nav-link fw-medium mx-1 @(currentController == "Donation" ? "active" : "")" asp-controller="Donation" asp-action="Index"><i class="fa-solid fa-heart me-1 text-success"></i> Donate</a>
-                        </li>
+                        @if (!User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link fw-medium mx-1 @(currentController == "Donation" ? "active" : "")" asp-controller="Donation" asp-action="Index"><i class="fa-solid fa-heart me-1 text-success"></i> Donate</a>
+                            </li>
+                        }
                     </ul>
 
                     <!-- Right User Actions / Auth Buttons -->
                     <ul class="navbar-nav align-items-lg-center">
+
+                        <li class="nav-item me-lg-2 mb-2 mb-lg-0">
+                            <button id="theme-toggle"
+                                    type="button"
+                                    class="theme-toggle"
+                                    aria-label="Switch to dark mode"
+                                    title="Switch to dark mode">
+                                <i class="fa-solid fa-moon theme-icon-dark" aria-hidden="true"></i>
+                                <i class="fa-solid fa-sun theme-icon-light" aria-hidden="true"></i>
+                                <span class="theme-toggle-label d-lg-none">Dark mode</span>
+                            </button>
+                        </li>
 
                         @if (User.Identity?.IsAuthenticated == true)
                         {
@@ -177,9 +212,14 @@
                                    role="button"
                                    data-bs-toggle="dropdown"
                                    aria-expanded="false">
-                                    <span class="user-avatar-initial me-2 text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 34px; height: 34px; font-size: 0.85rem; background-color: var(--primary);">
-                                        @((currentUser?.FullName ?? "U").Substring(0, 1).ToUpper())
-                                    </span>
+                                    @if (!string.IsNullOrWhiteSpace(currentUser?.ProfilePicturePath))
+                                    {
+                                        <img src="@currentUser.ProfilePicturePath" alt="Profile picture" class="user-avatar-initial me-2 rounded-circle shadow-sm" />
+                                    }
+                                    else
+                                    {
+                                        <span class="user-avatar-initial me-2 text-white rounded-circle d-inline-flex align-items-center justify-content-center fw-bold shadow-sm">@((currentUser?.FullName ?? "U").Substring(0, 1).ToUpper())</span>
+                                    }
                                     <span>@(currentUser?.FullName ?? "User")</span>
                                 </a>
 
@@ -305,7 +345,10 @@
                             <li class="mb-2"><a asp-controller="Account" asp-action="Register" class="text-white-50 text-decoration-none"><i class="fa-solid fa-angle-right me-1 text-success"></i> Register</a></li>
                         }
                         <li class="mb-2"><a asp-controller="Report" asp-action="Track" class="text-white-50 text-decoration-none"><i class="fa-solid fa-angle-right me-1 text-success"></i> Track Status</a></li>
-                        <li class="mb-2"><a asp-controller="Donation" asp-action="Index" class="text-white-50 text-decoration-none"><i class="fa-solid fa-heart me-1 text-success"></i> Donate</a></li>
+                        @if (!User.IsInRole("Admin"))
+                        {
+                            <li class="mb-2"><a asp-controller="Donation" asp-action="Index" class="text-white-50 text-decoration-none"><i class="fa-solid fa-heart me-1 text-success"></i> Donate</a></li>
+                        }
                     </ul>
                 </div>
 
@@ -353,6 +396,7 @@
     <!-- Core Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/loading.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
