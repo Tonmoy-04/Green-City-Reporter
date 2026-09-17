@@ -27,5 +27,10 @@ namespace GreenCityReporter.Services.AI
             string message,
             string? context = null,
             CancellationToken cancellationToken = default);
+
+        IAsyncEnumerable<string> ChatStreamAsync(
+            string message,
+            string? context = null,
+            CancellationToken cancellationToken = default);
     }
 }

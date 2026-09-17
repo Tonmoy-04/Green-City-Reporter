@@ -32,15 +32,23 @@
 
     <!-- FontAwesome and Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/GreenCityReporter.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/loading.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
+    @if (!User.IsInRole("Admin"))
+    {
+        <link rel="stylesheet" href="~/css/citizen.css" asp-append-version="true" />
+    }
 </head>
 
-<body class="d-flex flex-column min-vh-100 gcr-body">
+<body class="d-flex flex-column min-vh-100 gcr-body @(User.IsInRole("Admin") ? "gcr-admin-body" : "gcr-citizen")" data-page="@(currentController + "-" + currentAction)">
+    @if (!User.IsInRole("Admin"))
+    {
+        <a class="citizen-skip-link" href="#citizen-content">Skip to content</a>
+    }
     <partial name="_LoadingOverlay" />
     <!-- Top Scroll Progress Indicator -->
     <div id="scroll-progress" class="scroll-progress-bar"></div>
@@ -304,10 +312,35 @@
                 </div>
             </div>
         </nav>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="admin-command-bar">
+                <div class="container d-flex align-items-center justify-content-between gap-3">
+                    <span class="admin-command-label"><i class="fa-solid fa-shield-halved me-2"></i>Administration workspace</span>
+                    <nav class="admin-command-links" aria-label="Admin shortcuts">
+                        <a asp-controller="Admin" asp-action="Index" class="@(currentController == "Admin" && currentAction == "Index" ? "active" : "")">Reports</a>
+                        <a asp-controller="Donation" asp-action="Manage" class="@(currentController == "Donation" && currentAction == "Manage" ? "active" : "")">Donations</a>
+                        <a asp-controller="Account" asp-action="Profile">Profile</a>
+                    </nav>
+                </div>
+            </div>
+        }
     </header>
 
+    @if (User.IsInRole("Admin"))
+    {
+        <aside class="admin-sidebar" aria-label="Administration navigation">
+            <div class="admin-sidebar-brand"><span class="admin-sidebar-mark"><i class="fa-solid fa-leaf"></i></span><span>Green City<br /><small>Operations</small></span></div>
+            <span class="admin-sidebar-section">Workspace</span>
+            <a asp-controller="Admin" asp-action="Index" class="@(currentController == "Admin" && currentAction == "Index" ? "active" : "")"><i class="fa-solid fa-chart-line"></i><span>Reports overview</span></a>
+            <a asp-controller="Donation" asp-action="Manage" class="@(currentController == "Donation" && currentAction == "Manage" ? "active" : "")"><i class="fa-solid fa-hand-holding-dollar"></i><span>Donations</span></a>
+            <span class="admin-sidebar-section mt-3">Account</span>
+            <a asp-controller="Account" asp-action="Profile"><i class="fa-solid fa-user-gear"></i><span>Profile settings</span></a>
+        </aside>
+    }
+
     <!-- Main Content Container -->
-    <main role="main" class="flex-grow-1">
+    <main role="main" class="flex-grow-1" id="@(!User.IsInRole("Admin") ? "citizen-content" : null)" tabindex="@(!User.IsInRole("Admin") ? "-1" : null)">
         @RenderBody()
     </main>
 
@@ -400,5 +433,9 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+    @if (!User.IsInRole("Admin"))
+    {
+        <script src="~/js/citizen.js" asp-append-version="true"></script>
+    }
 </body>
 </html>

@@ -13,5 +13,10 @@ namespace GreenCityReporter.Services.AI
     {
         public string BaseUrl { get; set; } = "http://localhost:11434";
         public string Model { get; set; } = "llama3.2";
+        // Keep the model resident between requests to avoid repeated cold starts.
+        public string KeepAlive { get; set; } = "10m";
+        // AI answers in this app are intentionally concise; limiting output reduces latency.
+        public int NumPredict { get; set; } = 160;
+        public int NumCtx { get; set; } = 2048;
     }
 }
