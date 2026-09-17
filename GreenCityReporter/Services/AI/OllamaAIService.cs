@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using GreenCityReporter.Models.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -264,6 +265,58 @@ namespace GreenCityReporter.Services.AI
             }
         }
 
+        public async IAsyncEnumerable<string> ChatStreamAsync(
+            string message,
+            string? context = null,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            var prompt = new StringBuilder();
+            prompt.AppendLine("System: You are the Green City AI Assistant. Answer questions about Green City Reporter concisely and practically. Use only the supplied information.");
+            if (!string.IsNullOrWhiteSpace(context))
+            {
+                prompt.AppendLine();
+                prompt.AppendLine("Context:");
+                prompt.AppendLine(context);
+            }
+            prompt.AppendLine();
+            prompt.AppendLine("User:");
+            prompt.AppendLine(message ?? string.Empty);
+
+            var payload = new
+            {
+                model = _options.Ollama.Model,
+                prompt = prompt.ToString(),
+                stream = true,
+                keep_alive = _options.Ollama.KeepAlive,
+                options = new { temperature = 0, num_predict = _options.Ollama.NumPredict, num_ctx = _options.Ollama.NumCtx }
+            };
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, "/api/generate")
+            {
+                Content = new StringContent(JsonSerializer.Serialize(payload, _jsonOptions), Encoding.UTF8, "application/json")
+            };
+            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode) yield break;
+
+            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            using var reader = new System.IO.StreamReader(stream);
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+                if (line == null) break;
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                string? text = null;
+                try
+                {
+                    using var doc = JsonDocument.Parse(line);
+                    if (doc.RootElement.TryGetProperty("response", out var part) && part.ValueKind == JsonValueKind.String)
+                        text = part.GetString();
+                }
+                catch (JsonException) { }
+                if (!string.IsNullOrEmpty(text)) yield return text;
+            }
+        }
+
         private async Task<string?> SendPromptAsync(string prompt, CancellationToken cancellationToken)
         {
             try
@@ -273,9 +326,12 @@ namespace GreenCityReporter.Services.AI
                     model = _options.Ollama.Model,
                     prompt = prompt,
                     stream = false,
+                    keep_alive = _options.Ollama.KeepAlive,
                     options = new
                     {
-                        temperature = 0
+                        temperature = 0,
+                        num_predict = _options.Ollama.NumPredict,
+                        num_ctx = _options.Ollama.NumCtx
                     }
                 };
 

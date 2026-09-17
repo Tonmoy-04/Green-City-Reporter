@@ -59,6 +59,41 @@ document.addEventListener('DOMContentLoaded', () => {
 	const input = document.getElementById('gcr-chatbot-input');
 	const send = document.getElementById('gcr-chatbot-send');
 	const messages = document.getElementById('gcr-chatbot-messages');
+	const chatStorageKey = 'gcr-ai-chat-history';
+	const welcomeMessage = "Hello! I'm your Green City AI assistant. Ask about submitting reports, tracking statuses, or your recent submissions.";
+	let chatHistory = [];
+
+	const saveChatHistory = () => {
+		try {
+			// Keep storage small while retaining a useful recent conversation.
+			localStorage.setItem(chatStorageKey, JSON.stringify(chatHistory.slice(-40)));
+		} catch { }
+	};
+
+	const loadChatHistory = () => {
+		try {
+			const saved = JSON.parse(localStorage.getItem(chatStorageKey) || '[]');
+			if (Array.isArray(saved)) {
+				chatHistory = saved.filter(item => item && (item.role === 'user' || item.role === 'assistant') && typeof item.text === 'string');
+			}
+		} catch { chatHistory = []; }
+
+		if (!chatHistory.length) {
+			chatHistory = [{ role: 'assistant', text: welcomeMessage }];
+			saveChatHistory();
+		}
+
+		messages.replaceChildren();
+		chatHistory.forEach(item => {
+			const element = document.createElement('div');
+			element.className = `gcr-chatbot-message gcr-chatbot-message-${item.role}`;
+			element.textContent = item.text;
+			messages.appendChild(element);
+		});
+		messages.scrollTop = messages.scrollHeight;
+	};
+
+	loadChatHistory();
 
 	const setOpen = (isOpen) => {
 		panel.hidden = !isOpen;
@@ -74,6 +109,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		message.textContent = text;
 		messages.appendChild(message);
 		messages.scrollTop = messages.scrollHeight;
+		if (role === 'user' || role === 'assistant') {
+			chatHistory.push({ role, text });
+			saveChatHistory();
+		}
 		return message;
 	};
 
@@ -99,24 +138,44 @@ document.addEventListener('DOMContentLoaded', () => {
 		input.disabled = true;
 		send.disabled = true;
 		const loading = appendMessage('Thinking...', 'assistant');
+		// Keep the visual indicator out of the saved conversation.
+		chatHistory.pop();
+		saveChatHistory();
 
 		try {
-			const response = await fetch('/Chat/Ask', {
+			const response = await fetch('/Chat/Stream', {
 				method: 'POST',
 				body: formData,
 				headers: {
-					Accept: 'application/json'
+					Accept: 'text/plain'
 				}
 			});
-			const data = await response.json();
 			loading.remove();
 
 			if (!response.ok) {
-				appendMessage(data.error || 'Please try again.', 'assistant');
+				appendMessage('Please try again.', 'assistant');
 				return;
 			}
 
-			appendMessage(data.message || 'The assistant did not return a response.', 'assistant');
+			const streamed = document.createElement('div');
+			streamed.className = 'gcr-chatbot-message gcr-chatbot-message-assistant';
+			messages.appendChild(streamed);
+			const reader = response.body?.getReader();
+			const decoder = new TextDecoder();
+			let answer = '';
+			if (reader) {
+				while (true) {
+					const { value, done } = await reader.read();
+					if (done) break;
+					answer += decoder.decode(value, { stream: true });
+					streamed.textContent = answer;
+					messages.scrollTop = messages.scrollHeight;
+				}
+			}
+			answer += decoder.decode();
+			streamed.textContent = answer || 'The assistant did not return a response.';
+			chatHistory.push({ role: 'assistant', text: streamed.textContent });
+			saveChatHistory();
 			input.value = '';
 		} catch {
 			loading.remove();

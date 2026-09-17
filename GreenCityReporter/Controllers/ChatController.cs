@@ -49,5 +49,24 @@ namespace GreenCityReporter.Controllers
                 message = response ?? UnavailableMessage
             });
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task Stream([FromForm] string? message)
+        {
+            Response.ContentType = "text/plain; charset=utf-8";
+            if (string.IsNullOrWhiteSpace(message) || message.Length > MaxMessageLength)
+            {
+                Response.StatusCode = StatusCodes.Status400BadRequest;
+                await Response.WriteAsync("Please enter a valid message.", HttpContext.RequestAborted);
+                return;
+            }
+
+            await foreach (var chunk in _chatService.StreamAsync(message, User, HttpContext.RequestAborted))
+            {
+                await Response.WriteAsync(chunk, HttpContext.RequestAborted);
+                await Response.Body.FlushAsync(HttpContext.RequestAborted);
+            }
+        }
     }
 }

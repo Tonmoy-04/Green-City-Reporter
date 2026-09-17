@@ -8,5 +8,10 @@ namespace GreenCityReporter.Services.Chat
             string message,
             ClaimsPrincipal user,
             CancellationToken cancellationToken = default);
+
+        IAsyncEnumerable<string> StreamAsync(
+            string message,
+            ClaimsPrincipal user,
+            CancellationToken cancellationToken = default);
     }
 }

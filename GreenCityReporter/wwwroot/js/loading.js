@@ -33,7 +33,6 @@
         return () => { tasks.delete(id); if (!tasks.size) hide(); };
     }
     window.GreenCityLoading = { begin, reset };
-    document.getElementById('site-loading-dismiss').addEventListener('click', reset);
     document.addEventListener('keydown', event => { if (event.key === 'Escape' && !overlay.hidden) reset(); });
     window.addEventListener('pageshow', reset);
     window.addEventListener('pagehide', reset);
