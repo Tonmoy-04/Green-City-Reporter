@@ -5,6 +5,7 @@ using GreenCityReporter.Services.Assignment;
 using GreenCityReporter.Services.Background;
 using GreenCityReporter.Services.Chat;
 using GreenCityReporter.Services.Payments;
+using GreenCityReporter.Services.Storage;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Identity;
@@ -36,6 +37,35 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Services.Configure<AIOptions>(builder.Configuration.GetSection("AI"));
 builder.Services.Configure<ReportMonitoringOptions>(builder.Configuration.GetSection("ReportMonitoring"));
+builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection("Storage"));
+
+var storageProvider = builder.Configuration["Storage:Provider"]?.Trim();
+if (string.IsNullOrWhiteSpace(storageProvider))
+{
+    storageProvider = "Local";
+}
+
+if (!string.Equals(storageProvider, "Local", StringComparison.OrdinalIgnoreCase) &&
+    !string.Equals(storageProvider, "Supabase", StringComparison.OrdinalIgnoreCase))
+{
+    if (builder.Environment.IsProduction())
+    {
+        throw new InvalidOperationException($"Unknown storage provider '{storageProvider}'. Configure Storage:Provider as Local or Supabase.");
+    }
+
+    builder.Logging.AddFilter("GreenCityReporter.Services.Storage", LogLevel.Warning);
+    storageProvider = "Local";
+}
+
+if (string.Equals(storageProvider, "Supabase", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddHttpClient<SupabaseStorageService>(client => client.Timeout = TimeSpan.FromSeconds(30));
+    builder.Services.AddScoped<IFileStorageService, SupabaseStorageService>();
+}
+else
+{
+    builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+}
 
 builder.Services.AddHostedService<ReportMonitoringService>();
 builder.Services.AddScoped<IChatService, GreenCityChatService>();
@@ -91,10 +121,24 @@ builder.Services.AddScoped<IAIService>(sp =>
     return new OllamaAIService(httpFactory.CreateClient("Ollama"), loggerFactory.CreateLogger<OllamaAIService>(), Options.Create(opts));
 });
 
+var databaseProvider = builder.Configuration["Database:Provider"]?.Trim();
+var databaseConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlOptions => sqlOptions.EnableRetryOnFailure()));
+{
+    if (string.Equals(databaseProvider, "PostgreSQL", StringComparison.OrdinalIgnoreCase))
+    {
+        options.UseNpgsql(
+            databaseConnectionString,
+            npgsqlOptions => npgsqlOptions.EnableRetryOnFailure());
+    }
+    else
+    {
+        options.UseSqlServer(
+            databaseConnectionString,
+            sqlOptions => sqlOptions.EnableRetryOnFailure());
+    }
+});
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     options.Password.RequireDigit = true;

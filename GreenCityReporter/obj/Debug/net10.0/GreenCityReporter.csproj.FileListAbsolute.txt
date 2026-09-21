@@ -3397,3 +3397,5 @@ D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\nhoyhd91w7
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\otepga981r-{0}-px3el3c2bs-px3el3c2bs.gz
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\lrl4hhvqu4-{0}-taoi63tzp0-taoi63tzp0.gz
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\nlnhyrsh3o-{0}-ndk3jysbiy-ndk3jysbiy.gz
+D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\Npgsql.dll
+D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll

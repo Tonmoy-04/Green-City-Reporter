@@ -6,7 +6,7 @@ namespace GreenCityReporter.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public ApplicationDbContext(DbContextOptions options)
             : base(options)
         {
         }
@@ -24,11 +24,17 @@ namespace GreenCityReporter.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            var isPostgreSql = Database.ProviderName?.Contains("Npgsql", StringComparison.OrdinalIgnoreCase) == true;
+            var providerTransactionFilter = isPostgreSql ? "\"Provider\" = 'SSLCommerz'" : "[Provider] = 'SSLCommerz'";
+            var nullableColumnFilter = (string columnName) => isPostgreSql
+                ? $"\"{columnName}\" IS NOT NULL"
+                : $"[{columnName}] IS NOT NULL";
+
             modelBuilder.Entity<Donation>().HasIndex(d => new { d.PaymentMethod, d.TransactionId }).IsUnique();
-            modelBuilder.Entity<Donation>().HasIndex(d => new { d.Provider, d.TransactionId }).IsUnique().HasFilter("[Provider] = 'SSLCommerz'");
-            modelBuilder.Entity<Donation>().HasIndex(d => d.CheckoutKey).IsUnique().HasFilter("[CheckoutKey] IS NOT NULL");
-            modelBuilder.Entity<Donation>().HasIndex(d => d.ReceiptToken).IsUnique().HasFilter("[ReceiptToken] IS NOT NULL");
-            modelBuilder.Entity<Donation>().HasIndex(d => new { d.Provider, d.IsSandbox, d.BankTransactionId }).IsUnique().HasFilter("[BankTransactionId] IS NOT NULL");
+            modelBuilder.Entity<Donation>().HasIndex(d => new { d.Provider, d.TransactionId }).IsUnique().HasFilter(providerTransactionFilter);
+            modelBuilder.Entity<Donation>().HasIndex(d => d.CheckoutKey).IsUnique().HasFilter(nullableColumnFilter("CheckoutKey"));
+            modelBuilder.Entity<Donation>().HasIndex(d => d.ReceiptToken).IsUnique().HasFilter(nullableColumnFilter("ReceiptToken"));
+            modelBuilder.Entity<Donation>().HasIndex(d => new { d.Provider, d.IsSandbox, d.BankTransactionId }).IsUnique().HasFilter(nullableColumnFilter("BankTransactionId"));
             modelBuilder.Entity<Donation>().HasIndex(d => new { d.Provider, d.Status, d.LastCheckedAt });
             modelBuilder.Entity<Donation>().HasOne(d => d.User).WithMany().HasForeignKey(d => d.UserId).OnDelete(DeleteBehavior.Restrict);
 
