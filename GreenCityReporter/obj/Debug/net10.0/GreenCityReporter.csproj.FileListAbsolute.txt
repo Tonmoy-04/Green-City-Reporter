@@ -747,9 +747,7 @@ E:\Project\Green City\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\co
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\package-lock.json
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\yyuk90h6b7-{0}-0j1nc8hvaq-0j1nc8hvaq.gz
 D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\imibzq6l2l-{0}-0j1nc8hvaq-0j1nc8hvaq.gz
-D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\o4vj28aicm-{0}-rzn4r8dqik-rzn4r8dqik.gz
 D:\Green City Reporter\GreenCityReporter\bin\Debug\net10.0\GreenCityReporter.exe
-D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\otepga981r-{0}-ui79in27yi-ui79in27yi.gz
 E:\Users\Hp\Documents\Green-City-Reporter\GreenCityReporter\bin\Debug\net10.0\appsettings.Development.json
 E:\Users\Hp\Documents\Green-City-Reporter\GreenCityReporter\bin\Debug\net10.0\appsettings.json
 E:\Users\Hp\Documents\Green-City-Reporter\GreenCityReporter\bin\Debug\net10.0\package-lock.json
@@ -3384,3 +3382,18 @@ E:\Project\GreenCity\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\com
 E:\Project\GreenCity\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\nddbys3mcg-{0}-qsq56ikjcg-qsq56ikjcg.gz
 E:\Project\GreenCity\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\ilwp2xp54g-{0}-lg5domve9x-lg5domve9x.gz
 E:\Project\GreenCity\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\vbxib144pp-{0}-47rv3hyavj-47rv3hyavj.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\nddbys3mcg-{0}-5rq7ivm9yo-5rq7ivm9yo.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\7are5icy42-{0}-fvc2hpdeqn-fvc2hpdeqn.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\ilwp2xp54g-{0}-aqfhpizfcx-aqfhpizfcx.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\o4vj28aicm-{0}-xgel96diti-xgel96diti.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\ujtreew3j8-{0}-0jfl8h7gmo-0jfl8h7gmo.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\6h5qkdwvlf-{0}-ilt8fiifvz-ilt8fiifvz.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\k6n1s80tae-{0}-u5lsq0wg6e-u5lsq0wg6e.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\5sj8w6ssvx-{0}-g00cv2cxg1-g00cv2cxg1.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\9bpbix758v-{0}-mb8evqg622-mb8evqg622.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\i0e75qlrgt-{0}-ayf9dyo5h2-ayf9dyo5h2.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\vbxib144pp-{0}-r98bk154sg-r98bk154sg.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\nhoyhd91w7-{0}-5swye5wkx5-5swye5wkx5.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\otepga981r-{0}-px3el3c2bs-px3el3c2bs.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\lrl4hhvqu4-{0}-taoi63tzp0-taoi63tzp0.gz
+D:\Green City Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\nlnhyrsh3o-{0}-ndk3jysbiy-ndk3jysbiy.gz
