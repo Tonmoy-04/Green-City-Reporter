@@ -16,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDataProtection();
+builder.Services.AddHealthChecks();
 builder.Services.AddOptions<PaymentOptions>().BindConfiguration("Donations:Gateway").Validate(o => o.DemoMode || !o.Enabled || o.IsReady, "Configure valid payment credentials, organization contact details, and a public HTTPS base URL.").ValidateOnStart();
 builder.Services.AddOptions<DonationEmailOptions>().BindConfiguration("Donations:Email").Validate(o => !o.Enabled || (o.IsReady && (builder.Environment.IsDevelopment() || o.UseStartTls)), "Configure a valid SMTP server and sender. Production email requires STARTTLS.").ValidateOnStart();
 builder.Services.AddHttpClient<IDonationGateway, SslCommerzGateway>(client => client.Timeout = TimeSpan.FromSeconds(25))
@@ -33,31 +34,61 @@ builder.Services.AddRateLimiter(options =>
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
 });
 
-// Bind AI options
-builder.Services.Configure<AIOptions>(
-    builder.Configuration.GetSection("AI"));
-
-builder.Services.Configure<ReportMonitoringOptions>(
-    builder.Configuration.GetSection("ReportMonitoring"));
+builder.Services.Configure<AIOptions>(builder.Configuration.GetSection("AI"));
+builder.Services.Configure<ReportMonitoringOptions>(builder.Configuration.GetSection("ReportMonitoring"));
 
 builder.Services.AddHostedService<ReportMonitoringService>();
 builder.Services.AddScoped<IChatService, GreenCityChatService>();
 builder.Services.AddScoped<IReportAssignmentService, ReportAssignmentService>();
 
-// Register Ollama AI service with typed HttpClient
-builder.Services.AddHttpClient<IAIService, OllamaAIService>((sp, client) =>
+builder.Services.AddHttpClient("Ollama", (sp, client) =>
 {
     var opts = sp.GetRequiredService<IOptions<AIOptions>>().Value;
+    client.Timeout = TimeSpan.FromSeconds(Math.Max(5, opts.TimeoutSeconds));
     try
     {
         client.BaseAddress = new Uri(opts.Ollama.BaseUrl);
     }
     catch
     {
-        // If invalid, leave BaseAddress unset; OllamaAIService will log a warning
+        // Leave BaseAddress unset and rely on the service to log warnings.
+    }
+});
+
+builder.Services.AddHttpClient("Groq", (sp, client) =>
+{
+    var opts = sp.GetRequiredService<IOptions<AIOptions>>().Value;
+    client.Timeout = TimeSpan.FromSeconds(Math.Max(5, opts.TimeoutSeconds));
+    try
+    {
+        client.BaseAddress = new Uri(opts.Groq.BaseUrl);
+    }
+    catch
+    {
+        // Leave BaseAddress unset and rely on the service to log warnings.
+    }
+});
+
+builder.Services.AddScoped<IAIService>(sp =>
+{
+    var opts = sp.GetRequiredService<IOptions<AIOptions>>().Value;
+    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+    var httpFactory = sp.GetRequiredService<IHttpClientFactory>();
+    var providerName = (opts.Provider ?? "Ollama").Trim();
+    var normalizedProvider = providerName.ToLowerInvariant();
+
+    if (normalizedProvider == "ollama")
+    {
+        return new OllamaAIService(httpFactory.CreateClient("Ollama"), loggerFactory.CreateLogger<OllamaAIService>(), Options.Create(opts));
     }
 
-    client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds);
+    if (normalizedProvider == "groq")
+    {
+        return new GroqAIService(httpFactory.CreateClient("Groq"), loggerFactory.CreateLogger<GroqAIService>(), Options.Create(opts));
+    }
+
+    loggerFactory.CreateLogger<Program>().LogWarning("Unknown AI provider '{Provider}'. Falling back to Ollama.", providerName);
+    return new OllamaAIService(httpFactory.CreateClient("Ollama"), loggerFactory.CreateLogger<OllamaAIService>(), Options.Create(opts));
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -83,6 +114,15 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 var app = builder.Build();
+
+var startupLogger = app.Services.GetRequiredService<ILogger<Program>>();
+var aiOptions = app.Services.GetRequiredService<IOptions<AIOptions>>().Value;
+startupLogger.LogInformation("AI Provider: {Provider}", aiOptions.Provider ?? "Ollama");
+startupLogger.LogInformation("Groq API key configured: {HasApiKey}", !string.IsNullOrWhiteSpace(aiOptions.Groq.ApiKey));
+startupLogger.LogInformation("Groq model: {Model}", string.IsNullOrWhiteSpace(aiOptions.Groq.Model) ? "openai/gpt-oss-20b" : aiOptions.Groq.Model);
+startupLogger.LogInformation("Groq endpoint: {Endpoint}", string.IsNullOrWhiteSpace(aiOptions.Groq.BaseUrl)
+    ? "https://api.groq.com/openai/v1/chat/completions"
+    : new Uri(new Uri(aiOptions.Groq.BaseUrl.TrimEnd('/') + "/"), "chat/completions").ToString());
 
 // Seed data
 using (var scope = app.Services.CreateScope())
@@ -115,6 +155,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
 
+app.MapHealthChecks("/health");
 app.MapStaticAssets();
 
 app.MapControllerRoute(
