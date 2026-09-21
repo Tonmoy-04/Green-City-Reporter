@@ -2,21 +2,32 @@
     ViewData["Title"] = "Report. Track. Improve Your City.";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/home.js" asp-append-version="true"></script>
+}
+
 <!-- Hero Section -->
-<div class="py-5" style="background: linear-gradient(180deg, var(--background) 0%, var(--surface-alt) 100%); border-bottom: 1px solid var(--border);">
+<div class="home-page home-hero py-5" style="background: linear-gradient(180deg, var(--background) 0%, var(--surface-alt) 100%); border-bottom: 1px solid var(--border);">
+    <span class="home-orb home-orb-one" aria-hidden="true"></span>
+    <span class="home-orb home-orb-two" aria-hidden="true"></span>
+    <span class="home-grid" aria-hidden="true"></span>
     <div class="container py-4">
         <div class="row align-items-center g-5">
             <div class="col-lg-7 text-center text-lg-start">
-                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill mb-3 fw-bold">
+                <span class="home-entrance home-delay-1 badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill mb-3 fw-bold">
                     <i class="fa-solid fa-leaf me-1 text-success"></i> Public Civic Infrastructure Portal
                 </span>
-                <h1 class="display-4 fw-bold text-dark lh-sm mb-3">
+                <h1 class="home-entrance home-delay-2 display-4 fw-bold text-dark lh-sm mb-3">
                     Report. Track. <span style="color: var(--primary) !important;">Improve Your City.</span>
                 </h1>
-                <p class="lead text-muted mb-4 pe-lg-4 fs-5">
+                <p class="home-entrance home-delay-3 lead text-muted mb-4 pe-lg-4 fs-5">
                     Green City Reporter empowers citizens to log municipal hazards, waste accumulation, and infrastructure issues directly with city service authorities for fast resolution.
                 </p>
-                <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3 mb-4">
+                <div class="home-entrance home-delay-4 d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3 mb-4">
                     <a asp-controller="Report" asp-action="Create" class="btn btn-success btn-lg px-4 py-3 fw-bold">
                         <i class="fa-solid fa-bullhorn me-2"></i> Report an Issue
                     </a>
@@ -26,24 +37,24 @@
                 </div>
 
                 <!-- Feature Highlights Bar -->
-                <div class="row pt-4 border-top text-center text-lg-start g-3">
-                    <div class="col-4">
+                <div class="home-entrance home-delay-5 row pt-4 border-top text-center text-lg-start g-3">
+                    <div class="col-4 home-stat">
                         <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-map-pin text-success me-1"></i> Precise Pins</h6>
                         <p class="text-muted small mb-0">Dhaka GPS Mapping</p>
                     </div>
-                    <div class="col-4 border-start border-end">
+                    <div class="col-4 border-start border-end home-stat">
                         <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-robot text-primary me-1"></i> AI Assisted</h6>
                         <p class="text-muted small mb-0">Smart Categorization</p>
                     </div>
-                    <div class="col-4">
+                    <div class="col-4 home-stat">
                         <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-bell text-success me-1"></i> Live Alerts</h6>
                         <p class="text-muted small mb-0">Real-Time Status</p>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-5">
-                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="col-lg-5 home-entrance home-delay-3">
+                <div class="card home-flow-card border-0 shadow-lg rounded-4 overflow-hidden">
                     <div class="card-header bg-white p-4 border-bottom d-flex align-items-center justify-content-between">
                         <h5 class="fw-bold mb-0 text-dark d-flex align-items-center">
                             <i class="fa-solid fa-shield-halved text-success me-2"></i> Municipal Action Flow
@@ -51,7 +62,7 @@
                         <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1">Dhaka City</span>
                     </div>
                     <div class="card-body p-4">
-                        <div class="d-flex mb-3.5 p-3 rounded-3 bg-light border">
+                        <div class="home-flow-item d-flex mb-3.5 p-3 rounded-3 bg-light border">
                             <div class="rounded-3 p-3 me-3 text-danger d-flex align-items-center justify-content-center" style="background-color: var(--rejected-bg); width: 48px; height: 48px;">
                                 <i class="fa-solid fa-road fa-lg"></i>
                             </div>
@@ -61,7 +72,7 @@
                             </div>
                         </div>
 
-                        <div class="d-flex mb-3.5 p-3 rounded-3 bg-light border">
+                        <div class="home-flow-item d-flex mb-3.5 p-3 rounded-3 bg-light border">
                             <div class="rounded-3 p-3 me-3 text-success d-flex align-items-center justify-content-center" style="background-color: var(--resolved-bg); width: 48px; height: 48px;">
                                 <i class="fa-solid fa-trash fa-lg"></i>
                             </div>
@@ -71,7 +82,7 @@
                             </div>
                         </div>
 
-                        <div class="d-flex p-3 rounded-3 bg-light border">
+                        <div class="home-flow-item d-flex p-3 rounded-3 bg-light border">
                             <div class="rounded-3 p-3 me-3 text-info d-flex align-items-center justify-content-center" style="background-color: var(--progress-bg); width: 48px; height: 48px;">
                                 <i class="fa-solid fa-droplet fa-lg"></i>
                             </div>
@@ -93,10 +104,10 @@
 </div>
 
 <!-- Why Green City Reporter -->
-<div class="py-5 bg-white border-bottom">
+<div class="home-section home-section-light py-5 bg-white border-bottom">
     <div class="container py-3">
         <div class="row align-items-center g-5">
-            <div class="col-lg-6">
+            <div class="col-lg-6 home-reveal home-reveal-left">
                 <span class="text-success fw-bold text-uppercase small" style="letter-spacing: 1px;">Why Green City Reporter</span>
                 <h2 class="fw-bold text-dark mt-1 mb-3">Transforming Municipal Reporting into Action</h2>
                 <p class="text-muted mb-4">
@@ -134,8 +145,8 @@
                 </div>
             </div>
 
-            <div class="col-lg-6">
-                <div class="p-4 rounded-4 bg-light border">
+            <div class="col-lg-6 home-reveal home-reveal-right">
+                <div class="home-comparison p-4 rounded-4 bg-light border">
                     <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-list-check text-success me-2"></i>Platform Comparison</h5>
                     <div class="table-responsive">
                         <table class="table table-bordered bg-white mb-0 small">
@@ -177,9 +188,9 @@
 </div>
 
 <!-- How It Works Section -->
-<div id="how-it-works" class="py-5">
+<div id="how-it-works" class="home-section home-process py-5">
     <div class="container py-3">
-        <div class="text-center max-w-2xl mx-auto mb-5">
+        <div class="home-reveal text-center max-w-2xl mx-auto mb-5">
             <span class="text-success fw-bold text-uppercase small" style="letter-spacing: 1px;">Simple 3-Step Process</span>
             <h2 class="fw-bold text-dark mt-1">How Green City Reporter Works</h2>
             <p class="text-muted">From photo evidence to municipal resolution, experience seamless civic service.</p>
@@ -187,7 +198,7 @@
 
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="feature-card text-center h-100">
+                <div class="feature-card home-reveal home-reveal-delay-1 text-center h-100">
                     <div class="feature-icon-wrapper mx-auto">
                         <i class="fa-solid fa-camera"></i>
                     </div>
@@ -198,7 +209,7 @@
             </div>
 
             <div class="col-md-4">
-                <div class="feature-card text-center h-100">
+                <div class="feature-card home-reveal home-reveal-delay-2 text-center h-100">
                     <div class="feature-icon-wrapper mx-auto" style="background-color: var(--secondary-light); color: var(--secondary);">
                         <i class="fa-solid fa-microchip"></i>
                     </div>
@@ -209,7 +220,7 @@
             </div>
 
             <div class="col-md-4">
-                <div class="feature-card text-center h-100">
+                <div class="feature-card home-reveal home-reveal-delay-3 text-center h-100">
                     <div class="feature-icon-wrapper mx-auto" style="background-color: var(--progress-bg); color: var(--progress-text);">
                         <i class="fa-solid fa-circle-check"></i>
                     </div>
@@ -223,9 +234,9 @@
 </div>
 
 <!-- Features Section -->
-<div class="py-5 bg-white border-top border-bottom">
+<div class="home-section home-section-light home-capabilities py-5 bg-white border-top border-bottom">
     <div class="container py-3">
-        <div class="text-center max-w-2xl mx-auto mb-5">
+        <div class="home-reveal text-center max-w-2xl mx-auto mb-5">
             <span class="text-success fw-bold text-uppercase small" style="letter-spacing: 1px;">Key Capabilities</span>
             <h2 class="fw-bold text-dark mt-1">Built for Dhaka's Environmental Needs</h2>
             <p class="text-muted">Empowering municipal departments and citizens with modern technology.</p>
@@ -233,21 +244,21 @@
 
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="p-4 rounded-3 border bg-light h-100">
+                <div class="home-capability home-reveal home-reveal-delay-1 p-4 rounded-3 border bg-light h-100">
                     <div class="text-success fs-3 mb-3"><i class="fa-solid fa-map-location-dot"></i></div>
                     <h5 class="fw-bold text-dark">Dhaka City Boundary Guard</h5>
                     <p class="text-muted small mb-0">Ensures all coordinates fall strictly within Dhaka city boundaries, preventing off-jurisdiction submission errors.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="p-4 rounded-3 border bg-light h-100">
+                <div class="home-capability home-reveal home-reveal-delay-2 p-4 rounded-3 border bg-light h-100">
                     <div class="text-primary fs-3 mb-3"><i class="fa-solid fa-robot"></i></div>
                     <h5 class="fw-bold text-dark">Integrated AI Assistant</h5>
                     <p class="text-muted small mb-0">Floating AI assistant ready to answer questions about civic services, tracking numbers, and guidelines.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="p-4 rounded-3 border bg-light h-100">
+                <div class="home-capability home-reveal home-reveal-delay-3 p-4 rounded-3 border bg-light h-100">
                     <div class="text-warning fs-3 mb-3"><i class="fa-solid fa-bell"></i></div>
                     <h5 class="fw-bold text-dark">Real-Time Notification Hub</h5>
                     <p class="text-muted small mb-0">Instant notification alerts whenever administrative staff post remarks or update your report's status.</p>
@@ -258,8 +269,8 @@
 </div>
 
 <!-- Call to Action Banner -->
-<div class="py-5" style="background: linear-gradient(180deg, var(--background) 0%, var(--primary-light) 100%); border-top: 1px solid var(--border);">
-    <div class="container py-4 text-center">
+<div class="home-section home-cta py-5" style="background: linear-gradient(180deg, var(--background) 0%, var(--primary-light) 100%); border-top: 1px solid var(--border);">
+    <div class="container py-4 text-center home-reveal">
         <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill mb-3 fw-bold">
             <i class="fa-solid fa-leaf me-1 text-success"></i> Take Civic Action Today
         </span>
