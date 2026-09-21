@@ -1,13 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "6zmIxD8PDsU=",
+  "dgSpecHash": "xq5OUcJMV9M=",
   "success": true,
   "projectFilePath": "D:\\Green City Reporter\\GreenCityReporter\\GreenCityReporter.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\noman\\.nuget\\packages\\azure.core\\1.50.0\\azure.core.1.50.0.nupkg.sha512",
     "C:\\Users\\noman\\.nuget\\packages\\azure.identity\\1.17.1\\azure.identity.1.17.1.nupkg.sha512",
     "C:\\Users\\noman\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
-    "C:\\Users\\noman\\.nuget\\packages\\microsoft.aspnetcore.identity.entityframeworkcore\\8.0.0\\microsoft.aspnetcore.identity.entityframeworkcore.8.0.0.nupkg.sha512",
+    "C:\\Users\\noman\\.nuget\\packages\\microsoft.aspnetcore.identity.entityframeworkcore\\10.0.11\\microsoft.aspnetcore.identity.entityframeworkcore.10.0.11.nupkg.sha512",
     "C:\\Users\\noman\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\8.0.0\\microsoft.bcl.asyncinterfaces.8.0.0.nupkg.sha512",
     "C:\\Users\\noman\\.nuget\\packages\\microsoft.build.framework\\18.0.2\\microsoft.build.framework.18.0.2.nupkg.sha512",
     "C:\\Users\\noman\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\3.11.0\\microsoft.codeanalysis.analyzers.3.11.0.nupkg.sha512",

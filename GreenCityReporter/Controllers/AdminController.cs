@@ -118,6 +118,16 @@ namespace GreenCityReporter.Controllers
                 return Challenge();
             }
 
+            if (!Enum.IsDefined(newStatus))
+            {
+                return BadRequest("Please select a valid report status.");
+            }
+
+            if (!Enum.IsDefined(priority))
+            {
+                return BadRequest("Please select a valid report priority.");
+            }
+
             var categoryExists = await _context.Categories.AnyAsync(c => c.Id == categoryId);
             if (!categoryExists)
             {

@@ -1,6 +1,7 @@
 using GreenCityReporter.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace GreenCityReporter.Data
 {
@@ -11,10 +12,7 @@ namespace GreenCityReporter.Data
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
-
-            // =========================
-            // Seed Roles
-            // =========================
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
             string[] roles = { "Admin", "Citizen" };
 
@@ -26,65 +24,8 @@ namespace GreenCityReporter.Data
                 }
             }
 
-            // =========================
-            // Seed Admin User
-            // =========================
-
-            var adminUser = new ApplicationUser
-            {
-                UserName = "admin@greencity.com",
-                Email = "admin@greencity.com",
-                FullName = "System Admin",
-                EmailConfirmed = true
-            };
-
-            if (await userManager.FindByEmailAsync(adminUser.Email) == null)
-            {
-                var result = await userManager.CreateAsync(
-                    adminUser,
-                    "Admin@123"
-                );
-
-                if (result.Succeeded)
-                {
-                    await userManager.AddToRoleAsync(
-                        adminUser,
-                        "Admin"
-                    );
-                }
-            }
-
-            // =========================
-            // Seed Citizen User
-            // =========================
-
-            var citizenUser = new ApplicationUser
-            {
-                UserName = "citizen@example.com",
-                Email = "citizen@example.com",
-                FullName = "Sample Citizen",
-                EmailConfirmed = true
-            };
-
-            if (await userManager.FindByEmailAsync(citizenUser.Email) == null)
-            {
-                var result = await userManager.CreateAsync(
-                    citizenUser,
-                    "Citizen@123"
-                );
-
-                if (result.Succeeded)
-                {
-                    await userManager.AddToRoleAsync(
-                        citizenUser,
-                        "Citizen"
-                    );
-                }
-            }
-
-            // =========================
-            // Seed Categories
-            // =========================
+            await SeedUserAsync(userManager, configuration, "Admin", "SeedUsers:Admin", "System Admin");
+            await SeedUserAsync(userManager, configuration, "Citizen", "SeedUsers:Citizen", "Sample Citizen");
 
             var departments = new[]
             {
@@ -179,6 +120,45 @@ namespace GreenCityReporter.Data
             }
 
             await context.SaveChangesAsync();
+        }
+
+        private static async Task SeedUserAsync(
+            UserManager<ApplicationUser> userManager,
+            IConfiguration configuration,
+            string role,
+            string configurationPrefix,
+            string defaultFullName)
+        {
+            var email = configuration[$"{configurationPrefix}:Email"];
+            var password = configuration[$"{configurationPrefix}:Password"];
+
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                return;
+            }
+
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = configuration[$"{configurationPrefix}:FullName"] ?? defaultFullName,
+                    EmailConfirmed = true
+                };
+
+                var result = await userManager.CreateAsync(user, password);
+                if (!result.Succeeded)
+                {
+                    return;
+                }
+            }
+
+            if (!await userManager.IsInRoleAsync(user, role))
+            {
+                await userManager.AddToRoleAsync(user, role);
+            }
         }
     }
 }

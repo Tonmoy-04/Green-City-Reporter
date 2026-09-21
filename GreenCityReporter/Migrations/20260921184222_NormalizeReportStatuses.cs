@@ -14,9 +14,9 @@ namespace GreenCityReporter.Migrations
                 UPDATE Reports
                 SET CurrentStatus = CASE CurrentStatus
                     WHEN 0 THEN 0 -- Pending
-                    WHEN 1 THEN 0 -- InReview -> Pending
+                    WHEN 1 THEN 0 -- Legacy status -> Pending
                     WHEN 2 THEN 1 -- Assigned
-                    WHEN 3 THEN 1 -- InProgress -> Assigned
+                    WHEN 3 THEN 1 -- Legacy status -> Assigned
                     WHEN 4 THEN 2 -- Resolved
                     WHEN 5 THEN 3 -- Rejected
                     ELSE 0
