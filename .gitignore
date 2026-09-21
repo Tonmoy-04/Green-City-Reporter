@@ -17,4 +17,5 @@ GreenCityReporter/wwwroot/uploads/reports/
 .env
 .env.*
 *.env
-
+**/bin/
+**/obj/
