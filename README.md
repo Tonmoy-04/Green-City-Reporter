@@ -1,6 +1,21 @@
 # Green City Reporter
 
-Green City Reporter is an ASP.NET Core MVC web application designed to help citizens report civic and environmental issues directly to local authorities. The system allows citizens to submit reports, track progress, receive notifications, communicate with administrators, and use AI-assisted features such as automatic report categorization, priority detection, report summarization, and an AI chatbot powered locally using Ollama.
+Green City Reporter is an ASP.NET Core MVC web application designed to help citizens report civic and environmental issues directly to local authorities. The system allows citizens to submit reports, track progress, receive notifications, communicate with administrators, and use AI-assisted features such as automatic report categorization, priority detection, report summarization, and an AI chatbot powered through a configurable provider.
+
+## Overview
+
+The application provides a moderated civic reporting workflow for Dhaka. Citizens submit an issue with a map-selected location and optional evidence, review AI-assisted classification, and track updates. Administrators validate reports, assign departments, update statuses, and communicate with citizens.
+
+## Problem Statement
+
+Civic issues are often reported through disconnected channels, making it difficult for residents to track progress and for authorities to prioritize urgent work. Green City Reporter provides one searchable workflow for collecting, classifying, assigning, and resolving those reports.
+
+## Objectives
+
+* Make civic issue reporting simple and location-aware.
+* Reduce manual triage through local AI assistance.
+* Give administrators clear ownership, status, priority, and history controls.
+* Keep citizens informed through in-app status updates and notifications.
 
 ## Features
 
@@ -21,7 +36,7 @@ Green City Reporter is an ASP.NET Core MVC web application designed to help citi
 
 ### AI Features
 
-Green City Reporter uses local AI through Ollama with the `llama3.2` model.
+Green City Reporter supports both local and hosted AI providers through configuration. Local development defaults to Ollama, while production deployments can use Groq through the `AI__Provider` and `AI__Groq__ApiKey` environment variables.
 
 AI is used for:
 
@@ -30,7 +45,7 @@ AI is used for:
 * Report summary generation
 * Green City AI chatbot
 
-The application remains functional even when Ollama is unavailable. If AI cannot determine a category, the citizen can manually select one during the report review step.
+The application remains functional even when the selected AI provider is unavailable. If AI cannot determine a category, the citizen can manually select one during the report review step.
 
 ### Admin Features
 
@@ -92,13 +107,11 @@ A category dropdown is then shown on the review page so the citizen can manually
 
 Green City Reporter includes a background monitoring service for unattended reports.
 
-The system monitors active reports with statuses such as:
+        The system monitors active reports with statuses:
 
 ```text
 Pending
-InReview
 Assigned
-InProgress
 ```
 
 Completed reports such as:
@@ -132,7 +145,7 @@ The chatbot can answer questions such as:
 ```text
 How do I submit a report?
 How can I track my report?
-What does In Review mean?
+What does Pending mean?
 What is the status of my latest report?
 What priority does my latest report have?
 ```
@@ -157,11 +170,13 @@ For user-specific report questions, the backend only retrieves reports belonging
 * Bootstrap
 * JavaScript
 * Fetch API
+* Leaflet with OpenStreetMap tiles; Google Maps is optional when an API key is configured
 
 ### AI
 
-* Ollama
-* Llama 3.2
+* Ollama for local development
+* Groq Cloud for production
+* Configurable `AI:Provider` selection
 
 ## Project Structure
 
@@ -201,7 +216,9 @@ GreenCityReporter/
 │   │   ├── ReportMonitoringOptions.cs
 │   │   └── ReportMonitoringService.cs
 │   │
-│   └── Chat/
+        │   ├── Assignment/
+        │   ├── Payments/
+        │   └── Chat/
 │       ├── GreenCityChatService.cs
 │       └── IChatService.cs
 │
@@ -251,6 +268,19 @@ AISummary
 CategorySource
 Priority
 ```
+
+## User Roles
+
+* **Citizen**: submits reports, selects a Dhaka location, follows status history, comments, receives notifications, and can use the donation checkout.
+* **Admin**: reviews all reports, overrides categories, assigns departments, changes status and priority, comments, and manages donation reviews.
+
+## Report Workflow
+
+1. A citizen submits a title, description, evidence, and location from the interactive map.
+2. Ollama attempts category, priority, criticality, and summary analysis. AI category selection remains editable.
+3. The report is stored as `Pending`, or assigned immediately when a critical report has a configured department.
+4. An administrator reviews the report and moves it through `Pending`, `Assigned`, `Resolved`, or `Rejected`.
+5. The citizen follows the report and its notifications from the dashboard.
 
 ## Requirements
 
@@ -339,6 +369,15 @@ Example:
   }
 }
 ```
+
+Sensitive values should be supplied with .NET User Secrets or environment variables. Optional seed accounts use `SeedUsers:Admin:*` and `SeedUsers:Citizen:*`; no user is created unless both an email and password are configured. For example:
+
+```powershell
+dotnet user-secrets set "SeedUsers:Admin:Email" "admin@example.test" --project GreenCityReporter/GreenCityReporter.csproj
+dotnet user-secrets set "SeedUsers:Admin:Password" "Use-a-development-only-password" --project GreenCityReporter/GreenCityReporter.csproj
+```
+
+The development configuration enables the local simulated payment flow. It does not collect real money or require payment credentials.
 
 Background monitoring configuration:
 
@@ -447,17 +486,24 @@ Possible future improvements include:
 * image-based issue recognition
 * multilingual chatbot support
 * AI confidence scoring
-* administrator assignment system
 * analytics dashboard
 * production AI deployment
 * cloud storage for report images
 * persistent chatbot history
+* production payment gateway onboarding, if real donations become a requirement
 
 ## Project Objective
 
 The goal of Green City Reporter is to improve communication between citizens and local authorities by providing a simple digital reporting platform enhanced with automation and AI.
 
 The system reduces manual categorization work, highlights urgent reports, alerts administrators about unattended issues, and helps citizens interact with the reporting system more easily.
+
+## Known Limitations
+
+* Report coordinates are restricted to a Dhaka bounding box.
+* AI requires a locally running Ollama instance for classification, priority detection, summaries, and chat; fallback behavior keeps report submission available.
+* Notifications are in-app. SMTP receipts are optional and apply to confirmed non-demo gateway payments.
+* The default development donation flow is simulated and is not a financial transaction.
 
 ## License
 
@@ -473,6 +519,6 @@ All team members are from the Department of Computer Science and Engineering (CS
 
 ## Donations
 
-`/Donation` provides a four-step checkout for Credit/Debit Card, bKash, Nagad and Rocket through SSLCommerz hosted payment pages. Guest and signed-in donors receive a receipt after server-side payment validation. Optional receipt emails use a durable retry queue. `/Donation/Manage` shows transactions and supports legacy manual donations and verified risk reviews.
+`/Donation` provides a clearly labeled simulated checkout for Card, bKash, Nagad, and Rocket in Development. It supports success, failure, and cancellation outcomes without collecting real financial information. Guest and signed-in donors receive a demo receipt, while `/Donation/Manage` is protected for administrators.
 
-Development runs in local demo mode: no merchant account is needed. Choose a payment method and simulate success, failure or cancellation to show a clearly labeled demo receipt. For actual gateway sandbox testing, disable DemoMode and configure merchant credentials, real organization contact details, and a public HTTPS callback origin. See [donation payment setup and verification](docs/donation-payments.md) for gateway keys, email settings, migrations, tests, and deployment requirements.
+The codebase also contains an isolated SSLCommerz adapter for optional future sandbox testing. It is disabled by default and is not required for evaluation. See [payment integration](docs/payment-integration.md) and [donation payment checks](docs/donation-payments.md) for the exact boundaries.

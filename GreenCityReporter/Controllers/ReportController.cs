@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GreenCityReporter.Services.AI;
 using GreenCityReporter.Services.Assignment;
+using GreenCityReporter.Services.Storage;
 using GreenCityReporter.ViewModels;
 
 namespace GreenCityReporter.Controllers
@@ -23,22 +24,22 @@ namespace GreenCityReporter.Controllers
 
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IWebHostEnvironment _environment;
-                private readonly IAIService _aiService;
-                private readonly ILogger<ReportController> _logger;
+        private readonly IAIService _aiService;
+        private readonly IFileStorageService _fileStorage;
+        private readonly ILogger<ReportController> _logger;
         public ReportController(
           ApplicationDbContext context,
           UserManager<ApplicationUser> userManager,
-                    IWebHostEnvironment environment,
                     IAIService aiService,
                     IReportAssignmentService assignmentService,
+                    IFileStorageService fileStorage,
                     ILogger<ReportController> logger)
         {
             _context = context;
             _userManager = userManager;
-            _environment = environment;
             _aiService = aiService;
             _assignmentService = assignmentService;
+                        _fileStorage = fileStorage;
             _logger = logger;
         }
 
@@ -115,6 +116,7 @@ namespace GreenCityReporter.Controllers
             var imagePath = await SaveImageAsync(image, cancellationToken);
             if (image != null && image.Length > 0 && imagePath == null)
             {
+                ModelState.AddModelError(string.Empty, "The image could not be uploaded. Please use a valid image up to 5 MB and try again.");
                 return View("Create", model);
             }
 
@@ -183,7 +185,7 @@ namespace GreenCityReporter.Controllers
                 ModelState.AddModelError(string.Empty, "The review has expired. Please start again.");
             }
 
-            if (!IsValidImagePath(model.ImagePath))
+            if (!string.IsNullOrWhiteSpace(model.ImagePath) && !_fileStorage.IsValidReportImagePath(model.ImagePath))
             {
                 ModelState.AddModelError(string.Empty, "The uploaded image is invalid.");
             }
@@ -240,69 +242,7 @@ namespace GreenCityReporter.Controllers
                 return null;
             }
 
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-            var extension = Path.GetExtension(image.FileName).ToLowerInvariant();
-
-            if (!allowedExtensions.Contains(extension))
-            {
-                ModelState.AddModelError(
-                    string.Empty,
-                    "Only JPG, JPEG, PNG, GIF, and WEBP images are allowed.");
-                return null;
-            }
-
-            const long maxFileSize = 5 * 1024 * 1024;
-            if (image.Length > maxFileSize)
-            {
-                ModelState.AddModelError(
-                    string.Empty,
-                    "The image size cannot exceed 5 MB.");
-                return null;
-            }
-
-            var uploadFolder = GetUploadFolder();
-            Directory.CreateDirectory(uploadFolder);
-
-            var fileName = $"{Guid.NewGuid()}{extension}";
-            var filePath = Path.Combine(uploadFolder, fileName);
-
-            await using var stream = new FileStream(filePath, FileMode.CreateNew);
-            await image.CopyToAsync(stream, cancellationToken);
-
-            return $"/uploads/reports/{fileName}";
-        }
-
-        private bool IsValidImagePath(string? imagePath)
-        {
-            if (string.IsNullOrWhiteSpace(imagePath))
-            {
-                return true;
-            }
-
-            const string prefix = "/uploads/reports/";
-            if (!imagePath.StartsWith(prefix, StringComparison.Ordinal) ||
-                imagePath.Contains("..", StringComparison.Ordinal))
-            {
-                return false;
-            }
-
-            var fileName = imagePath[prefix.Length..];
-            var extension = Path.GetExtension(fileName).ToLowerInvariant();
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-
-            return Guid.TryParse(Path.GetFileNameWithoutExtension(fileName), out _) &&
-                   string.Equals(Path.GetFileName(fileName), fileName, StringComparison.Ordinal) &&
-                   allowedExtensions.Contains(extension) &&
-                   System.IO.File.Exists(Path.Combine(GetUploadFolder(), fileName));
-        }
-
-        private string GetUploadFolder()
-        {
-            var webRootPath = string.IsNullOrEmpty(_environment.WebRootPath)
-                ? Path.Combine(_environment.ContentRootPath, "wwwroot")
-                : _environment.WebRootPath;
-
-            return Path.Combine(webRootPath, "uploads", "reports");
+            return await _fileStorage.SaveReportImageAsync(image, cancellationToken);
         }
 
         private static IEnumerable<SelectListItem> ToCategorySelectList(

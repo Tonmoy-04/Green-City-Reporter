@@ -1,0 +1,17 @@
+.git
+.gitignore
+.vscode
+.vs
+**/bin
+**/obj
+**/.idea
+**/.DS_Store
+**/*.user
+**/*.suo
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/wwwroot/uploads/reports/
+.env
+.env.*
+**/*.log
