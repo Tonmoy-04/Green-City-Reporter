@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GreenCityReporter.Services.AI;
+using GreenCityReporter.Services.Assignment;
 using GreenCityReporter.ViewModels;
 
 namespace GreenCityReporter.Controllers
@@ -17,6 +18,8 @@ namespace GreenCityReporter.Controllers
         private const string ReviewAICategoryIdKey = "ReportReviewAICategoryId";
         private const string ReviewPriorityKey = "ReportReviewPriority";
         private const string ReviewSummaryKey = "ReportReviewSummary";
+        private const string ReviewCriticalKey = "ReportReviewCritical";
+        private const string ReviewConfidenceKey = "ReportReviewConfidence";
 
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -28,14 +31,18 @@ namespace GreenCityReporter.Controllers
           UserManager<ApplicationUser> userManager,
                     IWebHostEnvironment environment,
                     IAIService aiService,
+                    IReportAssignmentService assignmentService,
                     ILogger<ReportController> logger)
         {
             _context = context;
             _userManager = userManager;
             _environment = environment;
             _aiService = aiService;
+            _assignmentService = assignmentService;
             _logger = logger;
         }
+
+        private readonly IReportAssignmentService _assignmentService;
 
         // GET: /Report/Create
         [HttpGet]
@@ -76,7 +83,7 @@ namespace GreenCityReporter.Controllers
                 .OrderBy(c => c.Name)
                 .ToListAsync(cancellationToken);
 
-            var aiCategoryName = await _aiService.CategorizeReportAsync(
+            var classification = await _aiService.ClassifyReportAsync(
                 model.Title,
                 model.Description,
                 categoriesForSubmission.Select(c => c.Name),
@@ -85,7 +92,7 @@ namespace GreenCityReporter.Controllers
             var aiCategory = categoriesForSubmission.FirstOrDefault(c =>
                 string.Equals(
                     c.Name,
-                    aiCategoryName,
+                    classification?.Category,
                     StringComparison.OrdinalIgnoreCase));
 
             var aiPriority = await _aiService.DetectPriorityAsync(
@@ -114,6 +121,8 @@ namespace GreenCityReporter.Controllers
             TempData[ReviewAICategoryIdKey] = aiCategory?.Id.ToString();
             TempData[ReviewPriorityKey] = priority.ToString();
             TempData[ReviewSummaryKey] = summary;
+            TempData[ReviewCriticalKey] = classification?.IsCritical == true && classification.Confidence >= 0.7;
+            TempData[ReviewConfidenceKey] = classification?.Confidence?.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             var reviewModel = new ReportReviewViewModel
             {
@@ -126,11 +135,11 @@ namespace GreenCityReporter.Controllers
                 AISummary = summary,
                 AICategoryId = aiCategory?.Id,
                 AICategoryName = aiCategory?.Name,
+                AIConfidence = classification?.Confidence,
+                IsCritical = classification?.IsCritical == true && classification.Confidence >= 0.7,
                 Priority = priority,
                 RequiresManualCategory = aiCategory == null,
-                Categories = aiCategory == null
-                    ? ToCategorySelectList(categoriesForSubmission)
-                    : Enumerable.Empty<SelectListItem>()
+                Categories = ToCategorySelectList(categoriesForSubmission, aiCategory?.Id)
             };
 
             return View(reviewModel);
@@ -156,24 +165,18 @@ namespace GreenCityReporter.Controllers
             var aiCategoryId = GetTempDataInt(ReviewAICategoryIdKey);
             var reviewedPriority = GetTempDataPriority();
             var reviewedSummary = TempData.Peek(ReviewSummaryKey) as string;
+            var isCritical = bool.TryParse(TempData.Peek(ReviewCriticalKey)?.ToString(), out var critical) && critical;
+            var aiConfidence = double.TryParse(TempData.Peek(ReviewConfidenceKey)?.ToString(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var confidence)
+                ? confidence
+                : (double?)null;
             var aiCategory = aiCategoryId.HasValue
                 ? categories.FirstOrDefault(c => c.Id == aiCategoryId.Value)
                 : null;
 
-            var category = aiCategory;
-            var categorySource = "AI";
+            var category = categories.FirstOrDefault(c => c.Id == model.SelectedCategoryId) ?? aiCategory;
+            var categorySource = category?.Id == aiCategory?.Id ? "AI" : "Manual";
             if (category == null)
-            {
-                category = categories.FirstOrDefault(c => c.Id == model.SelectedCategoryId);
-                categorySource = "Manual";
-
-                if (category == null)
-                {
-                    ModelState.AddModelError(
-                        nameof(ReportReviewViewModel.SelectedCategoryId),
-                        "Please select a valid category.");
-                }
-            }
+                ModelState.AddModelError(nameof(ReportReviewViewModel.SelectedCategoryId), "Please select a valid category.");
 
             if (!reviewedPriority.HasValue)
             {
@@ -190,11 +193,11 @@ namespace GreenCityReporter.Controllers
                 model.AICategoryId = aiCategory?.Id;
                 model.AICategoryName = aiCategory?.Name;
                 model.AISummary = reviewedSummary;
+                model.AIConfidence = aiConfidence;
+                model.IsCritical = isCritical;
                 model.Priority = reviewedPriority ?? Priority.Low;
                 model.RequiresManualCategory = aiCategory == null;
-                model.Categories = aiCategory == null
-                    ? ToCategorySelectList(categories, model.SelectedCategoryId)
-                    : Enumerable.Empty<SelectListItem>();
+                model.Categories = ToCategorySelectList(categories, model.SelectedCategoryId ?? aiCategory?.Id);
 
                 return View("Review", model);
             }
@@ -209,6 +212,9 @@ namespace GreenCityReporter.Controllers
                 ImagePath = model.ImagePath,
                 AISummary = reviewedSummary,
                 CategoryId = category!.Id,
+                AiSuggestedCategoryId = aiCategory?.Id,
+                AiConfidence = aiConfidence,
+                IsCritical = isCritical,
                 CategorySource = categorySource,
                 Priority = reviewedPriority!.Value,
                 UserId = user.Id,
@@ -219,6 +225,7 @@ namespace GreenCityReporter.Controllers
             };
 
             _context.Reports.Add(report);
+            await _assignmentService.ApplyInitialAssignmentAsync(report, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
             return RedirectToAction(nameof(Details), new { id = report.Id });
@@ -352,7 +359,7 @@ namespace GreenCityReporter.Controllers
             {
                 TotalReports = userReports.Count,
                 PendingCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.Pending),
-                InProgressCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.InProgress),
+                AssignedCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.Assigned),
                 ResolvedCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.Resolved),
                 RejectedCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.Rejected),
                 RecentReports = userReports.OrderByDescending(r => r.CreatedAt).Take(5).ToList(),

@@ -6,7 +6,7 @@ namespace GreenCityReporter.ViewModels
     {
         public int TotalReports { get; set; }
         public int PendingCount { get; set; }
-        public int InProgressCount { get; set; }
+        public int AssignedCount { get; set; }
         public int ResolvedCount { get; set; }
         public int RejectedCount { get; set; }
 

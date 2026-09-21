@@ -48,9 +48,9 @@
                                     </span>
                                     break;
 
-                                case "InProgress":
+                                case "Assigned":
                                     <span class="badge-in-progress">
-                                        <i class="fa-solid fa-spinner me-1"></i> Action In Progress
+                                        <i class="fa-solid fa-user-check me-1"></i> Assigned
                                     </span>
                                     break;
 
@@ -269,11 +269,11 @@
                         <div class="timeline">
                             @foreach (var history in Model.StatusHistories.OrderByDescending(h => h.UpdatedAt))
                             {
-                                string newStatusStr = history.NewStatus.ToString() == "InProgress" ? "In Progress" : history.NewStatus.ToString();
+                                string newStatusStr = history.NewStatus.ToString();
                                 string badgeClass = history.NewStatus.ToString() switch
                                 {
                                     "Pending" => "badge-pending",
-                                    "InProgress" => "badge-in-progress",
+                                    "Assigned" => "badge-in-progress",
                                     "Resolved" => "badge-resolved",
                                     "Rejected" => "badge-rejected",
                                     _ => "badge bg-secondary"

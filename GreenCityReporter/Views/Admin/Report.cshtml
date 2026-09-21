@@ -46,11 +46,11 @@
 
                         <div>
                             @{
-                                string statusStr = Model.CurrentStatus.ToString() == "InProgress" ? "In Progress" : Model.CurrentStatus.ToString();
+                                string statusStr = Model.CurrentStatus.ToString();
                                 string badgeClass = Model.CurrentStatus.ToString() switch
                                 {
                                     "Pending" => "badge-pending",
-                                    "InProgress" => "badge-in-progress",
+                                    "Assigned" => "badge-in-progress",
                                     "Resolved" => "badge-resolved",
                                     "Rejected" => "badge-rejected",
                                     _ => "badge bg-secondary"
@@ -104,6 +104,10 @@
                         <div class="col-6 col-md-3">
                             <small class="text-muted d-block mb-1">Category</small>
                             <strong class="text-dark d-block">@(Model.Category?.Name ?? "Uncategorized")</strong>
+                            @if (Model.AiSuggestedCategory != null)
+                            {
+                                <small class="text-muted d-block">AI suggested: @Model.AiSuggestedCategory.Name (@(Model.AiConfidence?.ToString("P0") ?? "n/a"))</small>
+                            }
                             <span class="badge @(Model.CategorySource == "AI" ? "bg-success" : "bg-secondary") mt-1" style="font-size:0.7rem;">
                                 @(Model.CategorySource == "AI" ? "AI Categorized" : "Manual Category")
                             </span>
@@ -265,6 +269,18 @@
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="reportId" value="@Model.Id" />
 
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Final Category</label>
+                            <select name="categoryId" asp-items="ViewBag.Categories" class="form-select" required></select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Assigned Department</label>
+                            <select name="departmentId" asp-items="ViewBag.Departments" class="form-select">
+                                <option value="">-- No department --</option>
+                            </select>
+                        </div>
+
                         <!-- Status Control -->
                         <div class="mb-3">
                             <label class="form-label fw-bold">Status</label>
@@ -272,7 +288,7 @@
                                 @foreach (var status in Enum.GetValues<GreenCityReporter.Models.Enums.ReportStatus>())
                                 {
                                     <option value="@status" selected="@(status == Model.CurrentStatus)">
-                                        @(status == GreenCityReporter.Models.Enums.ReportStatus.InProgress ? "In Progress" : status.ToString())
+                                        @status.ToString()
                                     </option>
                                 }
                             </select>
