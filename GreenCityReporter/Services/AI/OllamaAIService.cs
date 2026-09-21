@@ -46,6 +46,53 @@ namespace GreenCityReporter.Services.AI
             }
         }
 
+        public async Task<ReportClassificationResult?> ClassifyReportAsync(
+            string title,
+            string description,
+            IEnumerable<string> availableCategories,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var categories = string.Join(", ", availableCategories ?? Enumerable.Empty<string>());
+                var prompt = "Classify this civic report. Choose exactly one category from: " + categories + ".\n" +
+                    "Return only valid JSON with this shape: {\"category\":\"exact category name\",\"critical\":false,\"confidence\":0.0}.\n" +
+                    "Set critical true only for an immediate threat such as an active fire, road accident, severe electrical hazard, gas leak, major flooding, or dangerous infrastructure failure.\n" +
+                    "Confidence must be a number from 0 to 1. Do not invent categories or include markdown.\n" +
+                    "Title: " + (title ?? string.Empty) + "\nDescription: " + (description ?? string.Empty);
+
+                var raw = await SendPromptAsync(prompt, cancellationToken).ConfigureAwait(false);
+                if (string.IsNullOrWhiteSpace(raw)) return null;
+
+                var json = CleanModelOutput(raw).Trim('`', ' ', '\r', '\n');
+                if (json.StartsWith("json", StringComparison.OrdinalIgnoreCase)) json = json[4..].Trim();
+                using var document = JsonDocument.Parse(json);
+                var root = document.RootElement;
+                var category = root.TryGetProperty("category", out var categoryElement) && categoryElement.ValueKind == JsonValueKind.String
+                    ? categoryElement.GetString()
+                    : null;
+                var critical = root.TryGetProperty("critical", out var criticalElement) && criticalElement.ValueKind == JsonValueKind.True;
+                double? confidence = root.TryGetProperty("confidence", out var confidenceElement) && confidenceElement.TryGetDouble(out var value)
+                    ? Math.Clamp(value, 0, 1)
+                    : null;
+
+                var matchedCategory = (availableCategories ?? Enumerable.Empty<string>())
+                    .FirstOrDefault(candidate => string.Equals(candidate, category, StringComparison.OrdinalIgnoreCase));
+                return matchedCategory == null || confidence is null
+                    ? null
+                    : new ReportClassificationResult(matchedCategory, critical, confidence);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "ClassifyReportAsync could not parse the AI response.");
+                return null;
+            }
+        }
+
         public async Task<string?> CategorizeReportAsync(string title, string description, IEnumerable<string> availableCategories, CancellationToken cancellationToken = default)
         {
             try

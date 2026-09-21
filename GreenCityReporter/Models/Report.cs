@@ -20,6 +20,14 @@ namespace GreenCityReporter.Models
         [Required]
         public int CategoryId { get; set; }
 
+        public int? AiSuggestedCategoryId { get; set; }
+
+        public double? AiConfidence { get; set; }
+
+        public bool IsCritical { get; set; }
+
+        public int? DepartmentId { get; set; }
+
         [MaxLength(20)]
         public string CategorySource { get; set; } = "Manual";
 
@@ -56,6 +64,12 @@ namespace GreenCityReporter.Models
         [ValidateNever]
         [ForeignKey("CategoryId")]
         public Category Category { get; set; } = null!;
+
+        [ValidateNever]
+        public Category? AiSuggestedCategory { get; set; }
+
+        [ValidateNever]
+        public Department? Department { get; set; }
 
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<StatusHistory> StatusHistories { get; set; } = new List<StatusHistory>();

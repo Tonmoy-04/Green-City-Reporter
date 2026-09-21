@@ -31,6 +31,8 @@ namespace GreenCityReporter.ViewModels
         public string? AISummary { get; set; }
         public string? AICategoryName { get; set; }
         public int? AICategoryId { get; set; }
+        public double? AIConfidence { get; set; }
+        public bool IsCritical { get; set; }
         public Priority Priority { get; set; }
         public bool RequiresManualCategory { get; set; }
         public int? SelectedCategoryId { get; set; }

@@ -1,6 +1,7 @@
 using GreenCityReporter.Data;
 using GreenCityReporter.Models;
 using GreenCityReporter.Services.AI;
+using GreenCityReporter.Services.Assignment;
 using GreenCityReporter.Services.Background;
 using GreenCityReporter.Services.Chat;
 using GreenCityReporter.Services.Payments;
@@ -41,6 +42,7 @@ builder.Services.Configure<ReportMonitoringOptions>(
 
 builder.Services.AddHostedService<ReportMonitoringService>();
 builder.Services.AddScoped<IChatService, GreenCityChatService>();
+builder.Services.AddScoped<IReportAssignmentService, ReportAssignmentService>();
 
 // Register Ollama AI service with typed HttpClient
 builder.Services.AddHttpClient<IAIService, OllamaAIService>((sp, client) =>

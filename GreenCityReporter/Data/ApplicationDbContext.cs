@@ -19,6 +19,7 @@ namespace GreenCityReporter.Data
         public DbSet<Notification> Notifications { get; set; }
 
         public DbSet<Donation> Donations { get; set; }
+        public DbSet<Department> Departments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -56,6 +57,24 @@ namespace GreenCityReporter.Data
                 .WithMany(u => u.Notifications)
                 .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Report>()
+                .HasOne(r => r.Department)
+                .WithMany(d => d.Reports)
+                .HasForeignKey(r => r.DepartmentId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Report>()
+                .HasOne(r => r.AiSuggestedCategory)
+                .WithMany()
+                .HasForeignKey(r => r.AiSuggestedCategoryId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Category>()
+                .HasOne(c => c.DefaultDepartment)
+                .WithMany(d => d.DefaultCategories)
+                .HasForeignKey(c => c.DefaultDepartmentId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

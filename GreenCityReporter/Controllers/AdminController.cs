@@ -72,6 +72,8 @@ namespace GreenCityReporter.Controllers
         {
             var report = await _context.Reports
                 .Include(r => r.Category)
+                .Include(r => r.AiSuggestedCategory)
+                .Include(r => r.Department)
                 .Include(r => r.User)
                 .Include(r => r.Comments)
                     .ThenInclude(c => c.User)
@@ -84,6 +86,9 @@ namespace GreenCityReporter.Controllers
                 return NotFound();
             }
 
+            ViewBag.Categories = new SelectList(await _context.Categories.OrderBy(c => c.Name).ToListAsync(), "Id", "Name", report.CategoryId);
+            ViewBag.Departments = new SelectList(await _context.Departments.OrderBy(d => d.Name).ToListAsync(), "Id", "Name", report.DepartmentId);
+
             return View(report);
         }
 
@@ -94,6 +99,8 @@ namespace GreenCityReporter.Controllers
             int reportId,
             Models.Enums.ReportStatus newStatus,
             Models.Enums.Priority priority,
+            int categoryId,
+            int? departmentId,
             string? remarks)
         {
             var report = await _context.Reports
@@ -111,11 +118,41 @@ namespace GreenCityReporter.Controllers
                 return Challenge();
             }
 
+            var categoryExists = await _context.Categories.AnyAsync(c => c.Id == categoryId);
+            if (!categoryExists)
+            {
+                return BadRequest("Please select a valid category.");
+            }
+
+            if (departmentId.HasValue && !await _context.Departments.AnyAsync(d => d.Id == departmentId.Value))
+            {
+                return BadRequest("Please select a valid department.");
+            }
+
+            if (newStatus == ReportStatus.Assigned && !departmentId.HasValue)
+            {
+                ModelState.AddModelError(nameof(departmentId), "Assigned reports require a department.");
+            }
+
+            if (departmentId.HasValue && newStatus == ReportStatus.Pending)
+            {
+                newStatus = ReportStatus.Assigned;
+            }
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Assigned reports require a department.";
+                return RedirectToAction(nameof(Report), new { id = reportId });
+            }
+
             var previousStatus = report.CurrentStatus;
 
             // Update report
             report.CurrentStatus = newStatus;
             report.Priority = priority;
+            report.CategoryId = categoryId;
+            report.CategorySource = report.AiSuggestedCategoryId == categoryId ? "AI" : "Manual";
+            report.DepartmentId = departmentId;
             report.UpdatedAt = DateTime.UtcNow;
 
             // Create status history
@@ -132,7 +169,7 @@ namespace GreenCityReporter.Controllers
             _context.StatusHistories.Add(history);
 
             // Notify report owner
-            string readableStatus = newStatus == Models.Enums.ReportStatus.InProgress ? "In Progress" : newStatus.ToString();
+            string readableStatus = newStatus.ToString();
             var notification = new Notification
             {
                 UserId = report.UserId,

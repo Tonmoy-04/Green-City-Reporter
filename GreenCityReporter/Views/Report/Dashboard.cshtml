@@ -146,7 +146,7 @@
             </div>
         </div>
 
-        <!-- Card 3: In Progress -->
+                        <!-- Card 3: Assigned -->
         <div class="col-12 col-sm-6 col-lg-3">
             <div class="card h-100 p-3 border">
                 <div class="d-flex align-items-center">
@@ -154,8 +154,8 @@
                         <i class="fa-solid fa-spinner fa-2x"></i>
                     </div>
                     <div>
-                        <small class="text-muted fw-bold text-uppercase d-block" style="font-size: 0.75rem; letter-spacing: 0.5px;">In Progress</small>
-                        <h2 class="fw-bold mb-0 text-dark">@Model.InProgressCount</h2>
+                        <small class="text-muted fw-bold text-uppercase d-block" style="font-size: 0.75rem; letter-spacing: 0.5px;">Assigned</small>
+                        <h2 class="fw-bold mb-0 text-dark">@Model.AssignedCount</h2>
                     </div>
                 </div>
             </div>
@@ -223,11 +223,11 @@
                                 <tbody>
                                     @foreach (var report in Model.RecentReports)
                                     {
-                                        string statusStr = report.CurrentStatus.ToString() == "InProgress" ? "In Progress" : report.CurrentStatus.ToString();
+                                        string statusStr = report.CurrentStatus.ToString();
                                         string badgeClass = report.CurrentStatus.ToString() switch
                                         {
                                             "Pending" => "badge-pending",
-                                            "InProgress" => "badge-in-progress",
+                                            "Assigned" => "badge-in-progress",
                                             "Resolved" => "badge-resolved",
                                             "Rejected" => "badge-rejected",
                                             _ => "badge bg-secondary"
@@ -294,7 +294,7 @@
                                     iconClass = "fa-circle-check text-success";
                                     bgBadge = "bg-success bg-opacity-10";
                                 }
-                                else if (msg.Contains("In Progress", StringComparison.OrdinalIgnoreCase))
+                                else if (msg.Contains("Assigned", StringComparison.OrdinalIgnoreCase))
                                 {
                                     iconClass = "fa-bars-progress text-primary";
                                     bgBadge = "bg-primary bg-opacity-10";
