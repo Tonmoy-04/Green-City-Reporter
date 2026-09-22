@@ -45,7 +45,23 @@ Storage__Supabase__ProfileBucket=profile-pictures
 AI__Provider=Groq
 AI__Groq__ApiKey=your-render-secret
 AI__Groq__Model=llama-3.1-8b-instant
+Email__SmtpHost=<transactional-provider-smtp-host>
+Email__SmtpPort=587
+Email__SenderName=Green City Reporter
+Email__SenderEmail=<verified-sender-address>
+Email__Username=<smtp-username>
+Email__Password=<smtp-api-key-or-password>
+Email__EnableSsl=true
+Email__PublicBaseUrl=https://<deployed-green-city-reporter-domain>
 ```
+
+## Account verification email
+
+Production registration requires a real transactional SMTP account. Brevo SMTP is the recommended deployment provider, while the implementation remains compatible with another authenticated SMTP provider. Copy the SMTP host, login, and SMTP key from the provider dashboard into the environment variables above; never put them in an appsettings file or source control.
+
+The value of `Email__SenderEmail` must be a sender or domain authorized by the provider. Complete the provider's sender/domain verification and publish the SPF and DKIM records it supplies before production use. `Email__PublicBaseUrl` must be the public HTTPS origin of this application and must not be localhost. Production startup rejects missing SMTP settings, disabled TLS, or a non-HTTPS public URL.
+
+After deploying, perform a mailbox test with a new account: verify that the provider accepts the message, it reaches the exact registered address, the link uses the deployed HTTPS origin, confirmation changes `EmailConfirmed` to true, and sign-in works only afterward. Provider acceptance alone is not proof of mailbox delivery.
 
 For local development, configure:
 

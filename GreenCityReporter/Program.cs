@@ -4,6 +4,7 @@ using GreenCityReporter.Services.AI;
 using GreenCityReporter.Services.Assignment;
 using GreenCityReporter.Services.Background;
 using GreenCityReporter.Services.Chat;
+using GreenCityReporter.Services.Email;
 using GreenCityReporter.Services.Payments;
 using GreenCityReporter.Services.Reports;
 using GreenCityReporter.Services.Storage;
@@ -45,11 +46,23 @@ builder.Services.AddRateLimiter(options =>
     options.AddPolicy("donation-checkout", context => RateLimitPartition.GetFixedWindowLimiter(
         context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+    options.AddPolicy("account-email", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(15), QueueLimit = 0 }));
 });
 
 builder.Services.Configure<AIOptions>(builder.Configuration.GetSection("AI"));
 builder.Services.Configure<ReportMonitoringOptions>(builder.Configuration.GetSection("ReportMonitoring"));
 builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection("Storage"));
+builder.Services.AddOptions<EmailOptions>()
+    .BindConfiguration("Email")
+    .Validate(options => !builder.Environment.IsProduction() || (options.IsReady && options.EnableSsl),
+        "Production email configuration is required. Set Email__SmtpHost, Email__SmtpPort, Email__SenderName, Email__SenderEmail, Email__Username, Email__Password, and Email__EnableSsl.")
+    .Validate(options => !builder.Environment.IsProduction() ||
+        (Uri.TryCreate(options.PublicBaseUrl, UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttps),
+        "Production requires Email__PublicBaseUrl to be an absolute HTTPS URL.")
+    .ValidateOnStart();
+builder.Services.AddScoped<IAccountEmailSender, SmtpAccountEmailSender>();
 
 var storageProvider = builder.Configuration["Storage:Provider"]?.Trim();
 if (string.IsNullOrWhiteSpace(storageProvider))
@@ -159,6 +172,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = true;
     options.Password.RequireLowercase = true;
+    options.SignIn.RequireConfirmedEmail = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
