@@ -8,6 +8,14 @@
     const error = document.getElementById('checkout-error');
     let current = 1;
     const selectedMethod = () => methods.find(method => method.checked && !method.disabled)?.value;
+    const ensureMethodSelected = () => {
+        const selected = methods.find(method => method.checked && !method.disabled);
+        if (selected) return selected.value;
+        const fallback = methods.find(method => !method.disabled);
+        if (!fallback) return null;
+        fallback.checked = true;
+        return fallback.value;
+    };
     const showStep = step => {
         current = step;
         sections.forEach(section => { section.hidden = Number(section.dataset.step) !== step; });
@@ -45,6 +53,13 @@
         if (!validateAmount()) return;
         if (Number(button.dataset.next) === 3 && !selectedMethod()) { error.textContent = 'Please select an available payment method.'; return; }
         showStep(Number(button.dataset.next));
+    }));
+    form.querySelectorAll('[data-submit-direct]').forEach(button => button.addEventListener('click', () => {
+        if (!validateAmount()) return;
+        if (!ensureMethodSelected()) { error.textContent = 'Please select an available payment method.'; return; }
+        updateMethod();
+        current = 3;
+        form.requestSubmit();
     }));
     form.querySelectorAll('[data-back]').forEach(button => button.addEventListener('click', () => showStep(Number(button.dataset.back))));
     // With JavaScript disabled, all sections remain visible and native validation still works.
