@@ -14,6 +14,10 @@ namespace GreenCityReporter.Data
             var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
+            // =========================
+            // Seed Roles
+            // =========================
+
             string[] roles = { "Admin", "Citizen" };
 
             foreach (var role in roles)
@@ -24,23 +28,89 @@ namespace GreenCityReporter.Data
                 }
             }
 
-            await SeedUserAsync(userManager, configuration, "Admin", "SeedUsers:Admin", "System Admin");
-            await SeedUserAsync(userManager, configuration, "Citizen", "SeedUsers:Citizen", "Sample Citizen");
+            // =========================
+            // Seed Multiple Admin Users
+            // =========================
+
+            var adminSection = configuration.GetSection("SeedUsers:Admins");
+
+            foreach (var adminConfig in adminSection.GetChildren())
+            {
+                await SeedUserAsync(
+                    userManager,
+                    adminConfig,
+                    "Admin",
+                    "System Admin"
+                );
+            }
+
+            // =========================
+            // Seed Sample Citizen
+            // =========================
+
+            var citizenSection = configuration.GetSection("SeedUsers:Citizen");
+
+            await SeedUserAsync(
+                userManager,
+                citizenSection,
+                "Citizen",
+                "Sample Citizen"
+            );
+
+            // =========================
+            // Seed Departments
+            // =========================
 
             var departments = new[]
             {
-                new Department { Name = "WASA", Description = "Water supply and leakage response." },
-                new Department { Name = "City Corporation", Description = "Municipal roads, drainage, waste, and public infrastructure." },
-                new Department { Name = "Fire Service", Description = "Fire and immediate emergency response." },
-                new Department { Name = "Electricity Department", Description = "Electrical infrastructure and street lighting." },
-                new Department { Name = "Gas Authority", Description = "Gas network and leak response." },
-                new Department { Name = "Traffic / Road Authority", Description = "Traffic and road safety response." },
-                new Department { Name = "Other", Description = "General municipal routing." }
+                new Department
+                {
+                    Name = "WASA",
+                    Description = "Water supply and leakage response."
+                },
+
+                new Department
+                {
+                    Name = "City Corporation",
+                    Description = "Municipal roads, drainage, waste, and public infrastructure."
+                },
+
+                new Department
+                {
+                    Name = "Fire Service",
+                    Description = "Fire and immediate emergency response."
+                },
+
+                new Department
+                {
+                    Name = "Electricity Department",
+                    Description = "Electrical infrastructure and street lighting."
+                },
+
+                new Department
+                {
+                    Name = "Gas Authority",
+                    Description = "Gas network and leak response."
+                },
+
+                new Department
+                {
+                    Name = "Traffic / Road Authority",
+                    Description = "Traffic and road safety response."
+                },
+
+                new Department
+                {
+                    Name = "Other",
+                    Description = "General municipal routing."
+                }
             };
 
             foreach (var department in departments)
             {
-                var existing = await context.Departments.FirstOrDefaultAsync(d => d.Name == department.Name);
+                var existing = await context.Departments
+                    .FirstOrDefaultAsync(d => d.Name == department.Name);
+
                 if (existing == null)
                 {
                     context.Departments.Add(department);
@@ -48,6 +118,10 @@ namespace GreenCityReporter.Data
             }
 
             await context.SaveChangesAsync();
+
+            // =========================
+            // Seed Categories
+            // =========================
 
             var categories = new[]
             {
@@ -90,8 +164,7 @@ namespace GreenCityReporter.Data
 
             foreach (var category in categories)
             {
-                if (!await context.Categories.AnyAsync(
-                    c => c.Name == category.Name))
+                if (!await context.Categories.AnyAsync(c => c.Name == category.Name))
                 {
                     context.Categories.Add(category);
                 }
@@ -99,7 +172,13 @@ namespace GreenCityReporter.Data
 
             await context.SaveChangesAsync();
 
-            var departmentByName = await context.Departments.ToDictionaryAsync(d => d.Name);
+            // =========================
+            // Map Categories to Departments
+            // =========================
+
+            var departmentByName = await context.Departments
+                .ToDictionaryAsync(d => d.Name);
+
             var categoryMappings = new Dictionary<string, string>
             {
                 ["Waste Management"] = "City Corporation",
@@ -112,8 +191,11 @@ namespace GreenCityReporter.Data
 
             foreach (var mapping in categoryMappings)
             {
-                var category = await context.Categories.FirstOrDefaultAsync(c => c.Name == mapping.Key);
-                if (category != null && departmentByName.TryGetValue(mapping.Value, out var department))
+                var category = await context.Categories
+                    .FirstOrDefaultAsync(c => c.Name == mapping.Key);
+
+                if (category != null &&
+                    departmentByName.TryGetValue(mapping.Value, out var department))
                 {
                     category.DefaultDepartmentId = department.Id;
                 }
@@ -122,33 +204,40 @@ namespace GreenCityReporter.Data
             await context.SaveChangesAsync();
         }
 
+        // =========================
+        // Seed User Helper
+        // =========================
+
         private static async Task SeedUserAsync(
             UserManager<ApplicationUser> userManager,
-            IConfiguration configuration,
+            IConfigurationSection userConfig,
             string role,
-            string configurationPrefix,
             string defaultFullName)
         {
-            var email = configuration[$"{configurationPrefix}:Email"];
-            var password = configuration[$"{configurationPrefix}:Password"];
+            var email = userConfig["Email"];
+            var password = userConfig["Password"];
+            var fullName = userConfig["FullName"] ?? defaultFullName;
 
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(email) ||
+                string.IsNullOrWhiteSpace(password))
             {
                 return;
             }
 
             var user = await userManager.FindByEmailAsync(email);
+
             if (user == null)
             {
                 user = new ApplicationUser
                 {
                     UserName = email,
                     Email = email,
-                    FullName = configuration[$"{configurationPrefix}:FullName"] ?? defaultFullName,
+                    FullName = fullName,
                     EmailConfirmed = true
                 };
 
                 var result = await userManager.CreateAsync(user, password);
+
                 if (!result.Succeeded)
                 {
                     return;

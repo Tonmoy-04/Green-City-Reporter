@@ -12,6 +12,15 @@ namespace GreenCityReporter.Services.Storage
             string? storedPath,
             CancellationToken cancellationToken = default);
 
+        Task<string?> SaveProfilePictureAsync(
+            string userId,
+            IFormFile file,
+            CancellationToken cancellationToken = default);
+
+        Task DeleteProfilePictureAsync(
+            string? storedPath,
+            CancellationToken cancellationToken = default);
+
         bool IsValidReportImagePath(string? storedPath);
     }
 }
