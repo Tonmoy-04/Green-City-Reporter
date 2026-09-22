@@ -1,4 +1,5 @@
 using GreenCityReporter.Models;
+using GreenCityReporter.Services.Storage;
 using GreenCityReporter.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,18 +11,18 @@ namespace GreenCityReporter.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly GreenCityReporter.Data.ApplicationDbContext _context;
-        private readonly IWebHostEnvironment _environment;
+        private readonly IFileStorageService _fileStorage;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             GreenCityReporter.Data.ApplicationDbContext context,
-            IWebHostEnvironment environment)
+            IFileStorageService fileStorage)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
-            _environment = environment;
+            _fileStorage = fileStorage;
         }
 
         [HttpGet]
@@ -187,29 +188,35 @@ public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl =
                     return await ProfileWithModel(model, user);
                 }
 
-                var uploadsPath = Path.Combine(_environment.WebRootPath, "uploads", "profiles");
-                Directory.CreateDirectory(uploadsPath);
-                var extension = model.ProfilePicture.ContentType.ToLowerInvariant() switch
+                var oldPath = user.ProfilePicturePath;
+                var newPath = await _fileStorage.SaveProfilePictureAsync(
+                    user.Id,
+                    model.ProfilePicture,
+                    HttpContext.RequestAborted);
+                if (newPath == null)
                 {
-                    "image/png" => ".png",
-                    "image/webp" => ".webp",
-                    _ => ".jpg"
-                };
-                var fileName = $"{Guid.NewGuid():N}{extension}";
-                var filePath = Path.Combine(uploadsPath, fileName);
-                await using (var stream = System.IO.File.Create(filePath))
-                {
-                    await model.ProfilePicture.CopyToAsync(stream);
+                    ModelState.AddModelError("ProfilePicture", "The profile picture could not be uploaded. Please try again.");
+                    return await ProfileWithModel(model, user);
                 }
 
-                var oldPath = user.ProfilePicturePath;
-                user.ProfilePicturePath = $"/uploads/profiles/{fileName}";
-                await _userManager.UpdateAsync(user);
-                if (!string.IsNullOrWhiteSpace(oldPath))
+                user.ProfilePicturePath = newPath;
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
                 {
-                    var oldFile = Path.Combine(_environment.WebRootPath, oldPath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
-                    if (System.IO.File.Exists(oldFile)) System.IO.File.Delete(oldFile);
+                    foreach (var error in updateResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
+                    user.ProfilePicturePath = oldPath;
+                    return await ProfileWithModel(model, user);
                 }
+
+                if (!string.IsNullOrWhiteSpace(oldPath) && !string.Equals(oldPath, newPath, StringComparison.Ordinal))
+                {
+                    await _fileStorage.DeleteProfilePictureAsync(oldPath, HttpContext.RequestAborted);
+                }
+
                 TempData["ProfileSuccess"] = "Profile picture updated successfully.";
             }
 

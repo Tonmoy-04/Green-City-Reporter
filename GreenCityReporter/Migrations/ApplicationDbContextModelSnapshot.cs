@@ -104,6 +104,9 @@ namespace GreenCityReporter.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("DefaultDepartmentId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -114,6 +117,8 @@ namespace GreenCityReporter.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DefaultDepartmentId");
 
                     b.ToTable("Categories");
                 });
@@ -147,6 +152,27 @@ namespace GreenCityReporter.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("GreenCityReporter.Models.Department", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Departments");
                 });
 
             modelBuilder.Entity("GreenCityReporter.Models.Donation", b =>
@@ -343,6 +369,12 @@ namespace GreenCityReporter.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double?>("AiConfidence")
+                        .HasColumnType("float");
+
+                    b.Property<int?>("AiSuggestedCategoryId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
@@ -357,6 +389,9 @@ namespace GreenCityReporter.Migrations
                     b.Property<int>("CurrentStatus")
                         .HasColumnType("int");
 
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -364,6 +399,9 @@ namespace GreenCityReporter.Migrations
                     b.Property<string>("ImagePath")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("IsCritical")
+                        .HasColumnType("bit");
 
                     b.Property<double?>("Latitude")
                         .HasColumnType("float");
@@ -393,30 +431,15 @@ namespace GreenCityReporter.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AiSuggestedCategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("DepartmentId");
+
                     b.HasIndex("UserId");
 
-                    b.HasIndex("CategoryId", "CurrentStatus", "Latitude", "Longitude");
-
                     b.ToTable("Reports");
-                });
-
-            modelBuilder.Entity("GreenCityReporter.Models.ReportSupport", b =>
-                {
-                    b.Property<int>("ReportId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ReportId", "UserId");
-
-                    b.HasIndex("UserId", "CreatedAt");
-
-                    b.ToTable("ReportSupports");
                 });
 
             modelBuilder.Entity("GreenCityReporter.Models.StatusHistory", b =>
@@ -590,6 +613,16 @@ namespace GreenCityReporter.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("GreenCityReporter.Models.Category", b =>
+                {
+                    b.HasOne("GreenCityReporter.Models.Department", "DefaultDepartment")
+                        .WithMany("DefaultCategories")
+                        .HasForeignKey("DefaultDepartmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("DefaultDepartment");
+                });
+
             modelBuilder.Entity("GreenCityReporter.Models.Comment", b =>
                 {
                     b.HasOne("GreenCityReporter.Models.Report", "Report")
@@ -640,38 +673,33 @@ namespace GreenCityReporter.Migrations
 
             modelBuilder.Entity("GreenCityReporter.Models.Report", b =>
                 {
+                    b.HasOne("GreenCityReporter.Models.Category", "AiSuggestedCategory")
+                        .WithMany()
+                        .HasForeignKey("AiSuggestedCategoryId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("GreenCityReporter.Models.Category", "Category")
                         .WithMany("Reports")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GreenCityReporter.Models.Department", "Department")
+                        .WithMany("Reports")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("GreenCityReporter.Models.ApplicationUser", "User")
                         .WithMany("Reports")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("AiSuggestedCategory");
+
                     b.Navigation("Category");
 
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("GreenCityReporter.Models.ReportSupport", b =>
-                {
-                    b.HasOne("GreenCityReporter.Models.Report", "Report")
-                        .WithMany("Supports")
-                        .HasForeignKey("ReportId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GreenCityReporter.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Report");
+                    b.Navigation("Department");
 
                     b.Navigation("User");
                 });
@@ -762,13 +790,18 @@ namespace GreenCityReporter.Migrations
                     b.Navigation("Reports");
                 });
 
+            modelBuilder.Entity("GreenCityReporter.Models.Department", b =>
+                {
+                    b.Navigation("DefaultCategories");
+
+                    b.Navigation("Reports");
+                });
+
             modelBuilder.Entity("GreenCityReporter.Models.Report", b =>
                 {
                     b.Navigation("Comments");
 
                     b.Navigation("StatusHistories");
-
-                    b.Navigation("Supports");
                 });
 #pragma warning restore 612, 618
         }

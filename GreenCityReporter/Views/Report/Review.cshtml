@@ -106,6 +106,10 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="mt-3 small text-muted">
+                            Critical: <strong>@(Model.IsCritical ? "Yes" : "No")</strong>
+                            | Confidence: <strong>@(Model.AIConfidence?.ToString("P0") ?? "Unavailable")</strong>
+                        </div>
                     </div>
 
                     <form asp-action="Confirm" method="post" id="report-review-form" data-check-url="@Url.Action("CheckDuplicates", "Report")">
@@ -117,17 +121,14 @@
                         <input asp-for="Longitude" type="hidden" />
                         <input asp-for="ImagePath" type="hidden" />
 
-                        @if (Model.RequiresManualCategory)
-                        {
-                            <div class="mb-4 p-3 bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-3">
-                                <label asp-for="SelectedCategoryId" class="form-label fw-bold">Select Category <span class="text-danger">*</span></label>
-                                <p class="text-muted small mb-2">Category could not be determined automatically. Please choose the closest matching category.</p>
-                                <select asp-for="SelectedCategoryId" asp-items="Model.Categories" class="form-select" required>
-                                    <option value="">-- Select Category --</option>
-                                </select>
-                                <span asp-validation-for="SelectedCategoryId" class="text-danger small"></span>
-                            </div>
-                        }
+                        <div class="mb-4 p-3 bg-light border rounded-3">
+                            <label asp-for="SelectedCategoryId" class="form-label fw-bold">Final Category <span class="text-danger">*</span></label>
+                            <p class="text-muted small mb-2">You may accept the AI suggestion or choose another category.</p>
+                            <select asp-for="SelectedCategoryId" asp-items="Model.Categories" class="form-select" required>
+                                <option value="">-- Select Category --</option>
+                            </select>
+                            <span asp-validation-for="SelectedCategoryId" class="text-danger small"></span>
+                        </div>
 
                         <section class="duplicate-panel mb-4" aria-labelledby="duplicate-heading">
                             <div class="duplicate-heading-row">

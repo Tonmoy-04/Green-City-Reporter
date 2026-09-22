@@ -13,6 +13,9 @@ namespace GreenCityReporter.Models
 
         public string Description { get; set; } = string.Empty;
 
+        public int? DefaultDepartmentId { get; set; }
+        public Department? DefaultDepartment { get; set; }
+
         // Navigation Property
         public ICollection<Report> Reports { get; set; } = new List<Report>();
     }

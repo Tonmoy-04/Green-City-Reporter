@@ -2295,24 +2295,31 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\USER\\.nuget\\packages\\": {}
+    "C:\\Users\\noman\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\Project\\GreenCity\\Green-City-Reporter\\GreenCityReporter.Checks\\GreenCityReporter.Checks.csproj",
+      "projectUniqueName": "D:\\Green City Reporter\\GreenCityReporter.Checks\\GreenCityReporter.Checks.csproj",
       "projectName": "GreenCityReporter.Checks",
-      "projectPath": "E:\\Project\\GreenCity\\Green-City-Reporter\\GreenCityReporter.Checks\\GreenCityReporter.Checks.csproj",
-      "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
-      "outputPath": "E:\\Project\\GreenCity\\Green-City-Reporter\\GreenCityReporter.Checks\\obj\\",
+      "projectPath": "D:\\Green City Reporter\\GreenCityReporter.Checks\\GreenCityReporter.Checks.csproj",
+      "packagesPath": "C:\\Users\\noman\\.nuget\\packages\\",
+      "outputPath": "D:\\Green City Reporter\\GreenCityReporter.Checks\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\USER\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\noman\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -2320,8 +2327,8 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "E:\\Project\\GreenCity\\Green-City-Reporter\\GreenCityReporter\\GreenCityReporter.csproj": {
-              "projectPath": "E:\\Project\\GreenCity\\Green-City-Reporter\\GreenCityReporter\\GreenCityReporter.csproj"
+            "D:\\Green City Reporter\\GreenCityReporter\\GreenCityReporter.csproj": {
+              "projectPath": "D:\\Green City Reporter\\GreenCityReporter\\GreenCityReporter.csproj"
             }
           }
         }

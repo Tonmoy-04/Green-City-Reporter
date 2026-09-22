@@ -56,7 +56,7 @@ namespace GreenCityReporter.Services.Chat
                 Green City Reporter facts:
                 - Citizens can submit civic issue reports with a title, description, category, address, and optional image.
                 - Citizens can track their reports from the Track page or their report dashboard.
-                - Report statuses are Pending, In Review, Assigned, In Progress, Resolved, and Rejected.
+                - Report statuses are Pending, Assigned, Resolved, and Rejected.
                 - Reports may be categorized as available in the report form.
                 - Administrators review reports and may update their status and priority.
                 - Keep answers concise and practical.
@@ -100,7 +100,7 @@ namespace GreenCityReporter.Services.Chat
                 .Select(report => new { report.TrackingNumber, report.Title, Category = report.Category.Name, report.CurrentStatus, report.Priority, report.CreatedAt })
                 .FirstOrDefaultAsync(cancellationToken);
 
-            var context = "You are the Green City Reporter assistant. Answer only about using the app and the citizen's own reports. Keep answers concise. Reports can be submitted with title, description, category, address and optional image. Statuses: Pending, In Review, Assigned, In Progress, Resolved, Rejected.";
+            var context = "You are the Green City Reporter assistant. Answer only about using the app and the citizen's own reports. Keep answers concise. Reports can be submitted with title, description, category, address and optional image. Statuses: Pending, Assigned, Resolved, Rejected.";
             context += latestReport == null
                 ? " The citizen has not submitted any reports yet."
                 : $" Latest report: {latestReport.TrackingNumber}, {latestReport.Title}, {latestReport.Category}, status {latestReport.CurrentStatus}, priority {latestReport.Priority}, created {latestReport.CreatedAt:yyyy-MM-dd}.";

@@ -1,6 +1,7 @@
 using GreenCityReporter.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace GreenCityReporter.Data
 {
@@ -11,6 +12,7 @@ namespace GreenCityReporter.Data
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
             // =========================
             // Seed Roles
@@ -27,60 +29,95 @@ namespace GreenCityReporter.Data
             }
 
             // =========================
-            // Seed Admin User
+            // Seed Multiple Admin Users
             // =========================
 
-            var adminUser = new ApplicationUser
-            {
-                UserName = "admin@greencity.com",
-                Email = "admin@greencity.com",
-                FullName = "System Admin",
-                EmailConfirmed = true
-            };
+            var adminSection = configuration.GetSection("SeedUsers:Admins");
 
-            if (await userManager.FindByEmailAsync(adminUser.Email) == null)
+            foreach (var adminConfig in adminSection.GetChildren())
             {
-                var result = await userManager.CreateAsync(
-                    adminUser,
-                    "Admin@123"
+                await SeedUserAsync(
+                    userManager,
+                    adminConfig,
+                    "Admin",
+                    "System Admin"
                 );
-
-                if (result.Succeeded)
-                {
-                    await userManager.AddToRoleAsync(
-                        adminUser,
-                        "Admin"
-                    );
-                }
             }
 
             // =========================
-            // Seed Citizen User
+            // Seed Sample Citizen
             // =========================
 
-            var citizenUser = new ApplicationUser
+            var citizenSection = configuration.GetSection("SeedUsers:Citizen");
+
+            await SeedUserAsync(
+                userManager,
+                citizenSection,
+                "Citizen",
+                "Sample Citizen"
+            );
+
+            // =========================
+            // Seed Departments
+            // =========================
+
+            var departments = new[]
             {
-                UserName = "citizen@example.com",
-                Email = "citizen@example.com",
-                FullName = "Sample Citizen",
-                EmailConfirmed = true
+                new Department
+                {
+                    Name = "WASA",
+                    Description = "Water supply and leakage response."
+                },
+
+                new Department
+                {
+                    Name = "City Corporation",
+                    Description = "Municipal roads, drainage, waste, and public infrastructure."
+                },
+
+                new Department
+                {
+                    Name = "Fire Service",
+                    Description = "Fire and immediate emergency response."
+                },
+
+                new Department
+                {
+                    Name = "Electricity Department",
+                    Description = "Electrical infrastructure and street lighting."
+                },
+
+                new Department
+                {
+                    Name = "Gas Authority",
+                    Description = "Gas network and leak response."
+                },
+
+                new Department
+                {
+                    Name = "Traffic / Road Authority",
+                    Description = "Traffic and road safety response."
+                },
+
+                new Department
+                {
+                    Name = "Other",
+                    Description = "General municipal routing."
+                }
             };
 
-            if (await userManager.FindByEmailAsync(citizenUser.Email) == null)
+            foreach (var department in departments)
             {
-                var result = await userManager.CreateAsync(
-                    citizenUser,
-                    "Citizen@123"
-                );
+                var existing = await context.Departments
+                    .FirstOrDefaultAsync(d => d.Name == department.Name);
 
-                if (result.Succeeded)
+                if (existing == null)
                 {
-                    await userManager.AddToRoleAsync(
-                        citizenUser,
-                        "Citizen"
-                    );
+                    context.Departments.Add(department);
                 }
             }
+
+            await context.SaveChangesAsync();
 
             // =========================
             // Seed Categories
@@ -127,14 +164,90 @@ namespace GreenCityReporter.Data
 
             foreach (var category in categories)
             {
-                if (!await context.Categories.AnyAsync(
-                    c => c.Name == category.Name))
+                if (!await context.Categories.AnyAsync(c => c.Name == category.Name))
                 {
                     context.Categories.Add(category);
                 }
             }
 
             await context.SaveChangesAsync();
+
+            // =========================
+            // Map Categories to Departments
+            // =========================
+
+            var departmentByName = await context.Departments
+                .ToDictionaryAsync(d => d.Name);
+
+            var categoryMappings = new Dictionary<string, string>
+            {
+                ["Waste Management"] = "City Corporation",
+                ["Road Damage"] = "City Corporation",
+                ["Drainage"] = "City Corporation",
+                ["Street Lighting"] = "Electricity Department",
+                ["Waterlogging"] = "City Corporation",
+                ["Public Infrastructure"] = "City Corporation"
+            };
+
+            foreach (var mapping in categoryMappings)
+            {
+                var category = await context.Categories
+                    .FirstOrDefaultAsync(c => c.Name == mapping.Key);
+
+                if (category != null &&
+                    departmentByName.TryGetValue(mapping.Value, out var department))
+                {
+                    category.DefaultDepartmentId = department.Id;
+                }
+            }
+
+            await context.SaveChangesAsync();
+        }
+
+        // =========================
+        // Seed User Helper
+        // =========================
+
+        private static async Task SeedUserAsync(
+            UserManager<ApplicationUser> userManager,
+            IConfigurationSection userConfig,
+            string role,
+            string defaultFullName)
+        {
+            var email = userConfig["Email"];
+            var password = userConfig["Password"];
+            var fullName = userConfig["FullName"] ?? defaultFullName;
+
+            if (string.IsNullOrWhiteSpace(email) ||
+                string.IsNullOrWhiteSpace(password))
+            {
+                return;
+            }
+
+            var user = await userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = fullName,
+                    EmailConfirmed = true
+                };
+
+                var result = await userManager.CreateAsync(user, password);
+
+                if (!result.Succeeded)
+                {
+                    return;
+                }
+            }
+
+            if (!await userManager.IsInRoleAsync(user, role))
+            {
+                await userManager.AddToRoleAsync(user, role);
+            }
         }
     }
 }

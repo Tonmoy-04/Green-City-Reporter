@@ -71,9 +71,7 @@ namespace GreenCityReporter.Services.Background
             var waitingStatuses = new[]
             {
                 ReportStatus.Pending,
-                ReportStatus.InReview,
-                ReportStatus.Assigned,
-                ReportStatus.InProgress
+                ReportStatus.Assigned
             };
 
             var overdueReports = await context.Reports

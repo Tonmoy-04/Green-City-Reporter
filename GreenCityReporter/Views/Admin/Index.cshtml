@@ -10,8 +10,8 @@
     var pendingReports = reports.Count(r =>
         r.CurrentStatus.ToString() == "Pending");
 
-    var inProgressReports = reports.Count(r =>
-        r.CurrentStatus.ToString() == "InProgress");
+    var assignedReports = reports.Count(r =>
+        r.CurrentStatus == GreenCityReporter.Models.Enums.ReportStatus.Assigned);
 
     var resolvedReports = reports.Count(r =>
         r.CurrentStatus.ToString() == "Resolved");
@@ -68,15 +68,15 @@
             </div>
         </div>
 
-        <!-- In Progress -->
+        <!-- Assigned -->
         <div class="admin-stat-card stat-progress">
             <div class="stat-icon">
                 <i class="fa-solid fa-spinner"></i>
             </div>
             <div>
-                <span class="stat-label">In Progress</span>
-                <strong class="stat-value">@inProgressReports</strong>
-                <span class="stat-note">Active response</span>
+                <span class="stat-label">Assigned</span>
+                <strong class="stat-value">@assignedReports</strong>
+                <span class="stat-note">Department response</span>
             </div>
         </div>
 
@@ -130,11 +130,7 @@
                         {
                             <option value="@statusOption"
                                     selected="@(ViewBag.SelectedStatus == statusOption)">
-                                @(statusOption == GreenCityReporter.Models.Enums.ReportStatus.InProgress
-                                    ? "In Progress"
-                                    : statusOption == GreenCityReporter.Models.Enums.ReportStatus.InReview
-                                        ? "In Review"
-                                        : statusOption.ToString())
+                                @statusOption.ToString()
                             </option>
                         }
                     </select>
@@ -197,11 +193,11 @@
                         {
                             var supporterCount = (ViewData["SupportCounts"] as IReadOnlyDictionary<int, int>)?.GetValueOrDefault(report.Id) ?? 0;
                             var status = report.CurrentStatus.ToString();
-                            string statusStr = status == "InProgress" ? "In Progress" : status;
+                            string statusStr = status;
                             string badgeClass = status switch
                             {
                                 "Pending" => "badge-pending",
-                                "InProgress" => "badge-in-progress",
+                                "Assigned" => "badge-in-progress",
                                 "Resolved" => "badge-resolved",
                                 "Rejected" => "badge-rejected",
                                 _ => "badge bg-secondary"

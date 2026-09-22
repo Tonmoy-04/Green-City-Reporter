@@ -7,46 +7,43 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GreenCityReporter.Services.AI;
+using GreenCityReporter.Services.Assignment;
+using GreenCityReporter.Services.Storage;
 using GreenCityReporter.ViewModels;
-using GreenCityReporter.Services.Reports;
 
 namespace GreenCityReporter.Controllers
 {
     [Authorize]
-    public partial class ReportController : Controller
+    public class ReportController : Controller
     {
         private const string ReviewAICategoryIdKey = "ReportReviewAICategoryId";
         private const string ReviewPriorityKey = "ReportReviewPriority";
         private const string ReviewSummaryKey = "ReportReviewSummary";
+        private const string ReviewCriticalKey = "ReportReviewCritical";
+        private const string ReviewConfidenceKey = "ReportReviewConfidence";
 
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IWebHostEnvironment _environment;
         private readonly IAIService _aiService;
+        private readonly IFileStorageService _fileStorage;
         private readonly ILogger<ReportController> _logger;
-        private readonly DuplicateReportService _duplicates;
-        private readonly DuplicateReviewTokens _duplicateTokens;
-        private readonly ReportSupportService _supports;
-
         public ReportController(
-            ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager,
-            IWebHostEnvironment environment,
-            IAIService aiService,
-            ILogger<ReportController> logger,
-            DuplicateReportService duplicates,
-            DuplicateReviewTokens duplicateTokens,
-            ReportSupportService supports)
+          ApplicationDbContext context,
+          UserManager<ApplicationUser> userManager,
+                    IAIService aiService,
+                    IReportAssignmentService assignmentService,
+                    IFileStorageService fileStorage,
+                    ILogger<ReportController> logger)
         {
             _context = context;
             _userManager = userManager;
-            _environment = environment;
             _aiService = aiService;
+            _assignmentService = assignmentService;
+                        _fileStorage = fileStorage;
             _logger = logger;
-            _duplicates = duplicates;
-            _duplicateTokens = duplicateTokens;
-            _supports = supports;
         }
+
+        private readonly IReportAssignmentService _assignmentService;
 
         // GET: /Report/Create
         [HttpGet]
@@ -87,7 +84,7 @@ namespace GreenCityReporter.Controllers
                 .OrderBy(c => c.Name)
                 .ToListAsync(cancellationToken);
 
-            var aiCategoryName = await _aiService.CategorizeReportAsync(
+            var classification = await _aiService.ClassifyReportAsync(
                 model.Title,
                 model.Description,
                 categoriesForSubmission.Select(c => c.Name),
@@ -96,7 +93,7 @@ namespace GreenCityReporter.Controllers
             var aiCategory = categoriesForSubmission.FirstOrDefault(c =>
                 string.Equals(
                     c.Name,
-                    aiCategoryName,
+                    classification?.Category,
                     StringComparison.OrdinalIgnoreCase));
 
             var aiPriority = await _aiService.DetectPriorityAsync(
@@ -119,12 +116,15 @@ namespace GreenCityReporter.Controllers
             var imagePath = await SaveImageAsync(image, cancellationToken);
             if (image != null && image.Length > 0 && imagePath == null)
             {
+                ModelState.AddModelError(string.Empty, "The image could not be uploaded. Please use a valid image up to 5 MB and try again.");
                 return View("Create", model);
             }
 
             TempData[ReviewAICategoryIdKey] = aiCategory?.Id.ToString();
             TempData[ReviewPriorityKey] = priority.ToString();
             TempData[ReviewSummaryKey] = summary;
+            TempData[ReviewCriticalKey] = classification?.IsCritical == true && classification.Confidence >= 0.7;
+            TempData[ReviewConfidenceKey] = classification?.Confidence?.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             var reviewModel = new ReportReviewViewModel
             {
@@ -137,14 +137,13 @@ namespace GreenCityReporter.Controllers
                 AISummary = summary,
                 AICategoryId = aiCategory?.Id,
                 AICategoryName = aiCategory?.Name,
+                AIConfidence = classification?.Confidence,
+                IsCritical = classification?.IsCritical == true && classification.Confidence >= 0.7,
                 Priority = priority,
                 RequiresManualCategory = aiCategory == null,
-                Categories = aiCategory == null
-                    ? ToCategorySelectList(categoriesForSubmission)
-                    : Enumerable.Empty<SelectListItem>()
+                Categories = ToCategorySelectList(categoriesForSubmission, aiCategory?.Id)
             };
 
-            await PopulateDuplicatesAsync(reviewModel, aiCategory?.Id, user.Id, cancellationToken);
             return View(reviewModel);
         }
 
@@ -168,51 +167,27 @@ namespace GreenCityReporter.Controllers
             var aiCategoryId = GetTempDataInt(ReviewAICategoryIdKey);
             var reviewedPriority = GetTempDataPriority();
             var reviewedSummary = TempData.Peek(ReviewSummaryKey) as string;
+            var isCritical = bool.TryParse(TempData.Peek(ReviewCriticalKey)?.ToString(), out var critical) && critical;
+            var aiConfidence = double.TryParse(TempData.Peek(ReviewConfidenceKey)?.ToString(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var confidence)
+                ? confidence
+                : (double?)null;
             var aiCategory = aiCategoryId.HasValue
                 ? categories.FirstOrDefault(c => c.Id == aiCategoryId.Value)
                 : null;
 
-            var category = aiCategory;
-            var categorySource = "AI";
+            var category = categories.FirstOrDefault(c => c.Id == model.SelectedCategoryId) ?? aiCategory;
+            var categorySource = category?.Id == aiCategory?.Id ? "AI" : "Manual";
             if (category == null)
-            {
-                category = categories.FirstOrDefault(c => c.Id == model.SelectedCategoryId);
-                categorySource = "Manual";
-
-                if (category == null)
-                {
-                    ModelState.AddModelError(
-                        nameof(ReportReviewViewModel.SelectedCategoryId),
-                        "Please select a valid category.");
-                }
-            }
+                ModelState.AddModelError(nameof(ReportReviewViewModel.SelectedCategoryId), "Please select a valid category.");
 
             if (!reviewedPriority.HasValue)
             {
                 ModelState.AddModelError(string.Empty, "The review has expired. Please start again.");
             }
 
-            if (!IsValidImagePath(model.ImagePath))
+            if (!string.IsNullOrWhiteSpace(model.ImagePath) && !_fileStorage.IsValidReportImagePath(model.ImagePath))
             {
                 ModelState.AddModelError(string.Empty, "The uploaded image is invalid.");
-            }
-
-            if (!model.Latitude.HasValue || !model.Longitude.HasValue ||
-                !DuplicateReportService.IsValidLocation(model.Latitude.Value, model.Longitude.Value))
-            {
-                ModelState.AddModelError(string.Empty, "Please select a valid issue location inside Dhaka on the map.");
-            }
-
-            // Recheck at the final write, including manual categories and reports created during review.
-            var submittedToken = model.DuplicateReviewToken;
-            await PopulateDuplicatesAsync(model, category?.Id, user.Id, cancellationToken);
-            if (model.DuplicateMatches.Count > 0 && (!model.SubmitAsSeparateReport ||
-                !_duplicateTokens.Covers(submittedToken, user.Id, model, category!.Id, model.DuplicateMatches.Select(r => r.Id))))
-            {
-                model.SubmitAsSeparateReport = false;
-                ModelState.Remove(nameof(model.SubmitAsSeparateReport));
-                ModelState.AddModelError(string.Empty,
-                    "Please check the nearby reports below. Support an existing issue, or confirm that yours is a different issue.");
             }
 
             if (!ModelState.IsValid)
@@ -220,11 +195,11 @@ namespace GreenCityReporter.Controllers
                 model.AICategoryId = aiCategory?.Id;
                 model.AICategoryName = aiCategory?.Name;
                 model.AISummary = reviewedSummary;
+                model.AIConfidence = aiConfidence;
+                model.IsCritical = isCritical;
                 model.Priority = reviewedPriority ?? Priority.Low;
                 model.RequiresManualCategory = aiCategory == null;
-                model.Categories = aiCategory == null
-                    ? ToCategorySelectList(categories, model.SelectedCategoryId)
-                    : Enumerable.Empty<SelectListItem>();
+                model.Categories = ToCategorySelectList(categories, model.SelectedCategoryId ?? aiCategory?.Id);
 
                 return View("Review", model);
             }
@@ -239,6 +214,9 @@ namespace GreenCityReporter.Controllers
                 ImagePath = model.ImagePath,
                 AISummary = reviewedSummary,
                 CategoryId = category!.Id,
+                AiSuggestedCategoryId = aiCategory?.Id,
+                AiConfidence = aiConfidence,
+                IsCritical = isCritical,
                 CategorySource = categorySource,
                 Priority = reviewedPriority!.Value,
                 UserId = user.Id,
@@ -249,6 +227,7 @@ namespace GreenCityReporter.Controllers
             };
 
             _context.Reports.Add(report);
+            await _assignmentService.ApplyInitialAssignmentAsync(report, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
             return RedirectToAction(nameof(Details), new { id = report.Id });
@@ -263,69 +242,7 @@ namespace GreenCityReporter.Controllers
                 return null;
             }
 
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-            var extension = Path.GetExtension(image.FileName).ToLowerInvariant();
-
-            if (!allowedExtensions.Contains(extension))
-            {
-                ModelState.AddModelError(
-                    string.Empty,
-                    "Only JPG, JPEG, PNG, GIF, and WEBP images are allowed.");
-                return null;
-            }
-
-            const long maxFileSize = 5 * 1024 * 1024;
-            if (image.Length > maxFileSize)
-            {
-                ModelState.AddModelError(
-                    string.Empty,
-                    "The image size cannot exceed 5 MB.");
-                return null;
-            }
-
-            var uploadFolder = GetUploadFolder();
-            Directory.CreateDirectory(uploadFolder);
-
-            var fileName = $"{Guid.NewGuid()}{extension}";
-            var filePath = Path.Combine(uploadFolder, fileName);
-
-            await using var stream = new FileStream(filePath, FileMode.CreateNew);
-            await image.CopyToAsync(stream, cancellationToken);
-
-            return $"/uploads/reports/{fileName}";
-        }
-
-        private bool IsValidImagePath(string? imagePath)
-        {
-            if (string.IsNullOrWhiteSpace(imagePath))
-            {
-                return true;
-            }
-
-            const string prefix = "/uploads/reports/";
-            if (!imagePath.StartsWith(prefix, StringComparison.Ordinal) ||
-                imagePath.Contains("..", StringComparison.Ordinal))
-            {
-                return false;
-            }
-
-            var fileName = imagePath[prefix.Length..];
-            var extension = Path.GetExtension(fileName).ToLowerInvariant();
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-
-            return Guid.TryParse(Path.GetFileNameWithoutExtension(fileName), out _) &&
-                   string.Equals(Path.GetFileName(fileName), fileName, StringComparison.Ordinal) &&
-                   allowedExtensions.Contains(extension) &&
-                   System.IO.File.Exists(Path.Combine(GetUploadFolder(), fileName));
-        }
-
-        private string GetUploadFolder()
-        {
-            var webRootPath = string.IsNullOrEmpty(_environment.WebRootPath)
-                ? Path.Combine(_environment.ContentRootPath, "wwwroot")
-                : _environment.WebRootPath;
-
-            return Path.Combine(webRootPath, "uploads", "reports");
+            return await _fileStorage.SaveReportImageAsync(image, cancellationToken);
         }
 
         private static IEnumerable<SelectListItem> ToCategorySelectList(
@@ -382,7 +299,7 @@ namespace GreenCityReporter.Controllers
             {
                 TotalReports = userReports.Count,
                 PendingCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.Pending),
-                InProgressCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.InProgress),
+                AssignedCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.Assigned),
                 ResolvedCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.Resolved),
                 RejectedCount = userReports.Count(r => r.CurrentStatus == Models.Enums.ReportStatus.Rejected),
                 RecentReports = userReports.OrderByDescending(r => r.CreatedAt).Take(5).ToList(),
@@ -413,8 +330,7 @@ namespace GreenCityReporter.Controllers
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
 
-            var supported = await GetSupportedReports(user.Id).OrderByDescending(r => r.UpdatedAt).ToListAsync();
-            return View(new MyReportsViewModel { SubmittedReports = reports, SupportedReports = supported });
+            return View(reports);
         }
 
         // GET: /Report/Details/5
@@ -441,15 +357,13 @@ namespace GreenCityReporter.Controllers
                 return NotFound();
             }
 
-            // Supporters get a limited progress page; full report details remain private.
+            // Citizens can only view their own reports.
+            // Admin access will be handled separately.
             if (report.UserId != user.Id && !User.IsInRole("Admin"))
             {
-                if (await _context.ReportSupports.AnyAsync(s => s.ReportId == id && s.UserId == user.Id))
-                    return RedirectToAction(nameof(SupportedReport), new { id });
                 return Forbid();
             }
 
-            ViewData["SupportCount"] = await _context.ReportSupports.CountAsync(s => s.ReportId == id);
             return View(report);
         }
 
@@ -544,12 +458,11 @@ namespace GreenCityReporter.Controllers
                 return View("Track", trackingNumber);
             }
 
-            // Tracking a supported issue leads to its limited progress page.
+            // A citizen can only track their own reports (per security requirements)
+            // Admins could track any report.
             if (report.UserId != user.Id && !User.IsInRole("Admin"))
             {
-                if (await _context.ReportSupports.AnyAsync(s => s.ReportId == report.Id && s.UserId == user.Id))
-                    return RedirectToAction(nameof(SupportedReport), new { id = report.Id });
-                TempData["TrackError"] = "Access denied. You can only track reports you submitted or support.";
+                TempData["TrackError"] = "Access denied. You can only track your own reports.";
                 return View("Track", trackingNumber);
             }
 
