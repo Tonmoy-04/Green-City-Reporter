@@ -963,6 +963,32 @@ textarea.form-control { min-height: 110px; resize: vertical; }
   transform: translateY(-1px);
 }
 
+.tracking-copy-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.gcr-copy-tracking {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--muted);
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gcr-copy-tracking:hover,
+.gcr-copy-tracking:focus-visible,
+.gcr-copy-tracking.is-copied {
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
 /* ==========================================================
    11. TABLES
    ========================================================== */
@@ -996,6 +1022,21 @@ textarea.form-control { min-height: 110px; resize: vertical; }
 
 .table tbody tr {
   transition: background-color .18s ease, box-shadow .18s ease;
+}
+
+.table tbody tr[data-row-href] {
+  cursor: pointer;
+}
+
+.table tbody tr[data-row-href]:hover {
+  background-color: var(--primary-light);
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
+.table tbody tr[data-row-href]:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 55%, transparent);
+  outline-offset: -3px;
+  background-color: var(--primary-light);
 }
 
 .table tbody tr:last-child td { border-bottom: 0; }
@@ -1228,11 +1269,54 @@ textarea.form-control { min-height: 110px; resize: vertical; }
   padding: 0.75rem 1rem;
   border-radius: 14px;
   font-size: 0.9rem;
-  line-height: 1.45;
+  line-height: 1.55;
   max-width: 86%;
   word-break: break-word;
+  overflow-wrap: anywhere;
   box-shadow: var(--shadow-sm);
   animation: gcr-fade-up 0.35s var(--ease-out) both;
+}
+
+.gcr-chatbot-message p {
+  margin: 0 0 0.65rem;
+}
+
+.gcr-chatbot-message p:last-child,
+.gcr-chatbot-message ol:last-child,
+.gcr-chatbot-message ul:last-child {
+  margin-bottom: 0;
+}
+
+.gcr-chatbot-message ol,
+.gcr-chatbot-message ul {
+  margin: 0.2rem 0 0.75rem;
+  padding-left: 1.35rem;
+}
+
+.gcr-chatbot-message li {
+  padding-left: 0.15rem;
+  margin-bottom: 0.45rem;
+}
+
+.gcr-chatbot-message li:last-child {
+  margin-bottom: 0;
+}
+
+.gcr-chatbot-message strong {
+  font-weight: 700;
+}
+
+.gcr-chatbot-message code {
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  color: inherit;
+  background: color-mix(in srgb, currentColor 9%, transparent);
+  font-size: 0.86em;
+}
+
+.gcr-chatbot-message-heading {
+  margin: 0 0 0.45rem;
+  font-weight: 700;
 }
 
 .gcr-chatbot-message-assistant {

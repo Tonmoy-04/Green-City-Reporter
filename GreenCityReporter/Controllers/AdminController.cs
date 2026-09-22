@@ -51,8 +51,8 @@ namespace GreenCityReporter.Controllers
             }
 
             var reports = await reportsQuery
-                .OrderByDescending(r => r.Priority)
-                .ThenBy(r => r.CreatedAt)
+                .OrderByDescending(r => r.CreatedAt)
+                .ThenByDescending(r => r.Id)
                 .ToListAsync();
 
             var categories = await _context.Categories
