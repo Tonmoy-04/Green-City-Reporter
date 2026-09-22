@@ -1,0 +1,26 @@
+@model IReadOnlyList<GreenCityReporter.ViewModels.AdminReportSupporterViewModel>
+
+<section id="report-supporters" class="card shadow-sm border mb-4" aria-labelledby="report-supporters-heading" style="scroll-margin-top: 6rem;">
+    <div class="card-header bg-white p-3 d-flex align-items-center justify-content-between gap-2">
+        <h5 id="report-supporters-heading" class="fw-bold mb-0 fs-6 text-dark">
+            <i class="fa-solid fa-users text-success me-2" aria-hidden="true"></i>Issue Supporters
+        </h5>
+        <span class="badge bg-success-subtle text-success">@Model.Count @(Model.Count == 1 ? "supporter" : "supporters")</span>
+    </div>
+    @if (Model.Count == 0)
+    {
+        <div class="card-body p-4"><p class="text-muted small mb-0">No citizens have supported this report yet.</p></div>
+    }
+    else
+    {
+        <ul class="list-group list-group-flush" style="max-height: 22rem; overflow-y: auto;" tabindex="0" aria-label="Citizens supporting this issue">
+            @foreach (var supporter in Model)
+            {
+                <li class="list-group-item px-4 py-3">
+                    <strong class="text-dark small d-block" style="overflow-wrap: anywhere;">@(string.IsNullOrWhiteSpace(supporter.FullName) ? "Citizen" : supporter.FullName)</strong>
+                    <span class="text-muted small">Supported <time datetime="@supporter.SupportedAt.ToString("O")">@supporter.SupportedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")</time></span>
+                </li>
+            }
+        </ul>
+    }
+</section>

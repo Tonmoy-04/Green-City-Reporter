@@ -3384,3 +3384,5 @@ E:\Project\GreenCity\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\com
 E:\Project\GreenCity\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\nddbys3mcg-{0}-qsq56ikjcg-qsq56ikjcg.gz
 E:\Project\GreenCity\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\ilwp2xp54g-{0}-lg5domve9x-lg5domve9x.gz
 E:\Project\GreenCity\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\vbxib144pp-{0}-47rv3hyavj-47rv3hyavj.gz
+E:\Project\GreenCity\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\9cibsn2qbf-{0}-gbk50rvu2o-gbk50rvu2o.gz
+E:\Project\GreenCity\Green-City-Reporter\GreenCityReporter\obj\Debug\net10.0\compressed\urmpeq23iw-{0}-bv4exkkiem-bv4exkkiem.gz

@@ -1,6 +1,7 @@
 using GreenCityReporter.Data;
 using GreenCityReporter.Models;
 using GreenCityReporter.Models.Enums;
+using GreenCityReporter.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -63,6 +64,10 @@ namespace GreenCityReporter.Controllers
             ViewBag.SelectedStatus = status;
             ViewBag.SelectedCategoryId = categoryId;
 
+            ViewData["SupportCounts"] = await reportsQuery
+                .Select(r => new { r.Id, Count = r.Supports.Count })
+                .ToDictionaryAsync(r => r.Id, r => r.Count, HttpContext.RequestAborted);
+
             return View(reports);
         }
 
@@ -84,6 +89,17 @@ namespace GreenCityReporter.Controllers
                 return NotFound();
             }
 
+            var supporters = await _context.ReportSupports.AsNoTracking()
+                .Where(s => s.ReportId == id)
+                .OrderByDescending(s => s.CreatedAt).ThenBy(s => s.UserId)
+                .Select(s => new AdminReportSupporterViewModel
+                {
+                    FullName = s.User.FullName,
+                    SupportedAt = s.CreatedAt
+                }).ToListAsync(HttpContext.RequestAborted);
+            ViewData["SupportCount"] = supporters.Count;
+            ViewData["Supporters"] = supporters;
+            Response.Headers.CacheControl = "no-store";
             return View(report);
         }
 
@@ -142,6 +158,18 @@ namespace GreenCityReporter.Controllers
                 CreatedAt = DateTime.UtcNow
             };
             _context.Notifications.Add(notification);
+
+            if (previousStatus != newStatus)
+            {
+                var supporterIds = await _context.ReportSupports.Where(s => s.ReportId == report.Id && s.UserId != report.UserId)
+                    .Select(s => s.UserId).ToListAsync();
+                _context.Notifications.AddRange(supporterIds.Select(userId => new Notification
+                {
+                    UserId = userId, ReportId = report.Id,
+                    Message = $"An issue you support '{report.Title}' ({report.TrackingNumber}) is now {GreenCityReporter.ViewModels.ReportStatusLabels.Display(newStatus)}.",
+                    CreatedAt = DateTime.UtcNow
+                }));
+            }
 
             await _context.SaveChangesAsync();
 

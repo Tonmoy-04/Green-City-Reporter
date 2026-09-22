@@ -152,6 +152,7 @@ foreach (var outcome in new[] { "failure", "cancel" })
 demoSettings.Value.DemoMode = false;
 Check(await demoController.Demo(new string('a', 64), default) is NotFoundResult, "demo endpoints are disabled when demo mode is off");
 Console.WriteLine("All donation payment checks passed. No real gateway or SMTP requests were made.");
+await DuplicateReportChecks.RunAsync();
 
 static Donation NewDonation() => new() { DonorName = "Test Donor", Email = "donor@example.test", Amount = 500, PaymentMethod = "Card",
     Provider = "SSLCommerz", IsSandbox = true, GatewayStoreId = "test-store", TransactionId = "GCR" + Guid.NewGuid().ToString("N")[..24],

@@ -4,6 +4,10 @@
     ViewData["Title"] = "Review Report";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/duplicate-reports.css" asp-append-version="true" />
+}
+
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-9 col-xl-8">
@@ -19,7 +23,7 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                     <!-- Photo Preview if uploaded -->
                     @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
@@ -104,7 +108,7 @@
                         </div>
                     </div>
 
-                    <form asp-action="Confirm" method="post">
+                    <form asp-action="Confirm" method="post" id="report-review-form" data-check-url="@Url.Action("CheckDuplicates", "Report")">
                         @Html.AntiForgeryToken()
                         <input asp-for="Title" type="hidden" />
                         <input asp-for="Description" type="hidden" />
@@ -125,11 +129,21 @@
                             </div>
                         }
 
-                        <div class="d-flex justify-content-between pt-3 border-top">
+                        <section class="duplicate-panel mb-4" aria-labelledby="duplicate-heading">
+                            <div class="duplicate-heading-row">
+                                <h4 id="duplicate-heading"><i class="fa-solid fa-copy me-2 text-success" aria-hidden="true"></i>Has this issue already been reported?</h4>
+                                <button type="submit" asp-action="CheckDuplicates" id="check-duplicates" class="btn btn-sm btn-outline-secondary">Check nearby reports</button>
+                            </div>
+                            <div id="duplicate-results" aria-live="polite">
+                                <partial name="_DuplicateReports" model="Model" />
+                            </div>
+                        </section>
+
+                        <div class="d-flex flex-wrap gap-3 justify-content-between pt-3 border-top">
                             <a asp-action="Create" class="btn btn-outline-secondary px-4">
                                 <i class="fa-solid fa-arrow-left me-1"></i> Back to Edit
                             </a>
-                            <button type="submit" class="btn btn-success fw-bold px-5 py-2.5 shadow-sm">
+                            <button type="submit" id="confirm-report" class="btn btn-success fw-bold px-5 py-2.5 shadow-sm">
                                 <i class="fa-solid fa-paper-plane me-2"></i> Confirm &amp; Submit Report
                             </button>
                         </div>
@@ -142,4 +156,5 @@
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script src="~/js/duplicate-reports.js" asp-append-version="true"></script>
 }

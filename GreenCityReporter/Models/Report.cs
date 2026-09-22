@@ -58,6 +58,7 @@ namespace GreenCityReporter.Models
         public Category Category { get; set; } = null!;
 
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        public ICollection<ReportSupport> Supports { get; set; } = new List<ReportSupport>();
         public ICollection<StatusHistory> StatusHistories { get; set; } = new List<StatusHistory>();
     }
 }

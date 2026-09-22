@@ -4,6 +4,7 @@ using GreenCityReporter.Services.AI;
 using GreenCityReporter.Services.Background;
 using GreenCityReporter.Services.Chat;
 using GreenCityReporter.Services.Payments;
+using GreenCityReporter.Services.Reports;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +16,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDataProtection();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddOptions<DuplicateReportOptions>().BindConfiguration("DuplicateReports")
+    .Validate(o => double.IsFinite(o.RadiusMeters) && o.RadiusMeters is >= 25 and <= 1000 && o.MaxResults is >= 1 and <= 20,
+        "DuplicateReports requires RadiusMeters between 25 and 1000 and MaxResults between 1 and 20.").ValidateOnStart();
+builder.Services.AddScoped<DuplicateReportService>();
+builder.Services.AddScoped<DuplicateReviewTokens>();
+builder.Services.AddScoped<ReportSupportService>();
 builder.Services.AddOptions<PaymentOptions>().BindConfiguration("Donations:Gateway").Validate(o => o.DemoMode || !o.Enabled || o.IsReady, "Configure valid payment credentials, organization contact details, and a public HTTPS base URL.").ValidateOnStart();
 builder.Services.AddOptions<DonationEmailOptions>().BindConfiguration("Donations:Email").Validate(o => !o.Enabled || (o.IsReady && (builder.Environment.IsDevelopment() || o.UseStartTls)), "Configure a valid SMTP server and sender. Production email requires STARTTLS.").ValidateOnStart();
 builder.Services.AddHttpClient<IDonationGateway, SslCommerzGateway>(client => client.Timeout = TimeSpan.FromSeconds(25))

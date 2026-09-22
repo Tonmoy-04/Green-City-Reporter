@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using GreenCityReporter.Models.Enums;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace GreenCityReporter.ViewModels
 {
@@ -35,5 +37,11 @@ namespace GreenCityReporter.ViewModels
         public bool RequiresManualCategory { get; set; }
         public int? SelectedCategoryId { get; set; }
         public IEnumerable<SelectListItem> Categories { get; set; } = Enumerable.Empty<SelectListItem>();
+        public bool SubmitAsSeparateReport { get; set; }
+        [StringLength(16000)] public string? DuplicateReviewToken { get; set; }
+        [BindNever, ValidateNever] public IReadOnlyList<DuplicateReportMatch> DuplicateMatches { get; set; } = [];
+        [BindNever] public bool DuplicatesChecked { get; set; }
+        [BindNever] public double DuplicateRadiusMeters { get; set; }
+        [BindNever] public string? DuplicateCheckError { get; set; }
     }
 }

@@ -8,11 +8,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GreenCityReporter.Services.AI;
 using GreenCityReporter.ViewModels;
+using GreenCityReporter.Services.Reports;
 
 namespace GreenCityReporter.Controllers
 {
     [Authorize]
-    public class ReportController : Controller
+    public partial class ReportController : Controller
     {
         private const string ReviewAICategoryIdKey = "ReportReviewAICategoryId";
         private const string ReviewPriorityKey = "ReportReviewPriority";
@@ -21,20 +22,30 @@ namespace GreenCityReporter.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _environment;
-                private readonly IAIService _aiService;
-                private readonly ILogger<ReportController> _logger;
+        private readonly IAIService _aiService;
+        private readonly ILogger<ReportController> _logger;
+        private readonly DuplicateReportService _duplicates;
+        private readonly DuplicateReviewTokens _duplicateTokens;
+        private readonly ReportSupportService _supports;
+
         public ReportController(
-          ApplicationDbContext context,
-          UserManager<ApplicationUser> userManager,
-                    IWebHostEnvironment environment,
-                    IAIService aiService,
-                    ILogger<ReportController> logger)
+            ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager,
+            IWebHostEnvironment environment,
+            IAIService aiService,
+            ILogger<ReportController> logger,
+            DuplicateReportService duplicates,
+            DuplicateReviewTokens duplicateTokens,
+            ReportSupportService supports)
         {
             _context = context;
             _userManager = userManager;
             _environment = environment;
             _aiService = aiService;
             _logger = logger;
+            _duplicates = duplicates;
+            _duplicateTokens = duplicateTokens;
+            _supports = supports;
         }
 
         // GET: /Report/Create
@@ -133,6 +144,7 @@ namespace GreenCityReporter.Controllers
                     : Enumerable.Empty<SelectListItem>()
             };
 
+            await PopulateDuplicatesAsync(reviewModel, aiCategory?.Id, user.Id, cancellationToken);
             return View(reviewModel);
         }
 
@@ -183,6 +195,24 @@ namespace GreenCityReporter.Controllers
             if (!IsValidImagePath(model.ImagePath))
             {
                 ModelState.AddModelError(string.Empty, "The uploaded image is invalid.");
+            }
+
+            if (!model.Latitude.HasValue || !model.Longitude.HasValue ||
+                !DuplicateReportService.IsValidLocation(model.Latitude.Value, model.Longitude.Value))
+            {
+                ModelState.AddModelError(string.Empty, "Please select a valid issue location inside Dhaka on the map.");
+            }
+
+            // Recheck at the final write, including manual categories and reports created during review.
+            var submittedToken = model.DuplicateReviewToken;
+            await PopulateDuplicatesAsync(model, category?.Id, user.Id, cancellationToken);
+            if (model.DuplicateMatches.Count > 0 && (!model.SubmitAsSeparateReport ||
+                !_duplicateTokens.Covers(submittedToken, user.Id, model, category!.Id, model.DuplicateMatches.Select(r => r.Id))))
+            {
+                model.SubmitAsSeparateReport = false;
+                ModelState.Remove(nameof(model.SubmitAsSeparateReport));
+                ModelState.AddModelError(string.Empty,
+                    "Please check the nearby reports below. Support an existing issue, or confirm that yours is a different issue.");
             }
 
             if (!ModelState.IsValid)
@@ -383,7 +413,8 @@ namespace GreenCityReporter.Controllers
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
 
-            return View(reports);
+            var supported = await GetSupportedReports(user.Id).OrderByDescending(r => r.UpdatedAt).ToListAsync();
+            return View(new MyReportsViewModel { SubmittedReports = reports, SupportedReports = supported });
         }
 
         // GET: /Report/Details/5
@@ -410,13 +441,15 @@ namespace GreenCityReporter.Controllers
                 return NotFound();
             }
 
-            // Citizens can only view their own reports.
-            // Admin access will be handled separately.
+            // Supporters get a limited progress page; full report details remain private.
             if (report.UserId != user.Id && !User.IsInRole("Admin"))
             {
+                if (await _context.ReportSupports.AnyAsync(s => s.ReportId == id && s.UserId == user.Id))
+                    return RedirectToAction(nameof(SupportedReport), new { id });
                 return Forbid();
             }
 
+            ViewData["SupportCount"] = await _context.ReportSupports.CountAsync(s => s.ReportId == id);
             return View(report);
         }
 
@@ -511,11 +544,12 @@ namespace GreenCityReporter.Controllers
                 return View("Track", trackingNumber);
             }
 
-            // A citizen can only track their own reports (per security requirements)
-            // Admins could track any report.
+            // Tracking a supported issue leads to its limited progress page.
             if (report.UserId != user.Id && !User.IsInRole("Admin"))
             {
-                TempData["TrackError"] = "Access denied. You can only track your own reports.";
+                if (await _context.ReportSupports.AnyAsync(s => s.ReportId == report.Id && s.UserId == user.Id))
+                    return RedirectToAction(nameof(SupportedReport), new { id = report.Id });
+                TempData["TrackError"] = "Access denied. You can only track reports you submitted or support.";
                 return View("Track", trackingNumber);
             }
 

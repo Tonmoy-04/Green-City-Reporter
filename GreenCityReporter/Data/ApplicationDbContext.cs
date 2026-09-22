@@ -17,12 +17,20 @@ namespace GreenCityReporter.Data
         public DbSet<StatusHistory> StatusHistories { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<ReportSupport> ReportSupports { get; set; }
 
         public DbSet<Donation> Donations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<ReportSupport>().HasKey(s => new { s.ReportId, s.UserId });
+            modelBuilder.Entity<ReportSupport>().HasOne(s => s.Report).WithMany(r => r.Supports)
+                .HasForeignKey(s => s.ReportId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ReportSupport>().HasOne(s => s.User).WithMany()
+                .HasForeignKey(s => s.UserId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<ReportSupport>().HasIndex(s => new { s.UserId, s.CreatedAt });
+            modelBuilder.Entity<Report>().HasIndex(r => new { r.CategoryId, r.CurrentStatus, r.Latitude, r.Longitude });
             modelBuilder.Entity<Donation>().HasIndex(d => new { d.PaymentMethod, d.TransactionId }).IsUnique();
             modelBuilder.Entity<Donation>().HasIndex(d => new { d.Provider, d.TransactionId }).IsUnique().HasFilter("[Provider] = 'SSLCommerz'");
             modelBuilder.Entity<Donation>().HasIndex(d => d.CheckoutKey).IsUnique().HasFilter("[CheckoutKey] IS NOT NULL");

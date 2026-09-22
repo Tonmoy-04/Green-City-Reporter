@@ -195,6 +195,7 @@
                     <tbody>
                         @foreach (var report in reports)
                         {
+                            var supporterCount = (ViewData["SupportCounts"] as IReadOnlyDictionary<int, int>)?.GetValueOrDefault(report.Id) ?? 0;
                             var status = report.CurrentStatus.ToString();
                             string statusStr = status == "InProgress" ? "In Progress" : status;
                             string badgeClass = status switch
@@ -214,6 +215,9 @@
                                 <td>
                                     <div class="fw-bold text-dark">@report.Title</div>
                                     <small class="text-muted">Report #@report.Id</small>
+                                    <a asp-action="Report" asp-route-id="@report.Id" asp-fragment="report-supporters" class="d-block small text-success mt-1">
+                                        <i class="fa-solid fa-users me-1" aria-hidden="true"></i>@supporterCount @(supporterCount == 1 ? "supporter" : "supporters")
+                                    </a>
                                 </td>
 
                                 <td>
