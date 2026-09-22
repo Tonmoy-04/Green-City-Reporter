@@ -2177,3 +2177,38 @@ main > .container-fluid {
     color: #555;
   }
 }
+/* Password visibility control */
+.password-field {
+    position: relative;
+}
+
+.password-field .password-field-input {
+    padding-right: 3.25rem;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.65rem;
+    z-index: 5;
+    display: inline-flex;
+    width: 2.5rem;
+    height: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: var(--bs-secondary-color);
+}
+
+.password-toggle:hover,
+.password-toggle:focus-visible {
+    background: var(--bs-tertiary-bg);
+    color: var(--bs-success);
+}
+
+.password-toggle:focus-visible {
+    outline: 2px solid var(--bs-success);
+    outline-offset: 1px;
+}
