@@ -12,14 +12,27 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
 var settings = Options.Create(new PaymentOptions { Enabled = true, StoreId = "test-store", StorePassword = "test-only-secret",
     PublicBaseUrl = "https://donations.example.test", ContactEmail = "support@example.test", ContactPhone = "01700000000" });
+var renderConfiguration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+{
+    ["SSLCOMMERZ:StoreId"] = "render-store", ["SSLCOMMERZ:StorePassword"] = "render-secret",
+    ["SSLCOMMERZ:IsSandbox"] = "true", ["SSLCOMMERZ:ContactEmail"] = "payments@example.test",
+    ["SSLCOMMERZ:ContactPhone"] = "01700000000", ["APP_BASE_URL"] = "https://green-city-reporter.onrender.com/"
+}).Build();
+var renderOptions = new PaymentOptions();
+PaymentOptionsSetup.Configure(renderOptions, renderConfiguration);
+Check(renderOptions.IsReady && renderOptions.Enabled && renderOptions.Sandbox &&
+    renderOptions.PublicBaseUrl == "https://green-city-reporter.onrender.com",
+    "Render SSLCommerz environment variables create a ready sandbox configuration");
 var donation = NewDonation();
 var validation = new Dictionary<string, object> { ["status"] = "VALID", ["tran_id"] = donation.TransactionId, ["amount"] = "500.00",
     ["currency"] = "BDT", ["val_id"] = "validation-1", ["bank_tran_id"] = "bank-1", ["card_type"] = "VISA-Test", ["risk_level"] = "0", ["store_id"] = "test-store" };
@@ -38,6 +51,12 @@ validation["risk_level"] = "0";
 var initHandler = new FakeHttpHandler(request => {
     var payload = request.Content!.ReadAsStringAsync().GetAwaiter().GetResult();
     Check(!payload.Contains("cvv", StringComparison.OrdinalIgnoreCase) && !payload.Contains("card_number", StringComparison.OrdinalIgnoreCase), "gateway initialization contains no card details");
+    var fields = QueryHelpers.ParseQuery("?" + payload);
+    Check(fields["success_url"].ToString().Contains("/Donation/Success?token=") &&
+        fields["fail_url"].ToString().Contains("/Donation/Fail?token=") &&
+        fields["cancel_url"].ToString().Contains("/Donation/Cancel?token=") &&
+        fields["ipn_url"] == "https://donations.example.test/Donation/Ipn",
+        "gateway initialization uses public success, failure, cancellation and IPN callbacks");
     return JsonSerializer.Serialize(new { status = "SUCCESS", GatewayPageURL = "https://sandbox.sslcommerz.com/pay/test", gw = new { mobilebanking = "bkash" } });
 });
 var initAdapter = new SslCommerzGateway(new HttpClient(initHandler), settings);
@@ -101,6 +120,24 @@ Check(first is RedirectResult && second is RedirectResult && fake.CreateCount ==
 form.Amount = 1000;
 Check(await controller.Submit(form, default) is BadRequestObjectResult, "idempotency key cannot be reused for a different amount");
 Check(await controller.Receipt(new string('0', 64), default) is NotFoundResult, "unguessable receipt tokens protect donor details");
+foreach (var callback in new[] { (Name: "Success", GatewayStatus: "VALID", Expected: DonationStatus.Confirmed),
+    (Name: "Fail", GatewayStatus: "FAILED", Expected: DonationStatus.Failed),
+    (Name: "Cancel", GatewayStatus: "CANCELLED", Expected: DonationStatus.Cancelled) })
+{
+    var callbackDonation = NewDonation(); db.Donations.Add(callbackDonation); await db.SaveChangesAsync();
+    fake.Payment = new(callbackDonation.TransactionId, callback.GatewayStatus, callbackDonation.Amount, "BDT",
+        callback.GatewayStatus == "VALID" ? "callback-valid-" + callbackDonation.Id : "",
+        callback.GatewayStatus == "VALID" ? "callback-bank-" + callbackDonation.Id : "", "VISA", false);
+    var result = callback.Name switch
+    {
+        "Success" => await controller.Success(callbackDonation.ReceiptToken, callbackDonation.TransactionId, fake.Payment.ValidationId, default),
+        "Fail" => await controller.Fail(callbackDonation.ReceiptToken, callbackDonation.TransactionId, null, default),
+        _ => await controller.Cancel(callbackDonation.ReceiptToken, callbackDonation.TransactionId, null, default)
+    };
+    Check(result is RedirectToActionResult &&
+        (await db.Donations.AsNoTracking().SingleAsync(d => d.Id == callbackDonation.Id)).Status == callback.Expected,
+        callback.Name.ToLowerInvariant() + " callback stores only the validated gateway outcome");
+}
 controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "admin-test") }, "test"));
 await controller.Review(duplicateBank.Id, DonationStatus.Confirmed, true);
 Check((await db.Donations.AsNoTracking().SingleAsync(d => d.Id == duplicateBank.Id)).Status == DonationStatus.Pending, "admin cannot confirm unverified gateway payment");

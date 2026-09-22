@@ -44,10 +44,5 @@ public sealed class MyReportsViewModel
 
 public static class ReportStatusLabels
 {
-    public static string Display(ReportStatus status) => status switch
-    {
-        ReportStatus.InReview => "In Review",
-        ReportStatus.InProgress => "In Progress",
-        _ => status.ToString()
-    };
+    public static string Display(ReportStatus status) => status.ToString();
 }

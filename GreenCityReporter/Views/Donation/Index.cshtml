@@ -16,7 +16,7 @@
                 <ol class="checkout-progress mb-4" aria-label="Donation checkout steps">
                     <li data-progress="1" aria-current="step"><span>1</span> Amount</li><li data-progress="2"><span>2</span> Method</li><li data-progress="3"><span>3</span> Payment</li><li><span>4</span> Receipt</li>
                 </ol>
-                @if (!Model.GatewayReady) { <div class="alert alert-warning">Payment checkout is currently unavailable. Please check back soon.</div> }
+                @if (!Model.GatewayReady) { <div class="alert alert-warning">Secure payment setup is temporarily unavailable. Please try again later.</div> }
                 <form asp-action="Submit" method="post" id="donation-form" data-ready="@Model.GatewayReady.ToString().ToLowerInvariant()">
                     <input asp-for="Form.CheckoutToken" type="hidden" />
                     <div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>

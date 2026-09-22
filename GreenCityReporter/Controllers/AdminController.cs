@@ -1,6 +1,7 @@
 using GreenCityReporter.Data;
 using GreenCityReporter.Models;
 using GreenCityReporter.Models.Enums;
+using GreenCityReporter.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -62,6 +63,9 @@ namespace GreenCityReporter.Controllers
             ViewBag.SelectedPriority = priority;
             ViewBag.SelectedStatus = status;
             ViewBag.SelectedCategoryId = categoryId;
+            ViewData["SupportCounts"] = await reportsQuery
+                .Select(r => new { r.Id, Count = r.Supports.Count })
+                .ToDictionaryAsync(r => r.Id, r => r.Count);
 
             return View(reports);
         }
@@ -88,6 +92,13 @@ namespace GreenCityReporter.Controllers
 
             ViewBag.Categories = new SelectList(await _context.Categories.OrderBy(c => c.Name).ToListAsync(), "Id", "Name", report.CategoryId);
             ViewBag.Departments = new SelectList(await _context.Departments.OrderBy(d => d.Name).ToListAsync(), "Id", "Name", report.DepartmentId);
+            var supporters = await _context.ReportSupports.AsNoTracking().Where(s => s.ReportId == id)
+                .OrderByDescending(s => s.CreatedAt).ThenBy(s => s.UserId)
+                .Select(s => new AdminReportSupporterViewModel { FullName = s.User.FullName, SupportedAt = s.CreatedAt })
+                .ToListAsync();
+            ViewData["Supporters"] = supporters;
+            ViewData["SupportCount"] = supporters.Count;
+            Response.Headers.CacheControl = "no-store";
 
             return View(report);
         }
@@ -189,6 +200,18 @@ namespace GreenCityReporter.Controllers
                 CreatedAt = DateTime.UtcNow
             };
             _context.Notifications.Add(notification);
+
+            if (previousStatus != newStatus)
+            {
+                var supporterIds = await _context.ReportSupports.Where(s => s.ReportId == report.Id && s.UserId != report.UserId)
+                    .Select(s => s.UserId).ToListAsync();
+                _context.Notifications.AddRange(supporterIds.Select(userId => new Notification
+                {
+                    UserId = userId, ReportId = report.Id,
+                    Message = $"The report you support '{report.Title}' ({report.TrackingNumber}) status was updated to {readableStatus}.",
+                    CreatedAt = DateTime.UtcNow
+                }));
+            }
 
             await _context.SaveChangesAsync();
 

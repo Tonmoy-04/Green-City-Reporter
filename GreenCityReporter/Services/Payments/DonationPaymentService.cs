@@ -5,7 +5,8 @@ using Microsoft.Data.SqlClient;
 
 namespace GreenCityReporter.Services.Payments;
 
-public class DonationPaymentService(ApplicationDbContext context, IDonationGateway gateway)
+public class DonationPaymentService(ApplicationDbContext context, IDonationGateway gateway,
+    ILogger<DonationPaymentService>? logger = null)
 {
     public async Task<bool> ReconcileAsync(Donation donation, string? validationId, CancellationToken cancellationToken)
     {
@@ -42,6 +43,8 @@ public class DonationPaymentService(ApplicationDbContext context, IDonationGatew
         else
             await candidates.ExecuteUpdateAsync(update => update.SetProperty(d => d.Status, status).SetProperty(d => d.LastCheckedAt, now)
                 .SetProperty(d => d.CheckoutUrl, (string?)null), cancellationToken);
+        logger?.LogInformation("Donation transaction {TransactionId} updated to {Status} after SSLCommerz validation.",
+            donation.TransactionId, status);
         return true;
     }
 }

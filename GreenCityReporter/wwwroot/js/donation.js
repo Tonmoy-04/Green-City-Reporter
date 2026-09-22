@@ -55,7 +55,7 @@
         if (!selectedMethod()) { event.preventDefault(); showStep(2); error.textContent = 'Please select an available payment method.'; return; }
         const invalid = [...form.querySelectorAll('input, textarea')].find(input => !input.checkValidity());
         if (invalid) { event.preventDefault(); showStep(3); invalid.reportValidity(); return; }
-        if (form.dataset.ready !== 'true') { event.preventDefault(); error.textContent = 'Payment checkout is currently unavailable.'; return; }
+        if (form.dataset.ready !== 'true') { event.preventDefault(); error.textContent = 'Secure payment setup is temporarily unavailable. Please try again later.'; return; }
         const submit = document.getElementById('donation-submit');
         submit.disabled = true;
         submit.textContent = 'Opening payment screen...';

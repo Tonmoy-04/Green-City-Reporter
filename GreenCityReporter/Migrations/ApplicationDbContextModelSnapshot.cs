@@ -433,13 +433,23 @@ namespace GreenCityReporter.Migrations
 
                     b.HasIndex("AiSuggestedCategoryId");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("CategoryId", "CurrentStatus", "Latitude", "Longitude");
 
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Reports");
+                });
+
+            modelBuilder.Entity("GreenCityReporter.Models.ReportSupport", b =>
+                {
+                    b.Property<int>("ReportId").HasColumnType("int");
+                    b.Property<string>("UserId").HasMaxLength(450).HasColumnType("nvarchar(450)");
+                    b.Property<DateTime>("CreatedAt").HasColumnType("datetime2");
+                    b.HasKey("ReportId", "UserId");
+                    b.HasIndex("UserId", "CreatedAt");
+                    b.ToTable("ReportSupports");
                 });
 
             modelBuilder.Entity("GreenCityReporter.Models.StatusHistory", b =>
@@ -704,6 +714,18 @@ namespace GreenCityReporter.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("GreenCityReporter.Models.ReportSupport", b =>
+                {
+                    b.HasOne("GreenCityReporter.Models.Report", "Report")
+                        .WithMany("Supports").HasForeignKey("ReportId")
+                        .OnDelete(DeleteBehavior.Cascade).IsRequired();
+                    b.HasOne("GreenCityReporter.Models.ApplicationUser", "User")
+                        .WithMany().HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict).IsRequired();
+                    b.Navigation("Report");
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("GreenCityReporter.Models.StatusHistory", b =>
                 {
                     b.HasOne("GreenCityReporter.Models.Report", "Report")
@@ -802,6 +824,8 @@ namespace GreenCityReporter.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("StatusHistories");
+
+                    b.Navigation("Supports");
                 });
 #pragma warning restore 612, 618
         }

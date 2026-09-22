@@ -28,7 +28,7 @@ No merchant credentials, public tunnel or SMTP setup is required. The default ba
 
 Set a channel to an empty string to disable it. Availability depends on your merchant store. Wallet initialization rejects a method missing from the provider's returned enabled gateway list instead of silently using a different wallet. Confirm Nagad's exact key and sandbox availability with SSLCommerz if your store does not expose it.
 
-Environment variables use double underscores, for example `Donations__Gateway__StorePassword`. For local secrets:
+Render can use `SSLCOMMERZ__STOREID`, `SSLCOMMERZ__STOREPASSWORD`, `SSLCOMMERZ__ISSANDBOX`, `SSLCOMMERZ__CONTACTEMAIL`, `SSLCOMMERZ__CONTACTPHONE`, and `APP_BASE_URL`. Existing `Donations__Gateway__...` variables remain supported. For local secrets:
 
 ```powershell
 dotnet user-secrets set "Donations:Gateway:StoreId" "YOUR_SANDBOX_STORE_ID" --project GreenCityReporter
@@ -44,7 +44,7 @@ dotnet ef database update --project GreenCityReporter -- --environment Developme
 dotnet run --project GreenCityReporter
 ```
 
-4. In the merchant panel, enable HTTP IPN and register `PUBLIC_BASE_URL/Donation/Ipn`. The session uses `PUBLIC_BASE_URL/Donation/Return?token=...` for success, failure and cancellation. Return and IPN accept provider POST callbacks without requiring a user session.
+4. In the merchant panel, enable HTTP IPN and register `PUBLIC_BASE_URL/Donation/Ipn`. New sessions use `/Donation/Success`, `/Donation/Fail`, and `/Donation/Cancel`; all include a protected receipt token. Callback and IPN routes accept provider POST requests without requiring a user session. `/Donation/Return` remains available for older sessions.
 5. Complete provider sandbox tests for success, failure, cancellation, wallet OTP, duplicate IPNs, delayed IPNs, and lost browser returns. Test-card details are available in the provider's documentation. Sandbox receipts and emails are explicitly marked as tests.
 
 ## Confirmation and receipts

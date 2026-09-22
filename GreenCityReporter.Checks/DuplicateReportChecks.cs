@@ -7,6 +7,8 @@ using GreenCityReporter.Data;
 using GreenCityReporter.Models;
 using GreenCityReporter.Models.Enums;
 using GreenCityReporter.Services.AI;
+using GreenCityReporter.Services.Assignment;
+using GreenCityReporter.Services.Storage;
 using GreenCityReporter.Services.Reports;
 using GreenCityReporter.ViewModels;
 using Microsoft.AspNetCore.DataProtection;
@@ -42,9 +44,11 @@ internal static class DuplicateReportChecks
         var road = new Category { Name = "Road Damage", Description = "Road repairs" };
         var waste = new Category { Name = "Waste Management", Description = "Waste clearance" };
         db.Categories.AddRange(road, waste);
+        var department = new Department { Name = "Road maintenance" };
+        db.Departments.Add(department);
         await db.SaveChangesAsync();
         var nearby = ReportAt("Broken road near the park", road.Id, 30);
-        var old = ReportAt("পুরোনো রাস্তার গর্ত", road.Id, 70, ReportStatus.InProgress);
+        var old = ReportAt("পুরোনো রাস্তার গর্ত", road.Id, 70, ReportStatus.Assigned);
         old.CreatedAt = DateTime.UtcNow.AddYears(-1);
         var inside = ReportAt("Inside radius", road.Id, 149, ReportStatus.Assigned);
         var outside = ReportAt("Outside radius", road.Id, 151);
@@ -172,11 +176,11 @@ internal static class DuplicateReportChecks
 
         var admin = new AdminController(db, userManager);
         SetContext(admin, "admin", isAdmin: true);
-        await admin.UpdateStatus(nearby.Id, ReportStatus.InProgress, Priority.Medium, "Private internal detail");
+        await admin.UpdateStatus(nearby.Id, ReportStatus.Assigned, Priority.Medium, road.Id, department.Id, "Private internal detail");
         Check(await db.Notifications.CountAsync(n => n.ReportId == nearby.Id && n.UserId == "citizen") == 1 &&
             await db.Notifications.AnyAsync(n => n.ReportId == nearby.Id && n.UserId == "owner"),
             "status updates notify both the owner and each supporter");
-        await admin.UpdateStatus(nearby.Id, ReportStatus.InProgress, Priority.High, "Priority only");
+        await admin.UpdateStatus(nearby.Id, ReportStatus.Assigned, Priority.High, road.Id, department.Id, "Priority only");
         Check(await db.Notifications.CountAsync(n => n.ReportId == nearby.Id && n.UserId == "citizen") == 1,
             "priority-only updates do not repeat supporter status notifications");
         var progress = (SupportedReportViewModel)((ViewResult)await ControllerFor("citizen").SupportedReport(nearby.Id)).Model!;
@@ -199,7 +203,7 @@ internal static class DuplicateReportChecks
         Check(!await db.ReportSupports.AnyAsync(s => s.ReportId == nearby.Id && s.UserId == "citizen") &&
             await db.ReportSupports.AnyAsync(s => s.ReportId == nearby.Id && s.UserId == "other"),
             "stopping support removes only the current citizen's support");
-        await admin.UpdateStatus(nearby.Id, ReportStatus.Resolved, Priority.Medium, "Done");
+        await admin.UpdateStatus(nearby.Id, ReportStatus.Resolved, Priority.Medium, road.Id, department.Id, "Done");
         Check(await db.Notifications.CountAsync(n => n.ReportId == nearby.Id && n.UserId == "citizen") == 1 &&
             await db.Notifications.AnyAsync(n => n.ReportId == nearby.Id && n.UserId == "other"),
             "unsubscribed citizens stop receiving status updates while other supporters still receive them");
@@ -210,7 +214,8 @@ internal static class DuplicateReportChecks
 
         ReportController ControllerFor(string userId, bool manual = false)
         {
-            var controller = new ReportController(db, userManager, new FakeEnvironment(), ai,
+            var controller = new ReportController(db, userManager, ai, new ReportAssignmentService(db),
+                new LocalFileStorageService(new FakeEnvironment(), NullLogger<LocalFileStorageService>.Instance),
                 NullLogger<ReportController>.Instance, detection, tokens, support);
             SetContext(controller, userId);
             controller.TempData["ReportReviewPriority"] = "Low";
@@ -239,6 +244,8 @@ internal static class DuplicateReportChecks
         builder.Services.AddScoped<DuplicateReviewTokens>();
         builder.Services.AddScoped<ReportSupportService>();
         builder.Services.AddSingleton<IAIService>(ai);
+        builder.Services.AddScoped<IReportAssignmentService, ReportAssignmentService>();
+        builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
         await using var app = builder.Build();
         app.UseRouting();
         app.UseAuthentication();
@@ -356,6 +363,8 @@ internal static class DuplicateReportChecks
     private sealed class TestAI : IAIService
     {
         public string? Category { get; set; }
+        public Task<ReportClassificationResult?> ClassifyReportAsync(string title, string description, IEnumerable<string> availableCategories, CancellationToken cancellationToken = default)
+            => Task.FromResult<ReportClassificationResult?>(new ReportClassificationResult(Category, false, null));
         public Task<string?> CategorizeReportAsync(string title, string description, IEnumerable<string> availableCategories, CancellationToken cancellationToken = default) => Task.FromResult(Category);
         public Task<Priority?> DetectPriorityAsync(string title, string description, CancellationToken cancellationToken = default) => Task.FromResult<Priority?>(Priority.Low);
         public Task<string?> SummarizeReportAsync(string title, string description, CancellationToken cancellationToken = default) => Task.FromResult<string?>(null);

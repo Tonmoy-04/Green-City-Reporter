@@ -23,12 +23,16 @@ public class SslCommerzGateway(HttpClient client, IOptions<PaymentOptions> optio
         EnsureReady(donation);
         if (!Settings.Channels.TryGetValue(donation.PaymentMethod, out var channel) || string.IsNullOrWhiteSpace(channel))
             throw new PaymentGatewayException("This payment method is unavailable.");
-        var callback = Settings.PublicBaseUrl.TrimEnd('/') + "/Donation/Return?token=" + donation.ReceiptToken;
+        var callbackBase = Settings.PublicBaseUrl.TrimEnd('/') + "/Donation/";
+        var callbackToken = "?token=" + donation.ReceiptToken;
         using var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             ["store_id"] = Settings.StoreId, ["store_passwd"] = Settings.StorePassword,
             ["total_amount"] = donation.Amount.ToString("0.00", CultureInfo.InvariantCulture), ["currency"] = "BDT",
-            ["tran_id"] = donation.TransactionId, ["success_url"] = callback, ["fail_url"] = callback, ["cancel_url"] = callback,
+            ["tran_id"] = donation.TransactionId,
+            ["success_url"] = callbackBase + "Success" + callbackToken,
+            ["fail_url"] = callbackBase + "Fail" + callbackToken,
+            ["cancel_url"] = callbackBase + "Cancel" + callbackToken,
             ["ipn_url"] = Settings.PublicBaseUrl.TrimEnd('/') + "/Donation/Ipn",
             ["cus_name"] = donation.DonorName, ["cus_email"] = donation.Email ?? Settings.ContactEmail,
             ["cus_phone"] = donation.Phone ?? Settings.ContactPhone, ["cus_add1"] = "Dhaka", ["cus_city"] = "Dhaka",
