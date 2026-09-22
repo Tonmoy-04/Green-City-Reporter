@@ -57,15 +57,21 @@
 								<span asp-validation-for="Email" class="text-danger small"></span>
 							</div>
 
-							<div class="form-floating mb-3">
-								<input asp-for="Password" class="form-control" placeholder="Password" required />
+							<div class="form-floating mb-3 password-field">
+								<input asp-for="Password" class="form-control password-field-input" placeholder="Password" required />
 								<label asp-for="Password">Password</label>
+								<button type="button" class="password-toggle" data-password-toggle="#Password" aria-controls="Password" aria-pressed="false" aria-label="Show password" title="Show password">
+									<i class="fa-solid fa-eye" aria-hidden="true"></i>
+								</button>
 								<span asp-validation-for="Password" class="text-danger small"></span>
 							</div>
 
-							<div class="form-floating mb-4">
-								<input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password" required />
+							<div class="form-floating mb-4 password-field">
+								<input asp-for="ConfirmPassword" class="form-control password-field-input" placeholder="Confirm Password" required />
 								<label asp-for="ConfirmPassword">Confirm Password</label>
+								<button type="button" class="password-toggle" data-password-toggle="#ConfirmPassword" aria-controls="ConfirmPassword" aria-pressed="false" aria-label="Show password" title="Show password">
+									<i class="fa-solid fa-eye" aria-hidden="true"></i>
+								</button>
 								<span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
 							</div>
 

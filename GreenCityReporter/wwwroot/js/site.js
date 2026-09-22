@@ -35,6 +35,23 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
+	// Accessible password visibility controls used by account forms.
+	document.querySelectorAll('[data-password-toggle]').forEach((toggle) => {
+		const input = document.querySelector(toggle.dataset.passwordToggle);
+		if (!(input instanceof HTMLInputElement)) return;
+
+		toggle.addEventListener('click', () => {
+			const showPassword = input.type === 'password';
+			input.type = showPassword ? 'text' : 'password';
+			toggle.setAttribute('aria-pressed', String(showPassword));
+			toggle.setAttribute('aria-label', showPassword ? 'Hide password' : 'Show password');
+			toggle.setAttribute('title', showPassword ? 'Hide password' : 'Show password');
+			const icon = toggle.querySelector('i');
+			icon?.classList.toggle('fa-eye', !showPassword);
+			icon?.classList.toggle('fa-eye-slash', showPassword);
+		});
+	});
+
 	// Scroll Progress Bar
 	const scrollProgress = document.getElementById('scroll-progress');
 	if (scrollProgress) {
