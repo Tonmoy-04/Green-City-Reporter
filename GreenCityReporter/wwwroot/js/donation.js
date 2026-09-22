@@ -1,6 +1,7 @@
 (() => {
     const form = document.getElementById('donation-form');
     if (!form) return;
+    const directPayment = form.dataset.directPayment === 'true';
     const amount = document.getElementById('Form_Amount');
     const buttons = document.querySelectorAll('.donation-amount');
     const methods = [...form.querySelectorAll('input[name="Form.PaymentMethod"]')];
@@ -50,6 +51,16 @@
     // With JavaScript disabled, all sections remain visible and native validation still works.
     form.noValidate = true;
     form.addEventListener('submit', event => {
+        if (directPayment) {
+            if (!validateAmount()) { event.preventDefault(); return; }
+            if (form.dataset.ready !== 'true') { event.preventDefault(); error.textContent = 'Secure payment setup is temporarily unavailable. Please try again later.'; return; }
+            const submit = document.getElementById('donation-submit');
+            if (submit) {
+                submit.disabled = true;
+                submit.textContent = 'Opening payment screen...';
+            }
+            return;
+        }
         if (current < 3) { event.preventDefault(); if (validateAmount()) showStep(current + 1); return; }
         if (!validateAmount()) { event.preventDefault(); return; }
         if (!selectedMethod()) { event.preventDefault(); showStep(2); error.textContent = 'Please select an available payment method.'; return; }
@@ -57,8 +68,10 @@
         if (invalid) { event.preventDefault(); showStep(3); invalid.reportValidity(); return; }
         if (form.dataset.ready !== 'true') { event.preventDefault(); error.textContent = 'Secure payment setup is temporarily unavailable. Please try again later.'; return; }
         const submit = document.getElementById('donation-submit');
-        submit.disabled = true;
-        submit.textContent = 'Opening payment screen...';
+        if (submit) {
+            submit.disabled = true;
+            submit.textContent = 'Opening payment screen...';
+        }
     });
     window.addEventListener('pageshow', () => {
         const submit = document.getElementById('donation-submit');

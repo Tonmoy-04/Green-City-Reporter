@@ -17,7 +17,7 @@
                     <li data-progress="1" aria-current="step"><span>1</span> Amount</li><li data-progress="2"><span>2</span> Method</li><li data-progress="3"><span>3</span> Payment</li><li><span>4</span> Receipt</li>
                 </ol>
                 @if (!Model.GatewayReady) { <div class="alert alert-warning">Secure payment setup is temporarily unavailable. Please try again later.</div> }
-                <form asp-action="Submit" method="post" id="donation-form" data-ready="@Model.GatewayReady.ToString().ToLowerInvariant()">
+                <form asp-action="Submit" method="post" id="donation-form" data-ready="@Model.GatewayReady.ToString().ToLowerInvariant()" data-direct-payment="true">
                     <input asp-for="Form.CheckoutToken" type="hidden" />
                     <div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>
                     <section data-step="1">
@@ -28,7 +28,7 @@
                         <label asp-for="Form.Amount" class="form-label fw-semibold">Your amount (BDT)</label>
                         <div class="input-group input-group-lg"><span class="input-group-text">Tk</span><input asp-for="Form.Amount" type="number" min="50" max="100000" step="0.01" required class="form-control" /></div>
                         <p class="form-text">Minimum Tk 50 · Maximum Tk 100,000</p>
-                        <button type="button" class="btn btn-success px-4 py-2" data-next="2">Choose payment method <i class="fa-solid fa-arrow-right ms-2"></i></button>
+                        <button type="submit" class="btn btn-success px-4 py-2">Proceed to payment <i class="fa-solid fa-arrow-right ms-2"></i></button>
                     </section>
                     <section data-step="2">
                         <h2 class="h4 fw-bold">How would you like to donate?</h2><p class="text-muted small">@(Model.IsDemo ? "Choose a card or wallet to try a simulated payment." : "Choose a card or mobile wallet for secure checkout.")</p>
