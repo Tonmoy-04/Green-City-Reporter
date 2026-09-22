@@ -1,0 +1,49 @@
+@model GreenCityReporter.ViewModels.ReportReviewViewModel
+
+<input asp-for="DuplicateReviewToken" type="hidden" />
+@if (Model.DuplicateCheckError != null)
+{
+    <p class="alert alert-warning mb-0" role="status">@Model.DuplicateCheckError</p>
+}
+else if (!Model.DuplicatesChecked)
+{
+    <p class="text-muted mb-0 small">Choose a category to check whether someone has already reported this issue nearby.</p>
+}
+else if (Model.DuplicateMatches.Count == 0)
+{
+    <p class="duplicate-clear mb-0" role="status"><i class="fa-solid fa-circle-check me-2" aria-hidden="true"></i>No open reports in this category were found within @Model.DuplicateRadiusMeters.ToString("0") metres of your pin.</p>
+}
+else
+{
+    <p class="text-muted small mb-3">These open reports are in the same category, within @Model.DuplicateRadiusMeters.ToString("0") metres of your pin. If one describes your issue, support it to follow its progress.</p>
+    <div class="duplicate-list">
+        @foreach (var match in Model.DuplicateMatches)
+        {
+            <article class="duplicate-match">
+                <div class="duplicate-match-meta">
+                    <span class="badge bg-success-subtle text-success">@match.CategoryName</span>
+                    <span class="text-muted small"><i class="fa-solid fa-location-dot me-1" aria-hidden="true"></i>About @Math.Max(1, Math.Round(match.DistanceMeters)).ToString("0") m away</span>
+                </div>
+                <h5 class="duplicate-match-title">@match.Title</h5>
+                <p class="small text-muted mb-3">@match.StatusLabel &middot; Reported @match.CreatedAt.ToLocalTime().ToString("dd MMM yyyy") &middot; @match.SupportCount @(match.SupportCount == 1 ? "supporter" : "supporters")</p>
+                @if (match.IsOwnReport)
+                {
+                    <button type="submit" asp-action="Support" name="reportId" value="@match.Id" formnovalidate class="btn btn-outline-success btn-sm">
+                        <i class="fa-solid fa-folder-open me-1" aria-hidden="true"></i> Follow my existing report
+                    </button>
+                }
+                else
+                {
+                    <button type="submit" asp-action="Support" name="reportId" value="@match.Id" formnovalidate class="btn @(match.AlreadySupported ? "btn-outline-success" : "btn-success") btn-sm">
+                        <i class="fa-solid @(match.AlreadySupported ? "fa-check" : "fa-hand") me-1" aria-hidden="true"></i>
+                        @(match.AlreadySupported ? "Already supported · View progress" : "Same issue · Support this report")
+                    </button>
+                }
+            </article>
+        }
+    </div>
+    <div class="duplicate-override form-check mt-3">
+        <input asp-for="SubmitAsSeparateReport" class="form-check-input" />
+        <label asp-for="SubmitAsSeparateReport" class="form-check-label">My report describes a different issue. Submit it as a new report.</label>
+    </div>
+}

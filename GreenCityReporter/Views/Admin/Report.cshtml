@@ -29,6 +29,8 @@
         </a>
     </div>
 
+    <partial name="_ReportSupportCount" model="@((int?)ViewData["SupportCount"] ?? 0)" />
+
     <!-- 2-COLUMN ADMIN LAYOUT -->
     <div class="row g-4">
 
@@ -256,6 +258,8 @@
 
         <!-- RIGHT COLUMN (4 Cols): Update Controls Card -->
         <div class="col-lg-4">
+
+            <partial name="_ReportSupporters" model="@((IReadOnlyList<GreenCityReporter.ViewModels.AdminReportSupporterViewModel>)ViewData["Supporters"]!)" />
 
             <div class="card shadow-sm border">
                 <div class="card-header bg-white p-3">

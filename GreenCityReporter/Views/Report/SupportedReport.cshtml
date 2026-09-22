@@ -1,0 +1,64 @@
+@model GreenCityReporter.ViewModels.SupportedReportViewModel
+@{ ViewData["Title"] = "Issue You Support"; }
+
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <span class="tracking-chip">@Model.TrackingNumber</span>
+            <h1 class="mt-2 mb-1">@Model.Title</h1>
+            <p class="text-muted mb-0">You're supporting this issue and following its progress.</p>
+        </div>
+        <a asp-action="MyReports" asp-fragment="supported-reports" class="btn btn-outline-secondary">Back to My Reports</a>
+    </div>
+    @if (TempData["SupportSuccess"] is string success)
+    {
+        <div class="alert alert-success" role="status">@success</div>
+    }
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-sm-4"><span class="text-muted small d-block">Current status</span><strong>@Model.StatusLabel</strong></div>
+                        <div class="col-sm-4"><span class="text-muted small d-block">Category</span><strong>@Model.CategoryName</strong></div>
+                        <div class="col-sm-4"><span class="text-muted small d-block">Community support</span><strong>@Model.SupportCount @(Model.SupportCount == 1 ? "citizen" : "citizens")</strong></div>
+                    </div>
+                    <p class="text-muted small mt-4 mb-0">Last updated @Model.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt"). You'll receive a notification when the status changes.</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h5 class="mb-0">Status updates</h5></div>
+                <div class="card-body p-4">
+                    @if (Model.History.Count == 0)
+                    {
+                        <p class="text-muted mb-0">This report is awaiting its first status update.</p>
+                    }
+                    else
+                    {
+                        <ol class="list-unstyled mb-0">
+                            @foreach (var update in Model.History)
+                            {
+                                <li class="d-flex flex-wrap justify-content-between gap-2 py-3 border-bottom">
+                                    <strong>@update.StatusLabel</strong>
+                                    <span class="small text-muted">@update.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")</span>
+                                </li>
+                            }
+                        </ol>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h5>Your support counts</h5>
+                    <p class="text-muted small">The team can see how many citizens share this concern. Your support helps keep updates together in one report.</p>
+                    <form asp-action="StopSupporting" method="post">
+                        <input type="hidden" name="reportId" value="@Model.Id" />
+                        <button class="btn btn-outline-secondary w-100" type="submit">Stop supporting this issue</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

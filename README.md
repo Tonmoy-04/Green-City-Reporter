@@ -32,6 +32,8 @@ Civic issues are often reported through disconnected channels, making it difficu
 * Receive notifications
 * View report priority and status
 * Review AI-generated report information before final submission
+* Check nearby reports before submitting the same issue again
+* Support an existing report and follow its status from My Reports
 * Use an AI chatbot for Green City Reporter-related questions
 
 ### AI Features
@@ -64,6 +66,7 @@ Administrators can:
 * Notify citizens about status updates
 * Receive overdue report notifications
 * Receive automatic priority escalation alerts
+* See supporter counts in the report list and supporter names and timestamps on each report's management page
 
 ## Smart Report Submission Flow
 
@@ -102,6 +105,41 @@ CategorySource = Manual
 ```
 
 A category dropdown is then shown on the review page so the citizen can manually select one.
+
+## Duplicate Report Detection
+
+The review page checks for open reports in the same category within **150 metres** of the selected pin and shows up to **5** suggestions, nearest first. The distance is measured between map coordinates, not street addresses. Pending, In Review, Assigned and In Progress reports are included even when they are old; Resolved and Rejected reports are excluded so recurring problems can be submitted again.
+
+Citizens can select **Same issue · Support this report** to follow an existing issue. Each citizen is counted once per report. Owners can open their own existing report instead of supporting it. Supported issues appear under **My Reports → Reports I Support**, with a separate progress page and status notifications. Citizens can stop supporting an issue at any time. The owner and admin can see its support count.
+
+Suggestions expose only the issue title, category, approximate distance, status, submission date and support count. Supporting a report does not grant access to its owner's private description, exact address, photo, comments, identity or staff remarks. Supporters see a limited summary and status history instead.
+
+If nearby reports describe a different problem, the citizen can check **My report describes a different issue** and submit a separate report. The server checks again at final submission, so a new match appearing during review must also be reviewed. Suggestions are advisory; reports are never automatically merged or rejected solely because they are nearby. The check also works when Ollama is unavailable: choosing a manual category refreshes suggestions, with a full-page fallback when JavaScript is disabled.
+
+Configuration in `GreenCityReporter/appsettings.json`:
+
+```json
+"DuplicateReports": {
+  "RadiusMeters": 150,
+  "MaxResults": 5
+}
+```
+
+`RadiusMeters` accepts 25–1000 and `MaxResults` accepts 1–20. Signed review tickets expire after 30 minutes; use **Check nearby reports** to refresh them. Tickets are bound to the citizen, category and reviewed details. A database composite key prevents repeated support, including simultaneous submissions.
+
+Apply the migration before starting an updated deployment:
+
+```powershell
+dotnet ef database update --project GreenCityReporter/GreenCityReporter.csproj
+```
+
+The `AddReportSupports` migration adds the support table and a location/category/status index without deleting existing reports.
+
+Run the existing payment checks and the duplicate-report integration checks (isolated SQLite database, no AI/network calls):
+
+```powershell
+dotnet run --project GreenCityReporter.Checks/GreenCityReporter.Checks.csproj
+```
 
 ## Automatic Priority Escalation
 
