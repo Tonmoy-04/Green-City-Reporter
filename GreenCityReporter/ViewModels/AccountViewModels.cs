@@ -37,4 +37,12 @@ namespace GreenCityReporter.ViewModels
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; } = string.Empty;
     }
+
+    public class ResendVerificationEmailViewModel
+    {
+        [Required]
+        [EmailAddress]
+        [Display(Name = "Email address")]
+        public string Email { get; set; } = string.Empty;
+    }
 }

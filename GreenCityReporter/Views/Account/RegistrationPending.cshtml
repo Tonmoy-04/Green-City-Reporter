@@ -1,0 +1,37 @@
+@{
+    ViewData["Title"] = "Verify Your Email";
+    var notice = TempData["VerificationNotice"] as string;
+    var error = TempData["VerificationError"] as string;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-body p-4 p-md-5 text-center">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-4 text-success" style="width:72px;height:72px;background:var(--primary-light)">
+                        <i class="fa-solid fa-envelope-circle-check fa-2x"></i>
+                    </div>
+                    <h1 class="h3 fw-bold mb-3">Verify your email address</h1>
+
+                    @if (!string.IsNullOrWhiteSpace(error))
+                    {
+                        <div class="alert alert-warning text-start" role="alert">@error</div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success text-start" role="status">
+                            @(notice ?? "If the address belongs to a newly registered account, a verification email has been sent.")
+                        </div>
+                    }
+
+                    <p class="text-muted">You cannot sign in until your email is confirmed. Check your inbox and spam folder, then open the verification link.</p>
+                    <div class="d-grid gap-2 mt-4">
+                        <a asp-action="ResendVerificationEmail" class="btn btn-success">Resend Verification Email</a>
+                        <a asp-action="Login" class="btn btn-outline-secondary">Return to Sign In</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

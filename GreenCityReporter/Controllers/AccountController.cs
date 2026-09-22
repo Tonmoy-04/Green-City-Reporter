@@ -1,8 +1,13 @@
+using System.Text;
 using GreenCityReporter.Models;
+using GreenCityReporter.Services.Email;
 using GreenCityReporter.Services.Storage;
 using GreenCityReporter.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
 
 namespace GreenCityReporter.Controllers
 {
@@ -12,17 +17,29 @@ namespace GreenCityReporter.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly GreenCityReporter.Data.ApplicationDbContext _context;
         private readonly IFileStorageService _fileStorage;
+        private readonly IAccountEmailSender _emailSender;
+        private readonly EmailOptions _emailOptions;
+        private readonly IWebHostEnvironment _environment;
+        private readonly ILogger<AccountController> _logger;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             GreenCityReporter.Data.ApplicationDbContext context,
-            IFileStorageService fileStorage)
+            IFileStorageService fileStorage,
+            IAccountEmailSender emailSender,
+            IOptions<EmailOptions> emailOptions,
+            IWebHostEnvironment environment,
+            ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
             _fileStorage = fileStorage;
+            _emailSender = emailSender;
+            _emailOptions = emailOptions.Value;
+            _environment = environment;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -33,7 +50,8 @@ namespace GreenCityReporter.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        [EnableRateLimiting("account-email")]
+        public async Task<IActionResult> Register(RegisterViewModel model, CancellationToken cancellationToken)
         {
             if (ModelState.IsValid)
             {
@@ -48,10 +66,24 @@ namespace GreenCityReporter.Controllers
                 if (result.Succeeded)
                 {
                     // By default, a sign-up makes the user a Citizen
-                    await _userManager.AddToRoleAsync(user, "Citizen");
+                    var roleResult = await _userManager.AddToRoleAsync(user, "Citizen");
+                    if (!roleResult.Succeeded)
+                    {
+                        _logger.LogError("Could not assign the Citizen role to newly registered user {UserId}.", user.Id);
+                    }
 
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Dashboard", "Report");
+                    try
+                    {
+                        await SendVerificationEmailAsync(user, cancellationToken);
+                        TempData["VerificationNotice"] = "We sent a verification email to the address you registered. Open it to activate your account.";
+                    }
+                    catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+                    {
+                        _logger.LogError(ex, "Verification email delivery failed for user {UserId}.", user.Id);
+                        TempData["VerificationError"] = "Your account was created, but we could not send the verification email. Please use Resend Verification Email or try again later.";
+                    }
+
+                    return RedirectToAction(nameof(RegistrationPending));
                 }
 
                 foreach (var error in result.Errors)
@@ -60,6 +92,88 @@ namespace GreenCityReporter.Controllers
                 }
             }
 
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult RegistrationPending()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string? userId, string? code)
+        {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
+            {
+                return View(model: false);
+            }
+
+            return await ConfirmEmailCoreAsync(userId, code);
+        }
+
+        private async Task<IActionResult> ConfirmEmailCoreAsync(string userId, string code)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return View("ConfirmEmail", false);
+            }
+
+            string token;
+            try
+            {
+                token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+            }
+            catch (FormatException)
+            {
+                return View("ConfirmEmail", false);
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (!result.Succeeded)
+            {
+                _logger.LogWarning("Email confirmation failed for user {UserId}.", user.Id);
+            }
+
+            return View("ConfirmEmail", result.Succeeded);
+        }
+
+        [HttpGet]
+        public IActionResult ResendVerificationEmail()
+        {
+            return View(new ResendVerificationEmailViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [EnableRateLimiting("account-email")]
+        public async Task<IActionResult> ResendVerificationEmail(
+            ResendVerificationEmailViewModel model,
+            CancellationToken cancellationToken)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user != null && !await _userManager.IsEmailConfirmedAsync(user))
+            {
+                try
+                {
+                    await SendVerificationEmailAsync(user, cancellationToken);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+                {
+                    _logger.LogError(ex, "Resent verification email delivery failed for user {UserId}.", user.Id);
+                    ModelState.AddModelError(string.Empty, "We could not send the verification email right now. Please try again later.");
+                    return View(model);
+                }
+            }
+
+            // Use the same response for unknown and already-confirmed addresses to avoid account enumeration.
+            ViewData["Submitted"] = true;
             return View(model);
         }
 
@@ -100,6 +214,12 @@ public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl =
 
             // Citizen -> requested page / Home
             return RedirectToLocal(returnUrl);
+        }
+
+        if (result.IsNotAllowed)
+        {
+            ModelState.AddModelError(string.Empty, "You must verify your email address before signing in.");
+            return View(model);
         }
 
         ModelState.AddModelError(
@@ -287,6 +407,45 @@ public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl =
             {
                 return RedirectToAction("Dashboard", "Report");
             }
+        }
+
+        private async Task SendVerificationEmailAsync(ApplicationUser user, CancellationToken cancellationToken)
+        {
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+            var relativeUrl = Url.Action(
+                nameof(ConfirmEmail),
+                "Account",
+                new { userId = user.Id, code = encodedToken })
+                ?? throw new InvalidOperationException("Could not create the email confirmation URL.");
+
+            string verificationUrl;
+            if (!string.IsNullOrWhiteSpace(_emailOptions.PublicBaseUrl))
+            {
+                var publicBaseUri = new Uri(_emailOptions.PublicBaseUrl.TrimEnd('/') + "/", UriKind.Absolute);
+                verificationUrl = new Uri(publicBaseUri, relativeUrl.TrimStart('/')).ToString();
+            }
+            else
+            {
+                if (_environment.IsProduction())
+                {
+                    throw new InvalidOperationException("A public HTTPS base URL is required in Production.");
+                }
+
+                verificationUrl = Url.Action(
+                    nameof(ConfirmEmail),
+                    "Account",
+                    new { userId = user.Id, code = encodedToken },
+                    Request.Scheme,
+                    Request.Host.ToUriComponent())
+                    ?? throw new InvalidOperationException("Could not create an absolute email confirmation URL.");
+            }
+
+            await _emailSender.SendVerificationEmailAsync(
+                user.Email ?? throw new InvalidOperationException("The registered user has no email address."),
+                user.FullName,
+                verificationUrl,
+                cancellationToken);
         }
     }
 }
