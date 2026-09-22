@@ -108,6 +108,90 @@ namespace GreenCityReporter.Services.Storage
             }
         }
 
+        public async Task<string?> SaveProfilePictureAsync(string userId, IFormFile file, CancellationToken cancellationToken = default)
+        {
+            if (!IsValidProfilePicture(file) ||
+                !IsSafeUserId(userId) ||
+                string.IsNullOrWhiteSpace(_options.Url) ||
+                string.IsNullOrWhiteSpace(_options.ServiceRoleKey) ||
+                string.IsNullOrWhiteSpace(_options.ProfileBucket))
+            {
+                _logger.LogWarning("Supabase profile picture upload rejected because the image, user ID, or storage configuration is invalid.");
+                return null;
+            }
+
+            var objectPath = $"users/{userId}{GetProfileExtension(file)}";
+            using var request = new HttpRequestMessage(HttpMethod.Post, BuildObjectUri(_options.ProfileBucket, objectPath));
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ServiceRoleKey);
+            request.Headers.Add("apikey", _options.ServiceRoleKey);
+            request.Headers.Add("x-upsert", "true");
+            request.Content = new StreamContent(file.OpenReadStream());
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+
+            try
+            {
+                using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                    _logger.LogWarning(
+                        "Supabase profile picture upload failed. Status={StatusCode}, Error={ResponseBody}, Bucket={Bucket}, ObjectPath={ObjectPath}",
+                        response.StatusCode,
+                        SanitizeResponseBody(responseBody),
+                        _options.ProfileBucket,
+                        objectPath);
+                    return null;
+                }
+
+                return BuildPublicUrl(_options.ProfileBucket, objectPath);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Supabase profile picture upload failed.");
+                return null;
+            }
+        }
+
+        public async Task DeleteProfilePictureAsync(string? storedPath, CancellationToken cancellationToken = default)
+        {
+            if (!TryGetObjectPath(storedPath, _options.ProfileBucket, "users/", out var objectPath) ||
+                string.IsNullOrWhiteSpace(_options.ServiceRoleKey) ||
+                string.IsNullOrWhiteSpace(_options.ProfileBucket))
+            {
+                return;
+            }
+
+            using var request = new HttpRequestMessage(HttpMethod.Delete, BuildObjectUri(_options.ProfileBucket, objectPath));
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ServiceRoleKey);
+            request.Headers.Add("apikey", _options.ServiceRoleKey);
+
+            try
+            {
+                using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+                if (!response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NotFound)
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                    _logger.LogWarning(
+                        "Supabase profile picture deletion failed. Status={StatusCode}, Error={ResponseBody}, Bucket={Bucket}, ObjectPath={ObjectPath}",
+                        response.StatusCode,
+                        SanitizeResponseBody(responseBody),
+                        _options.ProfileBucket,
+                        objectPath);
+                }
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Supabase profile picture deletion failed.");
+            }
+        }
+
         public bool IsValidReportImagePath(string? storedPath)
         {
             return TryGetObjectPath(storedPath, out _);
@@ -115,12 +199,22 @@ namespace GreenCityReporter.Services.Storage
 
         private Uri BuildObjectUri(string objectPath)
         {
-            return BuildStoragePath($"object/{EscapePathSegment(_options.Bucket)}/{EscapeObjectPath(objectPath)}");
+            return BuildObjectUri(_options.Bucket, objectPath);
         }
 
         private string BuildPublicUrl(string objectPath)
         {
-            return BuildStoragePath($"object/public/{EscapePathSegment(_options.Bucket)}/{EscapeObjectPath(objectPath)}").ToString();
+            return BuildPublicUrl(_options.Bucket, objectPath);
+        }
+
+        private Uri BuildObjectUri(string bucket, string objectPath)
+        {
+            return BuildStoragePath($"object/{EscapePathSegment(bucket)}/{EscapeObjectPath(objectPath)}");
+        }
+
+        private string BuildPublicUrl(string bucket, string objectPath)
+        {
+            return BuildStoragePath($"object/public/{EscapePathSegment(bucket)}/{EscapeObjectPath(objectPath)}").ToString();
         }
 
         private Uri BuildStoragePath(string path)
@@ -168,6 +262,12 @@ namespace GreenCityReporter.Services.Storage
 
         private bool TryGetObjectPath(string? storedPath, out string objectPath)
         {
+            return TryGetObjectPath(storedPath, _options.Bucket, "reports/", out objectPath) &&
+                   Guid.TryParse(Path.GetFileNameWithoutExtension(objectPath), out _);
+        }
+
+        private bool TryGetObjectPath(string? storedPath, string bucket, string pathPrefix, out string objectPath)
+        {
             objectPath = string.Empty;
             if (string.IsNullOrWhiteSpace(storedPath) || !Uri.TryCreate(storedPath, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
             {
@@ -181,7 +281,7 @@ namespace GreenCityReporter.Services.Storage
                 return false;
             }
 
-            var publicPrefix = $"/storage/v1/object/public/{_options.Bucket}/";
+            var publicPrefix = $"/storage/v1/object/public/{bucket}/";
             if (!uri.AbsolutePath.StartsWith(publicPrefix, StringComparison.Ordinal))
             {
                 return false;
@@ -190,10 +290,37 @@ namespace GreenCityReporter.Services.Storage
             objectPath = uri.AbsolutePath[publicPrefix.Length..];
             var fileName = Path.GetFileName(objectPath);
             var extension = Path.GetExtension(fileName);
-            return objectPath.StartsWith("reports/", StringComparison.Ordinal) &&
+            return objectPath.StartsWith(pathPrefix, StringComparison.Ordinal) &&
                    !objectPath.Contains("..", StringComparison.Ordinal) &&
-                   Guid.TryParse(Path.GetFileNameWithoutExtension(fileName), out _) &&
                    new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" }.Contains(extension, StringComparer.OrdinalIgnoreCase);
+        }
+
+        private static bool IsValidProfilePicture(IFormFile file)
+        {
+            return file.Length > 0 &&
+                   file.Length <= 5 * 1024 * 1024 &&
+                   (string.Equals(file.ContentType, "image/jpeg", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(file.ContentType, "image/png", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(file.ContentType, "image/webp", StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static bool IsSafeUserId(string userId)
+        {
+            return !string.IsNullOrWhiteSpace(userId) &&
+                   string.Equals(Path.GetFileName(userId), userId, StringComparison.Ordinal) &&
+                   !userId.Contains("..", StringComparison.Ordinal) &&
+                   !userId.Contains('/', StringComparison.Ordinal) &&
+                   !userId.Contains('\\', StringComparison.Ordinal);
+        }
+
+        private static string GetProfileExtension(IFormFile file)
+        {
+            return file.ContentType.ToLowerInvariant() switch
+            {
+                "image/png" => ".png",
+                "image/webp" => ".webp",
+                _ => ".jpg"
+            };
         }
     }
 }

@@ -11,5 +11,6 @@ namespace GreenCityReporter.Services.Storage
         public string Url { get; set; } = string.Empty;
         public string ServiceRoleKey { get; set; } = string.Empty;
         public string Bucket { get; set; } = "report-images";
+        public string ProfileBucket { get; set; } = "profile-pictures";
     }
 }

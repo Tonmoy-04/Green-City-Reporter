@@ -41,6 +41,7 @@ Storage__Provider=Supabase
 Storage__Supabase__Url=<supabase-project-url>
 Storage__Supabase__ServiceRoleKey=<supabase-service-role-secret>
 Storage__Supabase__Bucket=report-images
+Storage__Supabase__ProfileBucket=profile-pictures
 AI__Provider=Groq
 AI__Groq__ApiKey=your-render-secret
 AI__Groq__Model=llama-3.1-8b-instant
@@ -60,6 +61,8 @@ AI__Ollama__Model=llama3.2
 Seed accounts are opt-in. Configure `SeedUsers__Admin__Email` and `SeedUsers__Admin__Password` only for a controlled setup, then rotate or remove them after initialization.
 
 Create a Supabase Storage bucket named `report-images` and make it public so report evidence can be rendered directly in the civic UI. Configure the service-role key only in Render's server-side environment variables; never expose it to browser JavaScript or commit it. The application uploads objects under `reports/{yyyy}/{MM}/` and stores the resulting public HTTPS URL in the existing `Report.ImagePath` field.
+
+Also create a public Supabase Storage bucket named `profile-pictures` and configure `Storage__Supabase__ProfileBucket=profile-pictures`. Profile pictures are stored under `users/{user-id}.{extension}` for both Admin and Citizen accounts, using the authenticated Identity user ID.
 
 ## HTTPS and hosting
 
