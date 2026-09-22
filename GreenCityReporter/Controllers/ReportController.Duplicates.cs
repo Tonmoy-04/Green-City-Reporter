@@ -16,10 +16,14 @@ public partial class ReportController
         var cancellationToken = HttpContext.RequestAborted;
         var categories = await _context.Categories.AsNoTracking().OrderBy(c => c.Name).ToListAsync(cancellationToken);
         var aiCategory = categories.FirstOrDefault(c => c.Id == GetTempDataInt(ReviewAICategoryIdKey));
-        var category = aiCategory ?? categories.FirstOrDefault(c => c.Id == model.SelectedCategoryId);
+        var category = categories.FirstOrDefault(c => c.Id == model.SelectedCategoryId) ?? aiCategory;
         model.AICategoryId = aiCategory?.Id;
         model.AICategoryName = aiCategory?.Name;
         model.AISummary = TempData.Peek(ReviewSummaryKey) as string;
+        model.IsCritical = bool.TryParse(TempData.Peek(ReviewCriticalKey)?.ToString(), out var critical) && critical;
+        model.AIConfidence = double.TryParse(TempData.Peek(ReviewConfidenceKey)?.ToString(),
+            System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var confidence)
+            ? confidence : null;
         model.Priority = GetTempDataPriority() ?? Models.Enums.Priority.Low;
         model.RequiresManualCategory = aiCategory == null;
         model.Categories = ToCategorySelectList(categories, model.SelectedCategoryId);

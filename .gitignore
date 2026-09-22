@@ -1,6 +1,7 @@
 # Build output and IDE state
 [Bb]in/
 [Oo]bj/
+publish/
 .vs/
 
 # Local development data and uploaded evidence

@@ -3,6 +3,7 @@ using System;
 using GreenCityReporter.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GreenCityReporter.Migrations.PostgreSQL
 {
     [DbContext(typeof(PostgreSqlApplicationDbContext))]
-    partial class PostgreSqlApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260922165957_AddReportSupportsPostgreSql")]
+    partial class AddReportSupportsPostgreSql
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

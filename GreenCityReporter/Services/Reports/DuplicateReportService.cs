@@ -9,8 +9,7 @@ namespace GreenCityReporter.Services.Reports;
 public sealed class DuplicateReportService(ApplicationDbContext db, IOptions<DuplicateReportOptions> options)
 {
     public double RadiusMeters => options.Value.RadiusMeters;
-    public static bool IsActive(ReportStatus status) => status is ReportStatus.Pending or ReportStatus.InReview
-        or ReportStatus.Assigned or ReportStatus.InProgress;
+    public static bool IsActive(ReportStatus status) => status is ReportStatus.Pending or ReportStatus.Assigned;
 
     public async Task<IReadOnlyList<DuplicateReportMatch>> FindAsync(int categoryId, double latitude,
         double longitude, string userId, CancellationToken cancellationToken = default)
@@ -22,8 +21,7 @@ public sealed class DuplicateReportService(ApplicationDbContext db, IOptions<Dup
         var longitudeDelta = RadiusMeters / (110_000 * Math.Cos(latitude * Math.PI / 180));
         var candidates = await db.Reports.AsNoTracking()
             .Where(r => r.CategoryId == categoryId &&
-                (r.CurrentStatus == ReportStatus.Pending || r.CurrentStatus == ReportStatus.InReview ||
-                 r.CurrentStatus == ReportStatus.Assigned || r.CurrentStatus == ReportStatus.InProgress) &&
+                (r.CurrentStatus == ReportStatus.Pending || r.CurrentStatus == ReportStatus.Assigned) &&
                 r.Latitude >= latitude - latitudeDelta && r.Latitude <= latitude + latitudeDelta &&
                 r.Longitude >= longitude - longitudeDelta && r.Longitude <= longitude + longitudeDelta)
             .Select(r => new

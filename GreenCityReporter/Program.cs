@@ -5,6 +5,7 @@ using GreenCityReporter.Services.Assignment;
 using GreenCityReporter.Services.Background;
 using GreenCityReporter.Services.Chat;
 using GreenCityReporter.Services.Payments;
+using GreenCityReporter.Services.Reports;
 using GreenCityReporter.Services.Storage;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
@@ -17,8 +18,19 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDataProtection();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddOptions<DuplicateReportOptions>().BindConfiguration("DuplicateReports")
+    .Validate(o => double.IsFinite(o.RadiusMeters) && o.RadiusMeters is >= 25 and <= 1000 &&
+        o.MaxResults is >= 1 and <= 20, "Configure a duplicate radius of 25–1000 meters and 1–20 results.")
+    .ValidateOnStart();
+builder.Services.AddScoped<DuplicateReportService>();
+builder.Services.AddScoped<DuplicateReviewTokens>();
+builder.Services.AddScoped<ReportSupportService>();
 builder.Services.AddHealthChecks();
-builder.Services.AddOptions<PaymentOptions>().BindConfiguration("Donations:Gateway").Validate(o => o.DemoMode || !o.Enabled || o.IsReady, "Configure valid payment credentials, organization contact details, and a public HTTPS base URL.").ValidateOnStart();
+builder.Services.AddOptions<PaymentOptions>()
+    .Configure(options => PaymentOptionsSetup.Configure(options, builder.Configuration))
+    .Validate(o => o.DemoMode || !o.Enabled || o.IsReady, "Configure valid SSLCommerz credentials, organization contact details, and a public HTTPS application URL.")
+    .ValidateOnStart();
 builder.Services.AddOptions<DonationEmailOptions>().BindConfiguration("Donations:Email").Validate(o => !o.Enabled || (o.IsReady && (builder.Environment.IsDevelopment() || o.UseStartTls)), "Configure a valid SMTP server and sender. Production email requires STARTTLS.").ValidateOnStart();
 builder.Services.AddHttpClient<IDonationGateway, SslCommerzGateway>(client => client.Timeout = TimeSpan.FromSeconds(25))
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false })
@@ -124,21 +136,22 @@ builder.Services.AddScoped<IAIService>(sp =>
 var databaseProvider = builder.Configuration["Database:Provider"]?.Trim();
 var databaseConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+if (string.Equals(databaseProvider, "PostgreSQL", StringComparison.OrdinalIgnoreCase))
 {
-    if (string.Equals(databaseProvider, "PostgreSQL", StringComparison.OrdinalIgnoreCase))
-    {
+    builder.Services.AddDbContext<PostgreSqlApplicationDbContext>(options =>
         options.UseNpgsql(
             databaseConnectionString,
-            npgsqlOptions => npgsqlOptions.EnableRetryOnFailure());
-    }
-    else
-    {
+            npgsqlOptions => npgsqlOptions.EnableRetryOnFailure()));
+    builder.Services.AddScoped<ApplicationDbContext>(services =>
+        services.GetRequiredService<PostgreSqlApplicationDbContext>());
+}
+else
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(
             databaseConnectionString,
-            sqlOptions => sqlOptions.EnableRetryOnFailure());
-    }
-});
+            sqlOptions => sqlOptions.EnableRetryOnFailure()));
+}
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     options.Password.RequireDigit = true;
@@ -174,6 +187,8 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
+        var database = services.GetRequiredService<ApplicationDbContext>();
+        await database.Database.MigrateAsync();
         await DatabaseSeeder.SeedAsync(services);
     }
     catch (Exception ex)

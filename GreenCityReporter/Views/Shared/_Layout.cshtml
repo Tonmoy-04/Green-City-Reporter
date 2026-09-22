@@ -164,7 +164,7 @@
                         @if (!User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link fw-medium mx-1 @(currentController == "Donation" ? "active" : "")" asp-controller="Donation" asp-action="Index"><i class="fa-solid fa-heart me-1 text-success"></i> Donate</a>
+                                <a class="nav-link fw-medium mx-1 @(currentController == "Donation" ? "active" : "")" asp-controller="Donation" asp-action="Index" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-heart me-1 text-success"></i> Donate</a>
                             </li>
                         }
                     </ul>

@@ -528,7 +528,7 @@ Possible future improvements include:
 * production AI deployment
 * cloud storage for report images
 * persistent chatbot history
-* production payment gateway onboarding, if real donations become a requirement
+* donation analytics and recurring contribution support
 
 ## Project Objective
 
@@ -559,4 +559,4 @@ All team members are from the Department of Computer Science and Engineering (CS
 
 `/Donation` provides a clearly labeled simulated checkout for Card, bKash, Nagad, and Rocket in Development. It supports success, failure, and cancellation outcomes without collecting real financial information. Guest and signed-in donors receive a demo receipt, while `/Donation/Manage` is protected for administrators.
 
-The codebase also contains an isolated SSLCommerz adapter for optional future sandbox testing. It is disabled by default and is not required for evaluation. See [payment integration](docs/payment-integration.md) and [donation payment checks](docs/donation-payments.md) for the exact boundaries.
+The codebase uses SSLCommerz Hosted Checkout for deployed donations and keeps a clearly labelled local demo for Development. Real payments are confirmed only after server-side validation; IPN covers successful payments when a donor does not return to the site. See [payment integration](docs/payment-integration.md) and [donation payment checks](docs/donation-payments.md) for Render variables, callbacks and testing.

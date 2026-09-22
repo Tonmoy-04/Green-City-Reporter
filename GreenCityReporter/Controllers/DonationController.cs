@@ -88,19 +88,23 @@ public class DonationController(ApplicationDbContext context, IDonationGateway g
             if (existing == null) throw;
             return Resume(existing, form);
         }
+        logger.LogInformation("SSLCommerz checkout initialization started for transaction {TransactionId}, amount {Amount} BDT, method {PaymentMethod}.",
+            donation.TransactionId, donation.Amount, donation.PaymentMethod);
         if (donation.Provider == "Demo") return RedirectToAction(nameof(Demo), new { token = donation.ReceiptToken });
         try
         {
-            if (donation.Provider == "Demo") return RedirectToAction(nameof(Demo), new { token = donation.ReceiptToken });
             var checkoutUrl = await gateway.CreateCheckoutAsync(donation, cancellationToken);
             await context.Donations.Where(d => d.Id == donation.Id && d.Status == DonationStatus.Pending)
                 .ExecuteUpdateAsync(update => update.SetProperty(d => d.CheckoutUrl, checkoutUrl), cancellationToken);
+            logger.LogInformation("SSLCommerz checkout initialization succeeded for transaction {TransactionId}.", donation.TransactionId);
             return Redirect(checkoutUrl);
         }
         catch (PaymentGatewayException ex)
         {
             await context.Donations.Where(d => d.Id == donation.Id && d.Status == DonationStatus.Pending)
                 .ExecuteUpdateAsync(update => update.SetProperty(d => d.Status, DonationStatus.Failed), cancellationToken);
+            logger.LogWarning("SSLCommerz checkout initialization was rejected for transaction {TransactionId}: {Reason}",
+                donation.TransactionId, ex.Message);
             TempData["DonationNotice"] = ex.Message;
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or System.Text.Json.JsonException)
@@ -150,17 +154,50 @@ public class DonationController(ApplicationDbContext context, IDonationGateway g
     }
 
     [HttpPost, IgnoreAntiforgeryToken, RequestSizeLimit(16384)]
-    public async Task<IActionResult> Return([FromQuery] string? token, [FromForm(Name = "tran_id")] string transactionId,
-        [FromForm(Name = "val_id")] string? validationId, CancellationToken cancellationToken)
+    public Task<IActionResult> Success([FromQuery] string? token, [FromForm(Name = "tran_id")] string transactionId,
+        [FromForm(Name = "val_id")] string? validationId, CancellationToken cancellationToken) =>
+        HandleReturn("success", token, transactionId, validationId, cancellationToken);
+
+    [HttpPost, IgnoreAntiforgeryToken, RequestSizeLimit(16384)]
+    public Task<IActionResult> Fail([FromQuery] string? token, [FromForm(Name = "tran_id")] string transactionId,
+        [FromForm(Name = "val_id")] string? validationId, CancellationToken cancellationToken) =>
+        HandleReturn("failure", token, transactionId, validationId, cancellationToken);
+
+    [HttpPost, IgnoreAntiforgeryToken, RequestSizeLimit(16384)]
+    public Task<IActionResult> Cancel([FromQuery] string? token, [FromForm(Name = "tran_id")] string transactionId,
+        [FromForm(Name = "val_id")] string? validationId, CancellationToken cancellationToken) =>
+        HandleReturn("cancellation", token, transactionId, validationId, cancellationToken);
+
+    // Keep this route for payment sessions created before the dedicated callback routes were deployed.
+    [HttpPost, IgnoreAntiforgeryToken, RequestSizeLimit(16384)]
+    public Task<IActionResult> Return([FromQuery] string? token, [FromForm(Name = "tran_id")] string transactionId,
+        [FromForm(Name = "val_id")] string? validationId, CancellationToken cancellationToken) =>
+        HandleReturn("legacy return", token, transactionId, validationId, cancellationToken);
+
+    private async Task<IActionResult> HandleReturn(string callbackType, string? token, string transactionId,
+        string? validationId, CancellationToken cancellationToken)
     {
         Response.Headers["Referrer-Policy"] = "no-referrer";
         if (string.IsNullOrEmpty(transactionId) || transactionId.Length > 50) return BadRequest();
+        logger.LogInformation("SSLCommerz {CallbackType} callback received for transaction {TransactionId}.", callbackType, transactionId);
         var donation = await context.Donations.AsNoTracking().SingleOrDefaultAsync(d => d.TransactionId == transactionId && d.Provider == "SSLCommerz", cancellationToken);
         if (donation == null) return NotFound();
-        try { await paymentService.ReconcileAsync(donation, validationId, cancellationToken); }
-        catch (PaymentGatewayException) { TempData["DonationNotice"] = "Payment verification is pending. We have not confirmed this donation."; }
+        try
+        {
+            var reconciled = await paymentService.ReconcileAsync(donation, validationId, cancellationToken);
+            logger.LogInformation("SSLCommerz {CallbackType} validation completed for transaction {TransactionId}; authoritative result available: {Reconciled}.",
+                callbackType, transactionId, reconciled);
+        }
+        catch (PaymentGatewayException)
+        {
+            logger.LogWarning("SSLCommerz {CallbackType} validation failed for transaction {TransactionId}.", callbackType, transactionId);
+            TempData["DonationNotice"] = "Payment verification is pending. We have not confirmed this donation.";
+        }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or System.Text.Json.JsonException)
-        { TempData["DonationNotice"] = "The payment provider is temporarily unavailable. Verification will retry."; }
+        {
+            logger.LogWarning("SSLCommerz {CallbackType} validation could not reach the provider for transaction {TransactionId}.", callbackType, transactionId);
+            TempData["DonationNotice"] = "The payment provider is temporarily unavailable. Verification will retry.";
+        }
         if (token?.Length == 64 && token == donation.ReceiptToken) return RedirectToAction(nameof(Receipt), new { token });
         // Never disclose a donor's receipt token through an unauthenticated forged callback.
         return RedirectToAction(nameof(Index));
@@ -172,10 +209,21 @@ public class DonationController(ApplicationDbContext context, IDonationGateway g
     {
         if (!options.Value.IsReady) return StatusCode(503);
         if (string.IsNullOrEmpty(transactionId) || transactionId.Length > 50 || validationId?.Length > 80) return BadRequest();
+        logger.LogInformation("SSLCommerz IPN received for transaction {TransactionId}.", transactionId);
         var donation = await context.Donations.AsNoTracking().SingleOrDefaultAsync(d => d.TransactionId == transactionId && d.Provider == "SSLCommerz", cancellationToken);
         if (donation == null) return NotFound();
-        try { await paymentService.ReconcileAsync(donation, validationId, cancellationToken); return Ok(); }
-        catch (PaymentGatewayException) { return BadRequest("Transaction verification failed."); }
+        try
+        {
+            var reconciled = await paymentService.ReconcileAsync(donation, validationId, cancellationToken);
+            logger.LogInformation("SSLCommerz IPN validation completed for transaction {TransactionId}; authoritative result available: {Reconciled}.",
+                transactionId, reconciled);
+            return Ok();
+        }
+        catch (PaymentGatewayException)
+        {
+            logger.LogWarning("SSLCommerz IPN validation failed for transaction {TransactionId}.", transactionId);
+            return BadRequest("Transaction verification failed.");
+        }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or System.Text.Json.JsonException)
         { return StatusCode(503); }
     }
