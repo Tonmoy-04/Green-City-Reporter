@@ -223,6 +223,7 @@
                                 <tbody>
                                     @foreach (var report in Model.RecentReports)
                                     {
+                                        var reportUrl = Url.Action("Details", "Report", new { id = report.Id });
                                         string statusStr = report.CurrentStatus.ToString();
                                         string badgeClass = report.CurrentStatus.ToString() switch
                                         {
@@ -233,9 +234,21 @@
                                             _ => "badge bg-secondary"
                                         };
 
-                                        <tr>
+                                        <tr data-row-href="@reportUrl"
+                                            tabindex="0"
+                                            aria-label="View report @report.TrackingNumber">
                                             <td>
-                                                <span class="tracking-chip">@report.TrackingNumber</span>
+                                                <span class="tracking-copy-group">
+                                                    <span class="tracking-chip">@report.TrackingNumber</span>
+                                                    <button type="button"
+                                                            class="gcr-copy-tracking"
+                                                            data-copy-tracking="@report.TrackingNumber"
+                                                            title="Copy tracking number"
+                                                            aria-label="Copy tracking number @report.TrackingNumber">
+                                                        <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                                                        <span class="gcr-copy-label visually-hidden" aria-live="polite">Copy tracking number</span>
+                                                    </button>
+                                                </span>
                                             </td>
                                             <td class="fw-semibold text-dark">@report.Title</td>
                                             <td><span class="badge bg-light text-dark border">@(report.Category?.Name ?? "General")</span></td>

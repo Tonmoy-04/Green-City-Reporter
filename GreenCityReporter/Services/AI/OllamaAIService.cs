@@ -278,7 +278,7 @@ namespace GreenCityReporter.Services.AI
             try
             {
                 var prompt = new StringBuilder();
-                prompt.AppendLine("System: You are the Green City AI Assistant. Answer questions about the Green City Reporter application, reporting civic issues, tracking reports, categories, and statuses. Use only the information provided; do not access any databases.");
+                prompt.AppendLine("System: " + AIClassificationPromptBuilder.ChatSystemPrompt);
                 if (!string.IsNullOrWhiteSpace(context))
                 {
                     prompt.AppendLine();
@@ -318,7 +318,7 @@ namespace GreenCityReporter.Services.AI
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             var prompt = new StringBuilder();
-            prompt.AppendLine("System: You are the Green City AI Assistant. Answer questions about Green City Reporter concisely and practically. Use only the supplied information.");
+            prompt.AppendLine("System: " + AIClassificationPromptBuilder.ChatSystemPrompt);
             if (!string.IsNullOrWhiteSpace(context))
             {
                 prompt.AppendLine();

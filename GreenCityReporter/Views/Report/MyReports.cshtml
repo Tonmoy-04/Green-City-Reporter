@@ -70,9 +70,22 @@
                     <tbody>
                         @foreach (var report in Model.SubmittedReports)
                         {
-                            <tr>
+                            var reportUrl = Url.Action("Details", "Report", new { id = report.Id });
+                            <tr data-row-href="@reportUrl"
+                                tabindex="0"
+                                aria-label="View report @report.TrackingNumber">
                                 <td class="px-4">
-                                    <span class="tracking-chip">@report.TrackingNumber</span>
+                                    <span class="tracking-copy-group">
+                                        <span class="tracking-chip">@report.TrackingNumber</span>
+                                        <button type="button"
+                                                class="gcr-copy-tracking"
+                                                data-copy-tracking="@report.TrackingNumber"
+                                                title="Copy tracking number"
+                                                aria-label="Copy tracking number @report.TrackingNumber">
+                                            <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                                            <span class="gcr-copy-label visually-hidden" aria-live="polite">Copy tracking number</span>
+                                        </button>
+                                    </span>
                                 </td>
 
                                 <td class="fw-semibold text-dark">
@@ -178,7 +191,17 @@
                     <div class="col-12">
                         <div class="card p-3 border shadow-sm">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="tracking-chip">@report.TrackingNumber</span>
+                                <span class="tracking-copy-group">
+                                    <span class="tracking-chip">@report.TrackingNumber</span>
+                                    <button type="button"
+                                            class="gcr-copy-tracking"
+                                            data-copy-tracking="@report.TrackingNumber"
+                                            title="Copy tracking number"
+                                            aria-label="Copy tracking number @report.TrackingNumber">
+                                        <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                                        <span class="gcr-copy-label visually-hidden" aria-live="polite">Copy tracking number</span>
+                                    </button>
+                                </span>
                                 @switch (report.CurrentStatus.ToString())
                                 {
                                     case "Pending":

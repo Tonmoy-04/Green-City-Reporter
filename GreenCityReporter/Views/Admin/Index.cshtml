@@ -191,6 +191,7 @@
                     <tbody>
                         @foreach (var report in reports)
                         {
+                            var reportUrl = Url.Action("Report", "Admin", new { id = report.Id });
                             var supporterCount = (ViewData["SupportCounts"] as IReadOnlyDictionary<int, int>)?.GetValueOrDefault(report.Id) ?? 0;
                             var status = report.CurrentStatus.ToString();
                             string statusStr = status;
@@ -203,9 +204,21 @@
                                 _ => "badge bg-secondary"
                             };
 
-                            <tr>
+                            <tr data-row-href="@reportUrl"
+                                tabindex="0"
+                                aria-label="Manage report @report.TrackingNumber">
                                 <td>
-                                    <span class="tracking-chip">@report.TrackingNumber</span>
+                                    <span class="tracking-copy-group">
+                                        <span class="tracking-chip">@report.TrackingNumber</span>
+                                        <button type="button"
+                                                class="gcr-copy-tracking"
+                                                data-copy-tracking="@report.TrackingNumber"
+                                                title="Copy tracking number"
+                                                aria-label="Copy tracking number @report.TrackingNumber">
+                                            <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                                            <span class="gcr-copy-label visually-hidden" aria-live="polite">Copy tracking number</span>
+                                        </button>
+                                    </span>
                                 </td>
 
                                 <td>
