@@ -1,122 +1,59 @@
 # Green City Reporter
 
-Green City Reporter is an ASP.NET Core MVC web application designed to help citizens report civic and environmental issues directly to local authorities. The system allows citizens to submit reports, track progress, receive notifications, communicate with administrators, and use AI-assisted features such as automatic report categorization, priority detection, report summarization, and an AI chatbot powered through a configurable provider.
+Green City Reporter is an ASP.NET Core MVC application for reporting and managing civic and environmental issues in Dhaka. Citizens can submit location-aware reports with evidence, review AI-assisted classification, follow progress, support nearby reports, receive notifications, and communicate with local authorities. Administrators can triage, assign, monitor, and resolve reports through a role-protected workflow.
 
-## Overview
+## Current Project Status
 
-The application provides a moderated civic reporting workflow for Dhaka. Citizens submit an issue with a map-selected location and optional evidence, review AI-assisted classification, and track updates. Administrators validate reports, assign departments, update statuses, and communicate with citizens.
+The project currently includes:
 
-## Problem Statement
+- ASP.NET Core Identity with citizen and administrator roles.
+- Email-confirmed registration, login, password recovery, and role-based authorization.
+- Dhaka-bounded, map-based report submission with optional image evidence.
+- Two-step report submission with AI-assisted review before final submission.
+- AI category, priority, criticality, summary, and chatbot features.
+- Configurable Ollama and Groq providers with graceful fallback when AI is unavailable.
+- Nearby duplicate-report detection and one-support-per-citizen report following.
+- Department assignment, administrative comments, status and priority management.
+- Automatic overdue monitoring and priority escalation notifications.
+- In-app notifications and protected citizen-specific chatbot access.
+- Development donation simulation and SSLCommerz Hosted Checkout integration.
+- Server-side payment validation, IPN processing, idempotent callbacks, risk review, protected receipts, and optional email delivery.
+- Local or Supabase file storage.
+- SQL Server and PostgreSQL application database support, with SQLite used by isolated checks.
+- Docker support, health checks, rate limiting, automatic migrations, and deployment documentation.
 
-Civic issues are often reported through disconnected channels, making it difficult for residents to track progress and for authorities to prioritize urgent work. Green City Reporter provides one searchable workflow for collecting, classifying, assigning, and resolving those reports.
-
-## Objectives
-
-* Make civic issue reporting simple and location-aware.
-* Reduce manual triage through local AI assistance.
-* Give administrators clear ownership, status, priority, and history controls.
-* Keep citizens informed through in-app status updates and notifications.
-
-## Features
+## Main Features
 
 ### Citizen Features
 
-* User registration and login
-* Submit civic issue reports
-* Upload report images
-* Select/report location
-* Track reports using tracking numbers
-* View submitted reports
-* View report status history
-* Add comments
-* Receive notifications
-* View report priority and status
-* Review AI-generated report information before final submission
-* Check nearby reports before submitting the same issue again
-* Support an existing report and follow its status from My Reports
-* Use an AI chatbot for Green City Reporter-related questions
+- Register, confirm an email address, log in, and recover an account.
+- Submit civic and environmental issue reports with title, description, location, and evidence.
+- Track reports using tracking numbers.
+- View reports, status history, comments, notifications, priority, and current status.
+- Review AI-generated category, priority, criticality, and summary before submission.
+- Manually choose a category when AI cannot determine one.
+- Check nearby open reports before submitting a potentially duplicate issue.
+- Support an existing report and follow its status from My Reports.
+- Use the Green City AI chatbot for general and personal report questions.
+- Make donations through the development demo or configured SSLCommerz checkout.
+- View donation status and confirmed receipts.
 
 ### AI Features
 
-Green City Reporter supports both local and hosted AI providers through configuration. Local development defaults to Ollama, while production deployments can use Groq through the `AI__Provider` and `AI__Groq__ApiKey` environment variables.
+AI is selected with `AI:Provider`:
 
-AI is used for:
+- **Ollama** for local development.
+- **Groq** for hosted deployments.
 
-* Automatic report categorization
-* Initial priority detection
-* Report summary generation
-* Green City AI chatbot
+AI is used for report category detection, initial priority detection, criticality detection, report summaries, and chatbot responses. AI is an enhancement rather than a hard dependency: reports remain creatable when the provider is unavailable, category selection falls back to the review screen, and unavailable summaries do not block submission.
 
-The application remains functional even when the selected AI provider is unavailable. If AI cannot determine a category, the citizen can manually select one during the report review step.
+### Duplicate Report Detection
 
-### Admin Features
+During review, the application checks for open reports in the same category near the selected location. Suggestions are shown nearest first and expose only limited public information such as title, category, approximate distance, status, submission date, and support count.
 
-Administrators can:
+Citizens can support an existing issue or indicate that their report describes a different issue. The server validates the duplicate-review ticket again at final submission. Tickets are signed, citizen-bound, category-bound, location-bound, and expire after 30 minutes.
 
-* View all submitted reports
-* View citizen information
-* Filter reports by category
-* Filter reports by priority
-* Filter reports by status
-* Sort reports by priority and age
-* View AI-generated report summaries
-* Update report status
-* Change report priority
-* Add administrative comments
-* Notify citizens about status updates
-* Receive overdue report notifications
-* Receive automatic priority escalation alerts
-* See supporter counts in the report list and supporter names and timestamps on each report's management page
-
-## Smart Report Submission Flow
-
-The report submission process uses a two-step review workflow.
-
-```text
-Citizen fills report form
-        ↓
-Clicks Review Report
-        ↓
-AI analyzes the report
-        ↓
-Category Detection
-Priority Detection
-Summary Generation
-        ↓
-Review Screen
-        ↓
-Citizen confirms report
-        ↓
-Report saved to database
-```
-
-The initial report form does not require the citizen to manually select a category.
-
-If AI successfully detects a valid category:
-
-```text
-CategorySource = AI
-```
-
-If AI cannot determine the category:
-
-```text
-CategorySource = Manual
-```
-
-A category dropdown is then shown on the review page so the citizen can manually select one.
-
-## Duplicate Report Detection
-
-The review page checks for open reports in the same category within **150 metres** of the selected pin and shows up to **5** suggestions, nearest first. The distance is measured between map coordinates, not street addresses. Pending, In Review, Assigned and In Progress reports are included even when they are old; Resolved and Rejected reports are excluded so recurring problems can be submitted again.
-
-Citizens can select **Same issue · Support this report** to follow an existing issue. Each citizen is counted once per report. Owners can open their own existing report instead of supporting it. Supported issues appear under **My Reports → Reports I Support**, with a separate progress page and status notifications. Citizens can stop supporting an issue at any time. The owner and admin can see its support count.
-
-Suggestions expose only the issue title, category, approximate distance, status, submission date and support count. Supporting a report does not grant access to its owner's private description, exact address, photo, comments, identity or staff remarks. Supporters see a limited summary and status history instead.
-
-If nearby reports describe a different problem, the citizen can check **My report describes a different issue** and submit a separate report. The server checks again at final submission, so a new match appearing during review must also be reviewed. Suggestions are advisory; reports are never automatically merged or rejected solely because they are nearby. The check also works when Ollama is unavailable: choosing a manual category refreshes suggestions, with a full-page fallback when JavaScript is disabled.
-
-Configuration in `GreenCityReporter/appsettings.json`:
+Default configuration in `GreenCityReporter/appsettings.json`:
 
 ```json
 "DuplicateReports": {
@@ -125,43 +62,27 @@ Configuration in `GreenCityReporter/appsettings.json`:
 }
 ```
 
-`RadiusMeters` accepts 25–1000 and `MaxResults` accepts 1–20. Signed review tickets expire after 30 minutes; use **Check nearby reports** to refresh them. Tickets are bound to the citizen, category and reviewed details. A database composite key prevents repeated support, including simultaneous submissions.
+`RadiusMeters` accepts 25–1000 and `MaxResults` accepts 1–20.
 
-Apply the migration before starting an updated deployment:
+### Admin Features
 
-```powershell
-dotnet ef database update --project GreenCityReporter/GreenCityReporter.csproj
-```
+Administrators can view and search reports; filter and sort by category, priority, status, assignment, and age; view citizen information and AI summaries; assign departments; update status and priority; add comments; notify citizens; monitor overdue reports; and review supporter and donation information.
 
-The `AddReportSupports` migration adds the support table and a location/category/status index without deleting existing reports.
+## Report Workflow
 
-Run the existing payment checks and the duplicate-report integration checks (isolated SQLite database, no AI/network calls):
-
-```powershell
-dotnet run --project GreenCityReporter.Checks/GreenCityReporter.Checks.csproj
-```
+1. A citizen enters a title, description, evidence, and map-selected location.
+2. The application validates the location and sends report information to the configured AI provider.
+3. The citizen reviews the suggested category, priority, criticality, and summary.
+4. If necessary, the citizen selects a category manually.
+5. The application checks for nearby open reports in the same category.
+6. The citizen supports an existing report or confirms a new report.
+7. A new report is stored as `Pending`, or assigned immediately when a critical report has a configured department.
+8. An administrator manages it through `Pending`, `Assigned`, `Resolved`, or `Rejected`.
+9. Citizens receive notifications and can view status history and comments.
 
 ## Automatic Priority Escalation
 
-Green City Reporter includes a background monitoring service for unattended reports.
-
-        The system monitors active reports with statuses:
-
-```text
-Pending
-Assigned
-```
-
-Completed reports such as:
-
-```text
-Resolved
-Rejected
-```
-
-are excluded.
-
-Priority escalation is based on report age:
+A hosted background service monitors active `Pending` and `Assigned` reports. Completed `Resolved` and `Rejected` reports are excluded. Priority is never automatically decreased:
 
 ```text
 Less than 24 hours  → Keep current priority
@@ -170,211 +91,138 @@ Less than 24 hours  → Keep current priority
 More than 72 hours  → Critical
 ```
 
-Priority is never automatically decreased.
+Administrators receive notifications when reports become overdue or their priority is escalated. Duplicate overdue notifications are prevented.
 
-When a report becomes overdue or its priority is escalated, administrators receive a notification. Duplicate overdue notifications are prevented.
+## Donations and Payments
 
-## AI Chatbot
+`/Donation` provides a clearly labeled Development simulation for Card, bKash, Nagad, and Rocket. It supports success, failure, and cancellation outcomes without collecting real money.
 
-Green City Reporter includes a floating AI chatbot for authenticated users.
+Deployed environments can use SSLCommerz Hosted Checkout for sandbox or live payments. The application creates pending donations, redirects users to the provider, validates transactions server-side, processes callbacks and IPN notifications idempotently, retries unresolved transactions, supports administrator risk review, and provides protected receipts with optional SMTP delivery. Browser returns alone are never treated as proof of payment.
 
-The chatbot can answer questions such as:
-
-```text
-How do I submit a report?
-How can I track my report?
-What does Pending mean?
-What is the status of my latest report?
-What priority does my latest report have?
-```
-
-For user-specific report questions, the backend only retrieves reports belonging to the currently authenticated citizen. The chatbot never receives unrestricted database access.
+See [`docs/payment-integration.md`](docs/payment-integration.md) and [`docs/donation-payments.md`](docs/donation-payments.md).
 
 ## Technology Stack
 
 ### Backend
 
-* ASP.NET Core MVC
-* .NET 10
-* Entity Framework Core
-* ASP.NET Core Identity
-* SQL Server / LocalDB
+- ASP.NET Core MVC
+- .NET 10
+- Entity Framework Core 10
+- ASP.NET Core Identity
+- SQL Server or PostgreSQL for deployments
+- SQLite for isolated automated checks
 
 ### Frontend
 
-* Razor Views
-* HTML
-* CSS
-* Bootstrap
-* JavaScript
-* Fetch API
-* Leaflet with OpenStreetMap tiles; Google Maps is optional when an API key is configured
+- Razor Views, HTML, CSS, Bootstrap, and JavaScript
+- Fetch API
+- Leaflet with OpenStreetMap tiles
+- Optional Google Maps integration
+- Responsive donation checkout and receipt views
 
-### AI
+### Integrations and Infrastructure
 
-* Ollama for local development
-* Groq Cloud for production
-* Configurable `AI:Provider` selection
+- Ollama and Groq
+- SSLCommerz Hosted Checkout
+- Local or Supabase file storage
+- SMTP email delivery
+- Docker
+- Health checks at `/health`
+- Fixed-window rate limiting for sensitive endpoints
 
 ## Project Structure
 
 ```text
 GreenCityReporter/
-│
 ├── Controllers/
-│   ├── AccountController.cs
-│   ├── AdminController.cs
-│   ├── ChatController.cs
-│   ├── HomeController.cs
-│   ├── NotificationController.cs
-│   └── ReportController.cs
-│
 ├── Data/
-│   ├── ApplicationDbContext.cs
-│   └── DatabaseSeeder.cs
-│
 ├── Migrations/
-│
 ├── Models/
-│   ├── ApplicationUser.cs
-│   ├── Category.cs
-│   ├── Comment.cs
-│   ├── Notification.cs
-│   ├── Report.cs
-│   ├── StatusHistory.cs
-│   └── Enums/
-│
 ├── Services/
 │   ├── AI/
-│   │   ├── AIOptions.cs
-│   │   ├── IAIService.cs
-│   │   └── OllamaAIService.cs
-│   │
+│   ├── Assignment/
 │   ├── Background/
-│   │   ├── ReportMonitoringOptions.cs
-│   │   └── ReportMonitoringService.cs
-│   │
-        │   ├── Assignment/
-        │   ├── Payments/
-        │   └── Chat/
-│       ├── GreenCityChatService.cs
-│       └── IChatService.cs
-│
+│   ├── Chat/
+│   ├── Email/
+│   ├── Payments/
+│   ├── Reports/
+│   └── Storage/
 ├── ViewModels/
-│   └── ReportSubmissionViewModels.cs
-│
 ├── Views/
-│   ├── Admin/
-│   ├── Report/
-│   │   ├── Create.cshtml
-│   │   ├── Details.cshtml
-│   │   └── Review.cshtml
-│   │
-│   └── Shared/
-│       ├── _Chatbot.cshtml
-│       └── _Layout.cshtml
-│
 ├── wwwroot/
-│   ├── css/
-│   ├── js/
-│   └── uploads/
-│
 ├── Program.cs
 ├── appsettings.json
 └── GreenCityReporter.csproj
+
+GreenCityReporter.Checks/
+└── Isolated payment and duplicate-report integration checks
+
+docs/
+├── ai-integration.md
+├── architecture.md
+├── database.md
+├── deployment.md
+├── donation-payments.md
+└── payment-integration.md
 ```
 
-## Database Tables
+## Database and Storage
 
-The application uses tables such as:
+Core data includes:
 
 ```text
 AspNetUsers
 AspNetRoles
 AspNetUserRoles
 Categories
+Departments
 Reports
+ReportSupports
 Comments
 Notifications
 StatusHistories
+Donations
 ```
 
-The `Reports` table also contains AI-related fields such as:
+The `Reports` data includes location, tracking, assignment, priority, status, AI summary, and category-source information. `ReportSupports` ensures that each citizen is counted once per supported report.
 
-```text
-AISummary
-CategorySource
-Priority
-```
+Configure storage with `Storage:Provider`:
 
-## User Roles
-
-* **Citizen**: submits reports, selects a Dhaka location, follows status history, comments, receives notifications, and can use the donation checkout.
-* **Admin**: reviews all reports, overrides categories, assigns departments, changes status and priority, comments, and manages donation reviews.
-
-## Report Workflow
-
-1. A citizen submits a title, description, evidence, and location from the interactive map.
-2. Ollama attempts category, priority, criticality, and summary analysis. AI category selection remains editable.
-3. The report is stored as `Pending`, or assigned immediately when a critical report has a configured department.
-4. An administrator reviews the report and moves it through `Pending`, `Assigned`, `Resolved`, or `Rejected`.
-5. The citizen follows the report and its notifications from the dashboard.
+- `Local` stores files in the application storage area.
+- `Supabase` stores files through the configured Supabase storage service.
 
 ## Requirements
 
-Before running the project, install:
+- .NET 10 SDK
+- SQL Server LocalDB or SQL Server, unless another database provider is configured
+- Ollama for local AI, unless Groq is configured
+- Entity Framework Core CLI for manual migration operations
 
-* .NET 10 SDK
-* SQL Server LocalDB or SQL Server
-* Ollama
+## Local Setup
+
+From the repository root:
+
+```powershell
+dotnet restore
+dotnet ef database update --project GreenCityReporter/GreenCityReporter.csproj
+dotnet run --project GreenCityReporter/GreenCityReporter.csproj
+```
+
+The application also applies pending migrations during startup before seeding reference data.
 
 ## Ollama Setup
 
-The project currently uses:
-
-```text
-llama3.2
-```
-
-Install Ollama on Windows using:
+The default local provider uses the `llama3.2` model:
 
 ```powershell
 winget install Ollama.Ollama
-```
-
-If the `ollama` command is not available in the terminal after installation, use:
-
-```powershell
-& "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe"
-```
-
-Pull the model:
-
-```powershell
 & "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe" pull llama3.2
-```
-
-Verify the model:
-
-```powershell
 & "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe" list
 ```
 
-Ollama normally runs on:
+Ollama normally runs at `http://localhost:11434`.
 
-```text
-http://localhost:11434
-```
-
-If needed, start it manually:
-
-```powershell
-& "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe" serve
-```
-
-If you receive an error saying the socket address is already in use, Ollama is probably already running.
-
-Test Ollama directly:
+Example test:
 
 ```powershell
 Invoke-RestMethod `
@@ -384,18 +232,9 @@ Invoke-RestMethod `
   -Body '{"model":"llama3.2","prompt":"Reply only with AI_WORKING","stream":false}'
 ```
 
-Expected result:
-
-```text
-response : AI_WORKING
-done     : True
-```
-
 ## Configuration
 
-AI configuration is stored in `appsettings.json`.
-
-Example:
+Example AI configuration:
 
 ```json
 "AI": {
@@ -404,144 +243,73 @@ Example:
   "Ollama": {
     "BaseUrl": "http://localhost:11434",
     "Model": "llama3.2"
+  },
+  "Groq": {
+    "BaseUrl": "https://api.groq.com/openai/v1",
+    "Model": "openai/gpt-oss-20b"
   }
 }
 ```
 
-Sensitive values should be supplied with .NET User Secrets or environment variables. Optional seed accounts use `SeedUsers:Admin:*` and `SeedUsers:Citizen:*`; no user is created unless both an email and password are configured. For example:
+Use .NET User Secrets or environment variables for API keys, database passwords, SMTP credentials, SSLCommerz credentials, and Supabase service keys. Optional seed accounts use `SeedUsers:Admin:*` and `SeedUsers:Citizen:*`.
+
+Example:
 
 ```powershell
 dotnet user-secrets set "SeedUsers:Admin:Email" "admin@example.test" --project GreenCityReporter/GreenCityReporter.csproj
 dotnet user-secrets set "SeedUsers:Admin:Password" "Use-a-development-only-password" --project GreenCityReporter/GreenCityReporter.csproj
 ```
 
-The development configuration enables the local simulated payment flow. It does not collect real money or require payment credentials.
+See [`docs/deployment.md`](docs/deployment.md) for production configuration.
 
-Background monitoring configuration:
-
-```json
-"ReportMonitoring": {
-  "Enabled": true,
-  "CheckIntervalMinutes": 60,
-  "OverdueHours": 24
-}
-```
-
-## Database Setup
-
-From the repository root:
-
-```powershell
-dotnet ef database update --project GreenCityReporter/GreenCityReporter.csproj
-```
-
-This applies all existing Entity Framework Core migrations.
-
-## Run the Application
-
-From the repository root:
-
-```powershell
-dotnet run --project GreenCityReporter/GreenCityReporter.csproj
-```
-
-Or from inside the project folder:
-
-```powershell
-dotnet run
-```
-
-The terminal will show the local application URL, for example:
-
-```text
-http://localhost:5024
-```
-
-Open that URL in your browser.
-
-## Build the Project
+## Build and Checks
 
 ```powershell
 dotnet build GreenCityReporter/GreenCityReporter.csproj
+dotnet run --project GreenCityReporter.Checks/GreenCityReporter.Checks.csproj
 ```
 
-A successful build should end with:
+The checks use an isolated SQLite database and fake payment responses. They do not require AI, network access, or real payment credentials.
 
-```text
-Build succeeded.
-```
+## Docker
 
-## AI Failure Handling
+The repository includes a `Dockerfile` for containerized deployment. Supply database, AI, email, storage, and payment settings through environment variables or the hosting platform's secret store.
 
-AI is treated as an enhancement rather than a hard dependency.
+## Security and Reliability
 
-If Ollama is unavailable:
-
-* users can still log in
-* reports can still be created
-* citizens can manually select a category during review
-* priority falls back to `Low`
-* AI summary may remain unavailable
-* the rest of the system continues to work
-
-## Security
-
-The project uses ASP.NET Core Identity and role-based authorization.
-
-Security protections include:
-
-* authenticated report submission
-* admin-only administrative routes
-* citizen ownership checks
-* chatbot only accesses the authenticated user's own reports
-* anti-forgery validation
-* server-side category validation
-* AI output validation
-* Razor HTML encoding
-* JavaScript `textContent` for chatbot messages
-* no unrestricted AI database access
-
-## Git Ignore
-
-Recommended ignored files:
-
-```gitignore
-/.vs/
-[Bb]in/
-[Oo]bj/
-wwwroot/uploads/reports/
-```
-
-Generated build files, Visual Studio workspace data, and uploaded test files should not be committed.
-
-## Future Improvements
-
-Possible future improvements include:
-
-* email or SMS notifications
-* map-based issue heatmaps
-* duplicate report detection
-* image-based issue recognition
-* multilingual chatbot support
-* AI confidence scoring
-* analytics dashboard
-* production AI deployment
-* cloud storage for report images
-* persistent chatbot history
-* donation analytics and recurring contribution support
-
-## Project Objective
-
-The goal of Green City Reporter is to improve communication between citizens and local authorities by providing a simple digital reporting platform enhanced with automation and AI.
-
-The system reduces manual categorization work, highlights urgent reports, alerts administrators about unattended issues, and helps citizens interact with the reporting system more easily.
+- ASP.NET Core Identity and role-based authorization.
+- Citizen ownership checks for reports and chatbot data.
+- Anti-forgery validation on state-changing forms.
+- Server-side category, location, payment, and AI-output validation.
+- Signed and expiring duplicate-review tickets.
+- Protected payment receipt tokens with no-cache behavior.
+- Rate limiting for donation checkout and account-email operations.
+- Razor HTML encoding and safe client-side text rendering.
+- Retry-enabled SQL Server and PostgreSQL connections.
+- Health monitoring through `/health`.
+- Graceful AI failure handling.
 
 ## Known Limitations
 
-* Report coordinates are restricted to a Dhaka bounding box.
-* AI requires a locally running Ollama instance for classification, priority detection, summaries, and chat; fallback behavior keeps report submission available.
-* Notifications are in-app. SMTP receipts are optional and apply to confirmed non-demo gateway payments.
-* The default development donation flow is simulated and is not a financial transaction.
+- Report coordinates are restricted to a Dhaka bounding box.
+- AI features require a reachable Ollama or Groq provider; fallback behavior keeps report submission available.
+- Notifications are primarily in-app. SMTP delivery is optional.
+- Real SSLCommerz payments require merchant credentials, a public HTTPS URL, and callback/IPN configuration.
+- The Development donation flow is simulated and is not a financial transaction.
+- Local file storage is not intended to replace durable production storage.
+
+## Documentation
+
+- [`docs/architecture.md`](docs/architecture.md)
+- [`docs/database.md`](docs/database.md)
+- [`docs/ai-integration.md`](docs/ai-integration.md)
+- [`docs/deployment.md`](docs/deployment.md)
+- [`docs/payment-integration.md`](docs/payment-integration.md)
+- [`docs/donation-payments.md`](docs/donation-payments.md)
+
+## Project Objective
+
+The goal of Green City Reporter is to improve communication between citizens and local authorities through a simple, secure, and trackable reporting platform enhanced by automation and AI. The current implementation combines civic reporting, duplicate detection, departmental assignment, escalation monitoring, protected payments, and deployment support.
 
 ## License
 
@@ -554,9 +322,3 @@ This project was developed for academic and educational purposes.
 - Md Jonayed Bagdadi — ID: 20230104061
 
 All team members are from the Department of Computer Science and Engineering (CSE), Ahsanullah University of Science and Technology (AUST).
-
-## Donations
-
-`/Donation` provides a clearly labeled simulated checkout for Card, bKash, Nagad, and Rocket in Development. It supports success, failure, and cancellation outcomes without collecting real financial information. Guest and signed-in donors receive a demo receipt, while `/Donation/Manage` is protected for administrators.
-
-The codebase uses SSLCommerz Hosted Checkout for deployed donations and keeps a clearly labelled local demo for Development. Real payments are confirmed only after server-side validation; IPN covers successful payments when a donor does not return to the site. See [payment integration](docs/payment-integration.md) and [donation payment checks](docs/donation-payments.md) for Render variables, callbacks and testing.
